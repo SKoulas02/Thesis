@@ -6,6 +6,26 @@ __pycache__/
 # C extensions
 *.so
 
+# Vivado Temporary Files
+*.log
+*.jou
+*.str
+*.os
+.Xil/
+*.pb
+*.jou
+
+# Vivado Project Folders
+
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+
+# Backup files
+*~
+
 # Distribution / packaging
 .Python
 build/
