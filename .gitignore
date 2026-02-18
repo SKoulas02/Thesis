@@ -26,6 +26,14 @@ __pycache__/
 # Backup files
 *~
 
+# IP Generated Files
+*.vho
+*.veo
+*_stub.v
+*_stub.vhdl
+*_sim_netlist.v
+*_sim_netlist.vhdl
+
 # Distribution / packaging
 .Python
 build/
