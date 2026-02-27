@@ -44,16 +44,6 @@ architecture c_cell_arch of c_cell is
         );
     end component Accum_Mul_bf16;
 
-    component r_edge_detector is
-        port(
-            input   : in std_logic;
-            clk     : in std_logic;
-            resetn  : in std_logic;
-
-            output  : out std_logic
-        );
-    end component r_edge_detector;
-
     signal Breg     : std_logic_vector (15 downto 0);
     signal Cin      : std_logic_vector (15 downto 0) := x"0000";
     signal Cacc     : std_logic_vector (15 downto 0);
@@ -82,21 +72,24 @@ begin
             m_axis_result_tvalid    => cvalidout
         );
     
-    EDGE1 : r_edge_detector
-        port map(
-            clk     => clk,
-            resetn  => resetn,
-            input   => cvalidout,
-            output  => cvalidint
-        );
 
-    EDGE2 : r_edge_detector
-        port map(
-            clk     => clk,
-            resetn  => resetn,
-            input   => start,
-            output  => startint
-        );
+    process(cvalidout)
+    begin
+        if rising_edge(cvalidout) then
+            cvalidint <= '1';
+        else
+            cvalidint <= '0';
+        end if;
+    end process;
+
+    process(start)
+    begin
+        if rising_edge(start) then
+            startint <= '1';
+        else
+            startint <= '0';
+        end if;
+    end process;
 
     cvalid <= cvalidint OR startint;
 

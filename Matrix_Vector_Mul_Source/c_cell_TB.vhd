@@ -94,12 +94,12 @@ begin
         avalid  <= '1';
         bvalid  <= '1';
         
-        -- wait for (TIME_DELAY);
-        -- Bin     <= x"4000";
-        -- wait for (TIME_DELAY);
-        -- Bin     <= x"4040";
-        -- wait for (TIME_DELAY);
-        -- Bin     <= x"4080";
+        wait for (TIME_DELAY);
+        Bin     <= x"4000";
+        wait for (TIME_DELAY);
+        Bin     <= x"4040";
+        wait for (TIME_DELAY);
+        Bin     <= x"4080";
         wait;
 
     end process;
