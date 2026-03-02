@@ -2,12 +2,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity reg_rarray_TB is
-end entity reg_rarray_TB;
+entity matrix_shift_TB is
+end entity matrix_shift_TB;
 
-architecture reg_TB of reg_rarray_TB is
+architecture shift_arch_TB of matrix_shift_TB is
 
-    component reg_rarray is
+    component matrix_shift is
         generic(
             DATAW   : integer := 16;
             BUSW    : integer := 512;
@@ -32,7 +32,7 @@ architecture reg_TB of reg_rarray_TB is
 
 begin
 
-    DUT: reg_rarray
+    DUT: matrix_shift
         generic map (
             DATAW => 16,
             BUSW  => 512,
@@ -92,4 +92,4 @@ begin
         
     end process;
 
-end architecture reg_TB;
+end architecture shift_arch_TB;

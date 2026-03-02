@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity reg_rarray is
+entity matrix_shift is
     generic(
         DATAW   : integer := 16;
         BUSW    : integer := 512;
@@ -15,9 +15,9 @@ entity reg_rarray is
         DATA_IN : in std_logic_vector (BUSW-1 downto 0);
         DATA_OUT: out std_logic_vector ((N*DATAW)-1 downto 0)
     );
-end entity reg_rarray;
+end entity matrix_shift;
 
-architecture reg_rarray_arch of reg_rarray is
+architecture matrix_shift_arch of matrix_shift is
     -- Depth = 16
     component shift_ram is
         port(
@@ -91,4 +91,4 @@ begin
 
     end generate GEN_OUT;
     
-end architecture reg_rarray_arch;
+end architecture matrix_shift_arch;
