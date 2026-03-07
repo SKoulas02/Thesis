@@ -26,6 +26,10 @@ __pycache__/
 # Backup files
 *~
 
+# Additional Vivado junk
+*.gen/
+work/
+
 # IP Generated Files
 *.vho
 *.veo
