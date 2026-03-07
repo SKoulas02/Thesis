@@ -75,7 +75,7 @@ begin
     end process;
 
 
-    FIFO_GEN: for i in 0 to DIM-1 generate
+    FIFO_GEN_INSTANCE: for i in 0 to DIM-1 generate
         
         FIFO: fifo_gen
         port map(
@@ -88,6 +88,6 @@ begin
             empty   => empty_i(i),
             valid   => valid_out(i)
         );
-    end generate FIFO_GEN;
+    end generate FIFO_GEN_INSTANCE;
 
 end architecture bus_arch;

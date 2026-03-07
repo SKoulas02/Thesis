@@ -28,9 +28,9 @@ architecture bus2fifoTB_arch of bus2fifo_TB is
 
     end component bus2fifo;
 
-    constant C_EL_NUM   : integer := 32;
+    constant C_EL_NUM   : integer := 4;
     constant C_EL_WIDTH : integer := 16;
-    constant C_DIM      : integer := 64;
+    constant C_DIM      : integer := 8;
 
     signal clk       : std_logic := '0';
     signal resetn    : std_logic := '0';
