@@ -2,113 +2,120 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity c_cell is
-    port (
+    generic(
+        EL_WIDTH    : integer := 16
+    );
+    port(
         clk     : in std_logic;
-        avalid  : in std_logic;
-        bvalid  : in std_logic;
         resetn  : in std_logic;
-        start   : in std_logic;
-
-        Ain     : in std_logic_vector (15 downto 0);
-        Bin     : in std_logic_vector (15 downto 0);
-
-        Bout    : out std_logic_vector (15 downto 0);
-        Ci      : out std_logic_vector (15 downto 0);
-
-
-        tempCin         : out std_logic_vector (15 downto 0);
-        tempCvalid      : out std_logic;
-        tempCacc        : out std_logic_vector (15 downto 0);
-        tempCvalidint   : out std_logic
         
+        Ain     : in std_logic_vector (EL_WIDTH-1 downto 0);
+        avalid  : in std_logic;
+        tlast   : in std_logic;
+
+        Bin     : in std_logic_vector (EL_WIDTH-1 downto 0);
+        bvalid  : in std_logic;
+        
+        Aout        : out std_logic_vector (EL_WIDTH-1 downto 0);
+        avalidout   : out std_logic;
+
+        Bout        : out std_logic_vector (EL_WIDTH-1 downto 0);
+        bvalidout   : out std_logic;
+        
+        Ci      : out std_logic_vector (EL_WIDTH-1 downto 0);
+        Cvalid  : out std_logic;
+        Ctlast  : out std_logic
     );
 end entity c_cell;
 
 architecture c_cell_arch of c_cell is
 
-    component Accum_Mul_bf16 is
+    component Accumulator is
         port(
-            s_axis_a_tdata      : in std_logic_vector (15 downto 0);
-            s_axis_a_tvalid     : in std_logic;
-            s_axis_b_tdata      : in std_logic_vector (15 downto 0);
-            s_axis_b_tvalid     : in std_logic;
-            s_axis_c_tdata      : in std_logic_vector (15 downto 0);
-            s_axis_c_tvalid     : in std_logic;
+            aclk                    : in std_logic;
+            aresetn                 : in std_logic;
 
-            aclk                : in std_logic;
-            aclken              : in std_logic;
-            aresetn             : in std_logic;
+            s_axis_a_tvalid         : in std_logic;
+            s_axis_a_tdata          : in std_logic_vector (EL_WIDTH-1 downto 0);
+            s_axis_a_tlast          : in std_logic;
 
-            m_axis_result_tdata : out std_logic_vector (15 downto 0);
-            m_axis_result_tvalid: out std_logic
+            m_axis_result_tvalid    : out std_logic;
+            m_axis_result_tdata     : out std_logic_vector (EL_WIDTH-1 downto 0);
+            m_axis_result_tlast     : out std_logic
         );
-    end component Accum_Mul_bf16;
+    end component Accumulator;
 
-    signal Breg     : std_logic_vector (15 downto 0);
-    signal Cin      : std_logic_vector (15 downto 0) := x"0000";
-    signal Cacc     : std_logic_vector (15 downto 0);
-    signal cvalidint: std_logic;
-    signal cvalidout: std_logic;
-    signal cvalid   : std_logic;
-    signal clken    : std_logic := '1';
-    signal startint : std_logic;
+    component Multiplier is
+        port(
+            aclk                    : in std_logic;
+            aresetn                 : in std_logic;
 
+            s_axis_a_tvalid         : in std_logic;
+            s_axis_a_tdata          : in std_logic_vector (EL_WIDTH-1 downto 0);
+            s_axis_a_tlast          : in std_logic;
+
+            s_axis_b_tvalid         : in std_logic;
+            s_axis_b_tdata          : in std_logic_vector (EL_WIDTH-1 downto 0);
+
+            m_axis_result_tvalid    : out std_logic;
+            m_axis_result_tdata     : out std_logic_vector (EL_WIDTH-1 downto 0);
+            m_axis_result_tlast     : out std_logic
+        );
+    end component Multiplier;
+   
+
+    signal valid_mul    : std_logic;
+    signal data_mul     : std_logic_vector (EL_WIDTH-1 downto 0);
+    signal tlast_mul    : std_logic;
+
+    signal C_internal   : std_logic_vector (EL_WIDTH-1 downto 0);
+    signal C_tlast_int  : std_logic;
 begin
 
-    MUL_ACCUM : Accum_Mul_bf16
-        port map(
-            s_axis_a_tdata          => Ain,
-            s_axis_a_tvalid         => avalid,
-            s_axis_b_tdata          => Bin,
-            s_axis_b_tvalid         => bvalid,
-            s_axis_c_tdata          => Cin,
-            s_axis_c_tvalid         => cvalid,
-
-            aclk                    => clk,
-            aclken                  => clken,
-            aresetn                 => resetn,
-
-            m_axis_result_tdata     => Cacc,
-            m_axis_result_tvalid    => cvalidout
-        );
-    
-
-    process(cvalidout)
+    MAIN_PROC : process (clk)
     begin
-        if rising_edge(cvalidout) then
-            cvalidint <= '1';
-        else
-            cvalidint <= '0';
-        end if;
-    end process;
-
-    process(start)
-    begin
-        if rising_edge(start) then
-            startint <= '1';
-        else
-            startint <= '0';
-        end if;
-    end process;
-
-    cvalid <= cvalidint OR startint;
-
-    process(cvalidout)
-    begin
-        if rising_edge(cvalidout) then
-            if resetn = '1' then
-                Cin <= Cacc;
+        if rising_edge(clk) then
+            if resetn = '0' then
+                Ctlast <= '0';
+                Ci     <= (others => '0');
+            else
+                if C_tlast_int = '1' then
+                    Ci <= C_internal;
+                    Ctlast <= '1';
+                end if;
             end if;
         end if;
     end process;
 
-    Ci <= Cin;
-    Bout <= Bin;
+    MULTI_INSTANCE : Multiplier
+    port map(
+        aclk                    => clk,
+        aresetn                 => resetn,
 
--- Temp
-    tempCin         <= Cin;
-    tempCvalid      <= cvalid;
-    tempCacc        <= Cacc;
-    tempCvalidint   <= cvalidout;
+        s_axis_a_tvalid         => avalid,
+        s_axis_a_tdata          => Ain,
+        s_axis_a_tlast          => tlast,
+
+        s_axis_b_tvalid         => bvalid,
+        s_axis_b_tdata          => Bin,
+
+        m_axis_result_tvalid    => valid_mul,
+        m_axis_result_tdata     => data_mul,
+        m_axis_result_tlast     => tlast_mul
+    );
+
+    ACCUM_INSTANCE : Accumulator
+    port map(
+        aclk                    => clk,
+        aresetn                 => resetn,
+
+        s_axis_a_tvalid         => valid_mul,
+        s_axis_a_tdata          => data_mul,
+        s_axis_a_tlast          => tlast_mul,
+
+        m_axis_result_tvalid    => Cvalid,
+        m_axis_result_tdata     => C_internal,
+        m_axis_result_tlast     => C_tlast_int
+    );
 
 end architecture c_cell_arch;

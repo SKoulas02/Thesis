@@ -16,7 +16,6 @@ architecture add_mul_TB_arch of add_mul_TB is
             s_axis_c_tvalid     : in std_logic;
 
             aclk                : in std_logic;
-            aclken              : in std_logic;
             aresetn             : in std_logic;
 
             m_axis_result_tdata : out std_logic_vector (15 downto 0);
@@ -27,7 +26,6 @@ architecture add_mul_TB_arch of add_mul_TB is
     -- Signals and such 
     signal reset    : std_logic;
     signal clk      : std_logic;
-    signal clken    : std_logic;
     signal avalid   : std_logic;
     signal bvalid   : std_logic;
     signal cvalid   : std_logic;
@@ -52,7 +50,6 @@ begin
             s_axis_c_tvalid         => cvalid,
 
             aclk                    => clk,
-            aclken                  => clken,
             aresetn                 => reset,
 
             m_axis_result_tdata     => Cout,
@@ -72,27 +69,48 @@ begin
     STIMULUS : process
     begin
         reset   <= '0';
-        clken   <= '1';
         avalid  <= '0';
         bvalid  <= '0';
         cvalid  <= '0';
 
-        A       <= x"3F80"; -- Value of 1.0 in bf16
-        B       <= x"3F80";
-        Cin     <= x"4000";
+        A       <= x"0000"; -- Value of 2.0 in bf16
+        B       <= x"0000";
+        Cin     <= x"0000"; -- Value of 1.0 in bf16
 
-        wait for (5*TIME_DELAY);
+        
+        wait for (20*TIME_DELAY);
         
         reset <= '1';
         
-        wait for (2*TIME_DELAY);
+        wait for (20*TIME_DELAY);
 
         avalid <= '1';
         bvalid <= '1';
         cvalid <= '1';
-        wait for (TIME_DELAY);
-        Cin     <= x"4040";
 
+        A       <= x"4000"; -- Value of 2.0 in bf16
+        B       <= x"4000";
+        Cin     <= x"3F80"; -- Value of 1.0 in bf16
+
+        wait for (TIME_DELAY);
+
+        A       <= x"4040"; -- Value of 3.0 in bf16
+        B       <= x"4040";
+
+        wait for (TIME_DELAY);
+
+        A       <= x"4080"; -- Value of 4.0 in bf16
+        B       <= x"4080";
+
+        wait for (TIME_DELAY);
+        -- Cin     <= x"4040";
+        avalid <= '0';
+        bvalid <= '0';
+        cvalid <= '0';
+        
+        -- wait for (5*TIME_DELAY);
+
+        -- Cin     <= x"4000";
         wait;
 
     end process;
