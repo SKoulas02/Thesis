@@ -11,16 +11,17 @@ entity c_cell is
         
         Ain     : in std_logic_vector (EL_WIDTH-1 downto 0);
         avalid  : in std_logic;
-        tlast   : in std_logic;
-
+        
         Bin     : in std_logic_vector (EL_WIDTH-1 downto 0);
         bvalid  : in std_logic;
-        
+        tlast_in: in std_logic;
+
         Aout        : out std_logic_vector (EL_WIDTH-1 downto 0);
         avalidout   : out std_logic;
 
         Bout        : out std_logic_vector (EL_WIDTH-1 downto 0);
         bvalidout   : out std_logic;
+        tlast_out   : out std_logic;
         
         Ci      : out std_logic_vector (EL_WIDTH-1 downto 0);
         Cvalid  : out std_logic;
@@ -69,24 +70,46 @@ architecture c_cell_arch of c_cell is
     signal tlast_mul    : std_logic;
 
     signal C_internal   : std_logic_vector (EL_WIDTH-1 downto 0);
-    signal C_tlast_int  : std_logic;
+    signal C_tlast_int  : std_logic := '0';
+    signal C_valid_int  : std_logic;
+
 begin
 
     MAIN_PROC : process (clk)
     begin
         if rising_edge(clk) then
             if resetn = '0' then
+                
+                Cvalid <= '0';
                 Ctlast <= '0';
                 Ci     <= (others => '0');
+                Aout   <= (others => '0');
+                Bout   <= (others => '0');
+                avalidout   <= '0';
+                bvalidout   <= '0';
+                tlast_out   <= '0';
+                
+
             else
+                
                 if C_tlast_int = '1' then
-                    Ci <= C_internal;
-                    Ctlast <= '1';
+                    Ci  <= C_internal;
+                    Ctlast  <= C_tlast_int;
+                else
+                    Ctlast  <= '0';
                 end if;
+                
+                Cvalid      <= C_valid_int;
+                tlast_out   <= tlast_in;
+                Aout        <= Ain;
+                Bout        <= Bin;
+                avalidout   <= avalid;
+                bvalidout   <= bvalid;
+
             end if;
         end if;
     end process;
-
+    
     MULTI_INSTANCE : Multiplier
     port map(
         aclk                    => clk,
@@ -94,7 +117,7 @@ begin
 
         s_axis_a_tvalid         => avalid,
         s_axis_a_tdata          => Ain,
-        s_axis_a_tlast          => tlast,
+        s_axis_a_tlast          => tlast_in,
 
         s_axis_b_tvalid         => bvalid,
         s_axis_b_tdata          => Bin,
@@ -113,7 +136,7 @@ begin
         s_axis_a_tdata          => data_mul,
         s_axis_a_tlast          => tlast_mul,
 
-        m_axis_result_tvalid    => Cvalid,
+        m_axis_result_tvalid    => C_valid_int,
         m_axis_result_tdata     => C_internal,
         m_axis_result_tlast     => C_tlast_int
     );

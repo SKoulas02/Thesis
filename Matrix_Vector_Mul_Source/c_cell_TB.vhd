@@ -16,17 +16,19 @@ architecture c_cell_TB_arch of c_cell_TB is
         
         Ain     : in std_logic_vector (EL_WIDTH-1 downto 0);
         avalid  : in std_logic;
-        tlast   : in std_logic;
+        
 
         Bin     : in std_logic_vector (EL_WIDTH-1 downto 0);
         bvalid  : in std_logic;
+        tlast_in: in std_logic;
         
         Aout        : out std_logic_vector (EL_WIDTH-1 downto 0);
         avalidout   : out std_logic;
 
         Bout        : out std_logic_vector (EL_WIDTH-1 downto 0);
         bvalidout   : out std_logic;
-        
+        tlast_out   : out std_logic;
+
         Ci      : out std_logic_vector (EL_WIDTH-1 downto 0);
         Cvalid  : out std_logic;
         Ctlast  : out std_logic
@@ -41,7 +43,7 @@ architecture c_cell_TB_arch of c_cell_TB is
 
     signal Ain          : std_logic_vector(EL_WIDTH-1 downto 0) := (others => '0');
     signal avalid       : std_logic := '0';
-    signal tlast        : std_logic := '0';
+    signal tlast_in     : std_logic := '0';
 
     signal Bin          : std_logic_vector(EL_WIDTH-1 downto 0) := (others => '0');
     signal bvalid       : std_logic := '0';
@@ -50,6 +52,7 @@ architecture c_cell_TB_arch of c_cell_TB is
     signal avalidout    : std_logic;
     signal Bout         : std_logic_vector(EL_WIDTH-1 downto 0);
     signal bvalidout    : std_logic;
+    signal tlast_out    : std_logic;
     
     signal Ci           : std_logic_vector(EL_WIDTH-1 downto 0);
     signal Cvalid       : std_logic;
@@ -64,16 +67,17 @@ begin
 
             Ain         => Ain,
             avalid      => avalid,
-            tlast       => tlast,
 
             Bin         => Bin,
             bvalid      => bvalid,
+            tlast_in    => tlast_in,
 
             Aout        => Aout,
             avalidout   => avalidout,
 
             Bout        => Bout,
             bvalidout   => bvalidout,
+            tlast_out   => tlast_out,
 
             Ci          => Ci,
             Cvalid      => Cvalid,
@@ -100,32 +104,67 @@ begin
         Bin <= x"3F80";
         avalid <= '0';
         bvalid <= '1';
-        tlast <= '0';
+        tlast_in <= '0';
 
         wait until rising_edge(clk);
         Ain <= x"4000";
         avalid <= '1';
         bvalid <= '1';
-        tlast <= '0';
+        tlast_in <= '0';
 
         wait until rising_edge(clk);
         Ain <= x"4000";
         Bin <= x"40C0";
         avalid <= '0';
         bvalid <= '0';
-        tlast <= '0';
+        tlast_in <= '0';
 
         wait until rising_edge(clk);
         Ain <= x"4000";
         Bin <= x"4000";
         avalid <= '1';
         bvalid <= '1';
-        tlast <= '1';
+        tlast_in <= '1';
 
         wait until rising_edge(clk);
         avalid <= '0';
         bvalid <= '0';
-        tlast <= '0';
+        tlast_in <= '0';
+
+        wait for clk_period*30;
+
+        wait until rising_edge(clk);
+        Ain <= x"4000";
+        Bin <= x"4000";
+        avalid <= '0';
+        bvalid <= '1';
+        tlast_in <= '0';
+
+        wait until rising_edge(clk);
+        Ain <= x"4000";
+        avalid <= '1';
+        bvalid <= '1';
+        tlast_in <= '0';
+
+        wait until rising_edge(clk);
+        Ain <= x"4000";
+        Bin <= x"40C0";
+        avalid <= '0';
+        bvalid <= '0';
+        tlast_in <= '0';
+
+        wait until rising_edge(clk);
+        Ain <= x"4000";
+        Bin <= x"4000";
+        avalid <= '1';
+        bvalid <= '1';
+        tlast_in <= '1';
+
+        wait until rising_edge(clk);
+        avalid <= '0';
+        bvalid <= '0';
+        tlast_in <= '0';
+
 
         wait;
     end process;

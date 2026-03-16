@@ -29,7 +29,7 @@
         "Maximum_Latency": [ { "value": "true", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "C_Latency": [ { "value": "18", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_Rate": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "Has_ACLKEN": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
+        "Has_ACLKEN": [ { "value": "false", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "Has_ARESETn": [ { "value": "true", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "C_Has_UNDERFLOW": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "C_Has_OVERFLOW": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
