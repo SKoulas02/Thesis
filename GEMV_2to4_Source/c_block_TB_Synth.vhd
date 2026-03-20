@@ -8,25 +8,19 @@ end entity c_block_TB;
 architecture c_block_arch_TB of c_block_TB is
 
     component c_block is
-        generic(
-            EL_SIZE : integer := 16;
-            A_IDX   : integer := 2;
-            B_IDX   : integer := 4;
-            IND_NUM : integer := 3
-        );
         port(
             clk         : in std_logic;
             resetn      : in std_logic;
-            A_in        : in std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0);
+            A_in        : in std_logic_vector (31 downto 0);
             A_valid     : in std_logic;
-            Indeces     : in std_logic_vector (IND_NUM-1 downto 0);
-            B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);
+            Indeces     : in std_logic_vector (2 downto 0);
+            B_in        : in std_logic_vector (63 downto 0);
             B_valid     : in std_logic;
             tlast_in    : in std_logic;
-            Bout        : out std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);
+            Bout        : out std_logic_vector (63 downto 0);
             tlast_out   : out std_logic;
             B_valid_out : out std_logic;
-            Cout        : out std_logic_vector (EL_SIZE-1 downto 0);
+            Cout        : out std_logic_vector (15 downto 0);
             Cvalid      : out std_logic;
             Ctlast      : out std_logic
         );
@@ -61,11 +55,6 @@ architecture c_block_arch_TB of c_block_TB is
 begin
 
     DUT: c_block
-        generic map (
-            EL_SIZE => C_EL_SIZE,
-            A_IDX   => C_A_IDX,
-            B_IDX   => C_B_IDX
-        )
         port map (
             clk         => clk,
             resetn      => resetn,
