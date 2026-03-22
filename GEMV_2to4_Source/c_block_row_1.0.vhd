@@ -8,7 +8,7 @@ entity c_block_row is
         A_IDX       : integer := 2;     -- Number of matrix elements
         B_IDX       : integer := 4;     -- Number of vector elements
         BUS_EL      : integer := 8;     -- Maximum number of elements on bus
-        IND_NUM     : integer := 3      -- Number of Indeces Bits
+        IND_NUM     : integer := 3      -- Number of Indices Bits
     );
     port(
         clk         : in std_logic;
@@ -20,13 +20,13 @@ entity c_block_row is
 
         A_row       : in std_logic_vector ((BUS_EL*EL_SIZE/2)-1 downto 0);
         A_valid     : in std_logic;
-        indeces     : in std_logic_vector ((2*IND_NUM)-1 downto 0);
+        Indices     : in std_logic_vector ((BUS_EL*IND_NUM/B_IDX)-1 downto 0);
         
         B_vector_out: out std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
         B_valid_out : out std_logic;
         tlast_out   : out std_logic;
 
-        Cout        : out std_logic_vector ((2*EL_SIZE)-1 downto 0);
+        Cout        : out std_logic_vector ((BUS_EL*EL_SIZE/B_IDX)-1 downto 0);
         Cvalid      : out std_logic;
         Ctlast      : out std_logic
     );
@@ -40,7 +40,7 @@ architecture c_block_row_arch of c_block_row is
         EL_SIZE : integer := 16;    -- Bit size of each element
         A_IDX   : integer := 2;     -- Number of matrix elements
         B_IDX   : integer := 4;     -- Number of vector elements
-        IND_NUM : integer := 3      -- Number of Indeces Bits
+        IND_NUM : integer := 3      -- Number of Indices Bits
     );
     port(
         clk         : in std_logic;
@@ -48,7 +48,7 @@ architecture c_block_row_arch of c_block_row is
 
         A_in        : in std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0);     -- Matrix Input
         A_valid     : in std_logic;
-        Indeces     : in std_logic_vector (IND_NUM-1 downto 0);
+        Indices     : in std_logic_vector (IND_NUM-1 downto 0);
 
         B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);     -- Vector Input
         B_valid     : in std_logic;
@@ -76,7 +76,7 @@ begin
                 EL_SIZE => EL_SIZE, -- Bit size of each element
                 A_IDX   => A_IDX,   -- Number of matrix elements
                 B_IDX   => B_IDX,   -- Number of vector elements
-                IND_NUM => IND_NUM  -- Number of Indeces Bits
+                IND_NUM => IND_NUM  -- Number of Indices Bits
             )
             port map(
                 clk         => clk,
@@ -84,7 +84,7 @@ begin
 
                 A_in        => A_row (EL_SIZE*A_IDX*(i+1)-1 downto i*EL_SIZE*A_IDX),        -- Matrix Input for Each Block
                 A_valid     => A_valid,
-                Indeces     => indeces (((i+1)*IND_NUM)-1 downto i*IND_NUM),                  -- Indeces for Each Block
+                Indices     => Indices (((i+1)*IND_NUM)-1 downto i*IND_NUM),                  -- Indices for Each Block
 
                 B_in        => B_vector_in (EL_SIZE*B_IDX*(i+1)-1 downto i*EL_SIZE*B_IDX),  -- Vector Input for Each Block
                 B_valid     => B_valid_in,
@@ -108,7 +108,7 @@ begin
                 EL_SIZE => EL_SIZE, -- Bit size of each element
                 A_IDX   => A_IDX,   -- Number of matrix elements
                 B_IDX   => B_IDX,   -- Number of vector elements
-                IND_NUM => IND_NUM  -- Number of Indeces Bits
+                IND_NUM => IND_NUM  -- Number of Indices Bits
             )
             port map(
                 clk         => clk,
@@ -116,7 +116,7 @@ begin
 
                 A_in        => A_row (EL_SIZE*A_IDX*(i+1)-1 downto i*EL_SIZE*A_IDX),     -- Matrix Input for Each Block
                 A_valid     => A_valid,
-                Indeces     => indeces (((i+1)*IND_NUM)-1 downto i*IND_NUM),            -- Indeces for Each Block
+                Indices     => Indices (((i+1)*IND_NUM)-1 downto i*IND_NUM),            -- Indices for Each Block
 
                 B_in        => B_vector_in (EL_SIZE*B_IDX*(i+1)-1 downto i*EL_SIZE*B_IDX),    -- Vector Input for Each Block
                 B_valid     => B_valid_in,

@@ -25,7 +25,7 @@ architecture c_row_arch_TB of c_block_row_TB is
 
             A_row       : in std_logic_vector ((BUS_EL*EL_SIZE/2)-1 downto 0);
             A_valid     : in std_logic;
-            indeces     : in std_logic_vector ((2*IND_NUM)-1 downto 0);
+            Indices     : in std_logic_vector ((2*IND_NUM)-1 downto 0);
             
             B_vector_out: out std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
             B_valid_out : out std_logic;
@@ -55,7 +55,7 @@ architecture c_row_arch_TB of c_block_row_TB is
 
     signal A_row        : std_logic_vector((BUS_EL*EL_SIZE/2)-1 downto 0) := (others => '0');
     signal A_valid      : std_logic := '0';
-    signal indeces      : std_logic_vector((2*IND_NUM)-1 downto 0) := (others => '0');
+    signal Indices      : std_logic_vector((2*IND_NUM)-1 downto 0) := (others => '0');
     
     signal B_vector_out : std_logic_vector((BUS_EL*EL_SIZE)-1 downto 0);
     signal B_valid_out  : std_logic;
@@ -83,7 +83,7 @@ begin
             tlast_in     => tlast_in,
             A_row        => A_row,
             A_valid      => A_valid,
-            indeces      => indeces,
+            Indices      => Indices,
             B_vector_out => B_vector_out,
             B_valid_out  => B_valid_out,
             tlast_out    => tlast_out,
@@ -108,7 +108,7 @@ begin
         resetn <= '1';
         wait for CLK_PERIOD * 10;
 
-        indeces <= "010" & "001"; -- Block 1 uses index 2, Block 0 uses index 1
+        Indices <= "010" & "001"; -- Block 1 uses index 2, Block 0 uses index 1
         
         A_row   <=  x"3F80" & x"3F80" & -- Block 1
                     x"3F80" & x"3F80";  -- Block 0
@@ -121,7 +121,7 @@ begin
 
         wait for CLK_PERIOD;
         
-        indeces <= "101" & "101"; -- Block 1 uses index 2, Block 0 uses index 1
+        Indices <= "101" & "101"; -- Block 1 uses index 2, Block 0 uses index 1
         
         A_row   <=  x"4000" & x"4000" & -- Block 1
                     x"4000" & x"4000";  -- Block 0

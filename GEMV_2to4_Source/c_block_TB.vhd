@@ -19,7 +19,7 @@ architecture c_block_arch_TB of c_block_TB is
             resetn      : in std_logic;
             A_in        : in std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0);
             A_valid     : in std_logic;
-            Indeces     : in std_logic_vector (IND_NUM-1 downto 0);
+            Indices     : in std_logic_vector (IND_NUM-1 downto 0);
             B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);
             B_valid     : in std_logic;
             tlast_in    : in std_logic;
@@ -44,7 +44,7 @@ architecture c_block_arch_TB of c_block_TB is
     
     signal A_in        : std_logic_vector((C_EL_SIZE * C_A_IDX)-1 downto 0) := (others => '0');
     signal A_valid     : std_logic := '0';
-    signal Indeces     : std_logic_vector(C_IND_NUM-1 downto 0) := (others => '0');
+    signal Indices     : std_logic_vector(C_IND_NUM-1 downto 0) := (others => '0');
     
     signal B_in        : std_logic_vector((C_EL_SIZE * C_B_IDX)-1 downto 0) := (others => '0');
     signal B_valid     : std_logic := '0';
@@ -71,7 +71,7 @@ begin
             resetn      => resetn,
             A_in        => A_in,
             A_valid     => A_valid,
-            Indeces     => Indeces,
+            Indices     => Indices,
             B_in        => B_in,
             B_valid     => B_valid,
             tlast_in    => tlast_in,
@@ -107,7 +107,7 @@ begin
         B_in <= x"3F80" & x"4000" & x"4000" & x"3F80";
         
         -- Picked B[2]=2.0 and B[1]=2.0
-        Indeces <= "011";
+        Indices <= "011";
         
         A_valid  <= '1';
         B_valid  <= '1';
@@ -116,7 +116,7 @@ begin
         wait for CLK_PERIOD; 
                 
         -- Picked B[3]=1.0 and B[2]=2.0
-        Indeces  <= "101"; 
+        Indices  <= "101"; 
         A_valid  <= '1';
         B_valid  <= '1';
         tlast_in <= '1';
@@ -135,7 +135,7 @@ begin
         B_in <= x"3F80" & x"4000" & x"4000" & x"3F80";
         
         -- Picked B[2]=2.0 and B[1]=2.0
-        Indeces <= "011";
+        Indices <= "011";
         A_valid  <= '1';
         B_valid  <= '1';
         tlast_in <= '0';
@@ -143,7 +143,7 @@ begin
         wait for CLK_PERIOD;      
 
         -- Picked B[3]=1.0 and B[2]=2.0
-        Indeces  <= "101"; 
+        Indices  <= "101"; 
         A_valid  <= '1';
         B_valid  <= '1';
         tlast_in <= '1';

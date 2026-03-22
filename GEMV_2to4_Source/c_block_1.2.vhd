@@ -7,7 +7,7 @@ entity c_block is
         EL_SIZE : integer := 16;    -- Bit size of each element
         A_IDX   : integer := 2;     -- Number of matrix elements
         B_IDX   : integer := 4;     -- Number of vector elements
-        IND_NUM : integer := 3      -- Number of Indeces Bits
+        IND_NUM : integer := 3      -- Number of Indices Bits
     );
     port(
         clk         : in std_logic;
@@ -15,7 +15,7 @@ entity c_block is
 
         A_in        : in std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0);     -- Matrix Input
         A_valid     : in std_logic;
-        Indeces     : in std_logic_vector (IND_NUM-1 downto 0);
+        Indices     : in std_logic_vector (IND_NUM-1 downto 0);
 
         B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);     -- Vector Input
         B_valid     : in std_logic;
@@ -120,7 +120,7 @@ begin
                 
             else
 
-                case Indeces is
+                case Indices is
                     when "000" => 
 
                         B_internal <= B_in ((EL_SIZE*2)-1 downto EL_SIZE) & B_in (EL_SIZE-1 downto 0);
