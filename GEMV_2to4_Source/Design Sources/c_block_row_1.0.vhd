@@ -20,7 +20,7 @@ entity c_block_row is
 
         A_row       : in std_logic_vector ((BUS_EL*EL_SIZE/2)-1 downto 0);
         A_valid     : in std_logic;
-        Indices     : in std_logic_vector ((BUS_EL*IND_NUM/B_IDX)-1 downto 0);
+        Indices     : in std_logic_vector ((2*IND_NUM)-1 downto 0);
         
         B_vector_out: out std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
         B_valid_out : out std_logic;

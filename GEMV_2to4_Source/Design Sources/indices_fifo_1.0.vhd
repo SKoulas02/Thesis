@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.indices_array_pkg.all;
 
 entity indices_fifo is
     generic(
@@ -14,12 +13,12 @@ entity indices_fifo is
         clk         : in std_logic;
         resetn      : in std_logic;
 
-        indices     : in std_logic_vector ((97)-1 downto 0);    -- All Rows fit in Bus
+        indices     : in std_logic_vector ((96)-1 downto 0);    -- All Rows fit in Bus
         ind_valid   : in std_logic;
 
         rd_en       : in std_logic_vector (A_ROWS-1 downto 0);
 
-        indices_out     : out indices_array(0 to A_ROWS-1);
+        indices_out     : out std_logic_vector ((A_ROWS * IND_NUM * 2) - 1 downto 0);
         ind_valid_out   : out std_logic_vector (A_ROWS-1 downto 0);
         empty           : out std_logic_vector (A_ROWS-1 downto 0)
     );
@@ -42,25 +41,18 @@ architecture indices_fifo_arch of indices_fifo is
         );
     end component fifo_gen_ind;
 
+    type indices_array is array(natural range <>) of std_logic_vector (5 downto 0);
+    signal indices_out_int  : indices_array (0 to A_ROWS-1);
+    
     signal reset    : std_logic;
-    -- signal din      : std_logic_vector (128 downto 0);
-    -- signal dout     : std_logic_vector (128 downto 0);
-    -- signal counter  : integer := 0;
 
 begin
 
     reset   <= NOT resetn;
-    
-    -- ROUND_ROBIN : process(clk)
-    -- begin
-    --     if rising_edge(clk) then
-    --         if resetn = '0' then
-    --             counter <= 0;
-    --         else
-    --             counter <= counter + something
-    --         end if;
-    --     end if;
-    -- end process;
+
+    PACK_OUTPUT : for i in 0 to A_ROWS-1 generate
+        indices_out(((i+1) * IND_NUM * 2) - 1 downto i * IND_NUM * 2) <= indices_out_int(i);
+    end generate;
 
     FIFO_GEN : for i in 0 to A_ROWS-1 generate
 
@@ -72,7 +64,7 @@ begin
             din     => indices(((i+1)*IND_NUM*2)-1 downto i*IND_NUM*2),
             wr_en   => ind_valid,
             rd_en   => rd_en(i),
-            dout    => indices_out(i),
+            dout    => indices_out_int(i),
 
             empty   => empty(i),
             valid   => ind_valid_out(i)

@@ -6,66 +6,67 @@ use work.matrix_array_pkg.all;
 entity matrix_fifo_TB is
 end entity matrix_fifo_TB;
 
-architecture matrix_fifo_arch_TB of matrix_fifo_TB is
+architecture matrix_fifo_synthesis_TB of matrix_fifo_TB is
 
     component matrix_fifo is
-        generic(
-            EL_SIZE     : integer := 16;    -- Bits of each Element
-            BUS_EL      : integer := 8;     -- Max elements on Bus
-            A_IDX       : integer := 2;     -- Number of Matrix Elements (2to4)
-            A_ROWS      : integer := 16     -- Number of Rows of Matrix
-        );
         port(
             clk         : in std_logic;
             resetn      : in std_logic;
 
-            A_in        : in std_logic_vector (BUS_EL*EL_SIZE-1 downto 0); 
+            A_in        : in std_logic_vector (8*16-1 downto 0); 
             A_valid_in  : in std_logic;
 
-            rd_en       : in std_logic_vector (A_ROWS-1 downto 0);
+            rd_en       : in std_logic_vector (16-1 downto 0);
+            
+            
+            --Temp
+            write_en_out    : out std_logic_vector (16-1 downto 0);
+            write_reg_out   : out std_logic_vector (16-1 downto 0);
 
-            A_out           : out matrix_array(0 to A_ROWS-1);
-            A_valid_out     : out std_logic_vector (A_ROWS-1 downto 0);
-            empty           : out std_logic_vector (A_ROWS-1 downto 0)
+
+            A_out           : out std_logic_vector ((16*64)-1 downto 0);
+            A_valid_out     : out std_logic_vector (16-1 downto 0);
+            empty           : out std_logic_vector (16-1 downto 0)
         );
     end component;
 
-    constant C_EL_SIZE  : integer := 16;
-    constant C_BUS_EL   : integer := 8;
-    constant C_A_IDX    : integer := 2;
-    constant C_A_ROWS   : integer := 16;
     constant CLK_PERIOD : time := 10 ns;
 
     signal clk          : std_logic := '0';
     signal resetn       : std_logic := '0';
     
-    signal A_in         : std_logic_vector(C_BUS_EL*C_EL_SIZE-1 downto 0) := (others => '0');
+    signal A_in         : std_logic_vector(8*16-1 downto 0) := (others => '0');
     signal A_valid_in   : std_logic := '0';
-    signal rd_en        : std_logic_vector(C_A_ROWS-1 downto 0) := (others => '0');
+    signal rd_en        : std_logic_vector(16-1 downto 0) := (others => '0');
     
-    signal A_out        : matrix_array(0 to C_A_ROWS-1);
-    signal A_valid_out  : std_logic_vector(C_A_ROWS-1 downto 0);
-    signal empty        : std_logic_vector(C_A_ROWS-1 downto 0);
+    signal A_out_flat   : std_logic_vector((16*64)-1 downto 0);
+    signal A_out        : matrix_array(0 to 16-1);
+    signal A_valid_out  : std_logic_vector(16-1 downto 0);
+    signal empty        : std_logic_vector(16-1 downto 0);
+
+    signal write_en     : std_logic_vector(16-1 downto 0);
+    signal write_reg    : std_logic_vector(16-1 downto 0);
 
 begin
 
     DUT: matrix_fifo
-    generic map(
-        EL_SIZE => C_EL_SIZE,
-        BUS_EL  => C_BUS_EL,
-        A_IDX   => C_A_IDX,
-        A_ROWS  => C_A_ROWS
-    )
     port map(
         clk           => clk,
         resetn        => resetn,
         A_in          => A_in,
         A_valid_in    => A_valid_in,
         rd_en         => rd_en,
-        A_out         => A_out,
+        A_out         => A_out_flat,
         A_valid_out   => A_valid_out,
-        empty         => empty
+        empty         => empty,
+
+        write_en_out  => write_en,
+        write_reg_out => write_reg
     );
+
+    UNPACK_MATRIX : for i in 0 to 16-1 generate
+        A_out(i) <= A_out_flat(((i+1) * 64) - 1 downto i * 64);
+    end generate;
 
     CLK_PROC : process
     begin
@@ -100,7 +101,7 @@ begin
         
         wait for CLK_PERIOD * 5;
         
-        rd_en(7 downto 0) <= x"FF";
+        rd_en <= x"FFFF";
         wait for CLK_PERIOD;
         
         rd_en <= (others => '0');
@@ -108,4 +109,4 @@ begin
         wait;
     end process;
 
-end architecture matrix_fifo_arch_TB;
+end architecture matrix_fifo_synthesis_TB;

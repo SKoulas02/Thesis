@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 entity c_block_TB is
 end entity c_block_TB;
 
-architecture c_block_arch_TB of c_block_TB is
+architecture c_block_synthesis_TB of c_block_TB is
 
     component c_block is
         port(
@@ -145,4 +145,4 @@ begin
         wait;
     end process;
 
-end architecture c_block_arch_TB;
+end architecture c_block_synthesis_TB;

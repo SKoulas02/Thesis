@@ -18,10 +18,10 @@ architecture indices_fifo_arch_TB of indices_fifo_TB is
         port(
             clk             : in std_logic;
             resetn          : in std_logic;
-            indices         : in std_logic_vector ((97)-1 downto 0);
+            indices         : in std_logic_vector ((96)-1 downto 0);
             ind_valid       : in std_logic;
             rd_en           : in std_logic_vector (A_ROWS-1 downto 0);
-            indices_out     : out indices_array(0 to A_ROWS-1);
+            indices_out     : out std_logic_vector ((A_ROWS * IND_NUM * 2) - 1 downto 0);
             ind_valid_out   : out std_logic_vector (A_ROWS-1 downto 0);
             empty           : out std_logic_vector (A_ROWS-1 downto 0)
         );
@@ -29,12 +29,14 @@ architecture indices_fifo_arch_TB of indices_fifo_TB is
 
     constant CLK_PERIOD : time := 10 ns;
     constant C_ROWS     : integer := 16;
+    constant C_IND_NUM  : integer := 3;
 
     signal clk             : std_logic := '0';
     signal resetn          : std_logic := '0';
-    signal indices         : std_logic_vector(96 downto 0) := (others => '0');
+    signal indices         : std_logic_vector(95 downto 0) := (others => '0');
     signal ind_valid       : std_logic := '0';
     signal rd_en           : std_logic_vector(C_ROWS-1 downto 0) := (others => '0');
+    signal indices_out_flat: std_logic_vector((C_ROWS * C_IND_NUM * 2) - 1 downto 0);
     signal indices_out     : indices_array(0 to C_ROWS-1);
     signal ind_valid_out   : std_logic_vector(C_ROWS-1 downto 0);
     signal empty           : std_logic_vector(C_ROWS-1 downto 0);
@@ -48,10 +50,14 @@ begin
         indices         => indices,
         ind_valid       => ind_valid,
         rd_en           => rd_en,
-        indices_out     => indices_out,
+        indices_out     => indices_out_flat,
         ind_valid_out   => ind_valid_out,
         empty           => empty
     );
+
+    UNPACK_OUTPUT : for i in 0 to C_ROWS-1 generate
+        indices_out(i) <= indices_out_flat(((i+1) * C_IND_NUM * 2) - 1 downto i * C_IND_NUM * 2);
+    end generate;
 
     CLK_GEN : process
     begin
@@ -70,7 +76,7 @@ begin
 
         indices(5 downto 0)   <= "101010"; 
         indices(11 downto 6)  <= "110011";
-        indices(96 downto 12) <= (others => '0');
+        indices(95 downto 12) <= (others => '0');
         
         ind_valid <= '1'; 
         wait for CLK_PERIOD;
