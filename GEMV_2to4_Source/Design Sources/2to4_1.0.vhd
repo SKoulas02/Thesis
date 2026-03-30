@@ -28,7 +28,7 @@ entity two2four is
         indices     : in std_logic_vector (96-1 downto 0);          -- All Iteration indices fit in Bus in 1 Cycle
         ind_valid   : in std_logic;
 
-        Cout        : out std_logic_vector (((BUS_EL/B_IDX)*EL_SIZE*A_ROWS)-1 downto 0);
+        Cout        : out std_logic_vector (EL_SIZE-1 downto 0);
         Cvalid      : out std_logic;
         Ctlast      : out std_logic
     );
@@ -55,7 +55,7 @@ architecture two2four_arch of two2four is
 
             A_row       : in std_logic_vector ((BUS_EL*EL_SIZE/2)-1 downto 0);
             A_valid     : in std_logic;
-            Indices     : in std_logic_vector ((96)-1 downto 0);
+            Indices     : in std_logic_vector ((BUS_EL*IND_NUM/B_IDX)-1 downto 0);
             
             B_vector_out: out std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
             B_valid_out : out std_logic;
@@ -137,7 +137,25 @@ architecture two2four_arch of two2four is
             empty           : out std_logic
         );
     end component vector_fifo;
-    
+
+    component adder_tree is
+        generic(
+            EL_SIZE     : integer := 16;    -- Bit size of each element
+            EL_NUM      : integer := 2      -- Input elements 
+        );
+        port(
+            clk         : in std_logic;
+            resetn      : in std_logic;
+
+            in_elements     : in std_logic_vector((EL_SIZE*EL_NUM)-1 downto 0);
+            in_valid        : in std_logic;
+            tlast           : in std_logic;
+
+            out_elements    : out std_logic_vector(EL_SIZE-1 downto 0);
+            out_valid       : out std_logic;
+            tlast_out       : out std_logic
+        );
+    end component adder_tree;
     -- Inteernal Signals Vector FIFO
 
     signal rd_en_vector         : std_logic := '0';
@@ -183,36 +201,73 @@ architecture two2four_arch of two2four is
     type FSM_TYPE is (RESET, START);
     signal state : FSM_TYPE := RESET;
 
+    type FSM_ADDER is (RESET, ADDING);
+    signal adder_state : FSM_ADDER := RESET;
+
+    signal adder_reg : std_logic_vector((EL_SIZE*(BUS_EL/B_IDX))-1 downto 0) := (others => '0');
+    signal adder_reg_valid : std_logic := '0';
+    signal adder_reg_tlast : std_logic := '0';
+
+    signal counter_adder    : integer := 0;
 begin
+
 
     MAIN_PROC : process(clk)
     begin
         if rising_edge(clk) then
             if resetn = '0' then
                 state <= RESET;
+                adder_state <= RESET;
+                
                 rd_en_vector <= '0';
                 rd_en_matrix <= (others => '0');
                 rd_en_indices <= (others => '0');
             else
                 case state is
-                    when RESET =>
-                        if empty_vector_fifo = '0' AND empty_matrix_fifo(0) = '0' AND empty_indices_fifo(0) = '0' then
-                            rd_en_vector <= '1';
-                            rd_en_matrix <= rd_en_matrix(A_ROWS-2 downto 0) & '1';    
-                            rd_en_indices <= rd_en_indices(A_ROWS-2 downto 0) & '1';
-                            state <= START;
-                        else
-                            rd_en_matrix <= rd_en_matrix(A_ROWS-2 downto 0) & '0';    
-                            rd_en_indices <= rd_en_indices(A_ROWS-2 downto 0) & '0';
-                        end if;
-
-                    when START =>
-                        rd_en_vector <= '0';
+                when RESET =>
+                    
+                    if empty_vector_fifo = '0' AND empty_matrix_fifo(0) = '0' AND empty_indices_fifo(0) = '0' then
+                        rd_en_vector <= '1';
+                        rd_en_matrix <= rd_en_matrix(A_ROWS-2 downto 0) & '1';    
+                        rd_en_indices <= rd_en_indices(A_ROWS-2 downto 0) & '1';
+                        state <= START;
+                    else
                         rd_en_matrix <= rd_en_matrix(A_ROWS-2 downto 0) & '0';    
                         rd_en_indices <= rd_en_indices(A_ROWS-2 downto 0) & '0';
-                        state <= RESET;
-                    when others =>
+                    end if;
+
+                when START =>
+                    rd_en_vector <= '0';
+                    rd_en_matrix <= rd_en_matrix(A_ROWS-2 downto 0) & '0';    
+                    rd_en_indices <= rd_en_indices(A_ROWS-2 downto 0) & '0';
+                    state <= RESET;
+                when others =>
                 end case;
+
+                case adder_state is
+                when RESET =>
+
+                    if c_valid_internal(0) = '1' then
+                        adder_reg <= c_internal(0);
+                        adder_reg_valid <= c_valid_internal(0);
+                        adder_reg_tlast <= c_tlast_internal(0);
+                        adder_state <= ADDING;
+                        counter_adder <= 1;
+                    end if;
+                when ADDING =>
+                    if counter_adder = A_ROWS-1 then
+                        adder_reg <= c_internal(A_ROWS-1);
+                        adder_reg_valid <= c_valid_internal(A_ROWS-1);
+                        adder_reg_tlast <= c_tlast_internal(A_ROWS-1);
+                        adder_state <= RESET;
+                    else
+                        counter_adder <= counter_adder + 1;
+                        adder_reg <= c_internal(counter_adder);
+                        adder_reg_valid <= c_valid_internal(counter_adder);
+                        adder_reg_tlast <= c_tlast_internal(counter_adder);
+                    end if;
+                when others =>
+                end case; 
             end if;
         end if;
     end process MAIN_PROC;
@@ -348,4 +403,23 @@ begin
             );
         end generate;
     end generate;
+
+    ADDER_TREE_INSTANCE : adder_tree
+    generic map(
+        EL_SIZE => EL_SIZE,
+        EL_NUM  => BUS_EL/B_IDX
+    )
+    port map(
+        clk         => clk,
+        resetn      => resetn,
+
+        in_elements     => adder_reg,
+        in_valid        => adder_reg_valid,
+        tlast           => adder_reg_tlast,
+
+        out_elements    => Cout,
+        out_valid       => Cvalid,
+        tlast_out       => Ctlast
+    );
+
 end architecture two2four_arch;

@@ -31,7 +31,7 @@ architecture two2four_arch_TB of two2four_TB is
             indices     : in std_logic_vector (96-1 downto 0);
             ind_valid   : in std_logic;
 
-            Cout        : out std_logic_vector (((BUS_EL/B_IDX)*EL_SIZE*A_ROWS)-1 downto 0);
+            Cout        : out std_logic_vector (EL_SIZE-1 downto 0);
             Cvalid      : out std_logic;
             Ctlast      : out std_logic
         );
@@ -52,7 +52,7 @@ architecture two2four_arch_TB of two2four_TB is
     signal indices     : std_logic_vector(95 downto 0) := (others => '0');
     signal ind_valid   : std_logic := '0';
 
-    signal Cout        : std_logic_vector(511 downto 0);
+    signal Cout        : std_logic_vector(15 downto 0);
     signal Cvalid      : std_logic;
     signal Ctlast      : std_logic;
 
@@ -100,8 +100,13 @@ begin
         indices     <= (others => '0');
         ind_valid   <= '1';
 
-        wait for clk_period;
+        -- wait for clk_period;
 
+        -- tlast_in    <= '1';
+
+        wait for clk_period;
+        
+        tlast_in    <= '0';
         B_valid_in  <= '0';
         A_valid     <= '0';
         ind_valid   <= '0';
