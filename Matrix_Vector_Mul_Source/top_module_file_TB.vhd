@@ -14,7 +14,7 @@ architecture top_arch_TB of top_module_TB is
           ROWS     : integer := 1;
           COLS     : integer := 16;
           EL_WIDTH : integer := 16;
-          EL_NUM   : integer := 16  
+          EL_NUM   : integer := 16
        );
        port(
           clk      : in std_logic;

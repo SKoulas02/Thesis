@@ -18,11 +18,6 @@ entity matrix_fifo is
 
         rd_en       : in std_logic_vector (A_ROWS-1 downto 0);
 
-
-        --Temp
-        write_en_out    : out std_logic_vector (A_rows-1 downto 0);
-        write_reg_out   : out std_logic_vector (A_rows-1 downto 0);
-
         A_out           : out std_logic_vector ((A_ROWS*64)-1 downto 0);
         A_valid_out     : out std_logic_vector (A_ROWS-1 downto 0);
         empty           : out std_logic_vector (A_ROWS-1 downto 0)
@@ -55,9 +50,6 @@ architecture matrix_fifo_arch of matrix_fifo is
     signal write_reg    : std_logic_vector (A_rows-1 downto 0) := (others => '0'); 
 
 begin
-
-    write_en_out    <= write_en;
-    write_reg_out   <= write_reg;
 
     reset <= NOT resetn;
     

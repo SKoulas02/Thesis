@@ -36,7 +36,7 @@ end entity c_block;
 
 architecture c_block_arch of c_block is
 
-    component Multiplier is
+    component multiplier_wrapper is
     port(
         aclk                    : in std_logic;
         aresetn                 : in std_logic;
@@ -49,9 +49,9 @@ architecture c_block_arch of c_block is
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
     );
-    end component Multiplier;
+    end component multiplier_wrapper;
 
-    component Adder is
+    component adder_wrapper is
     port(
         aclk                    : in std_logic;
         aresetn                 : in std_logic;
@@ -64,9 +64,9 @@ architecture c_block_arch of c_block is
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
     );
-    end component Adder;
+    end component adder_wrapper;
 
-    component Accumulator is
+    component accumulator_wrapper is
     port(
         aclk                    : in std_logic;
         aresetn                 : in std_logic;
@@ -77,7 +77,7 @@ architecture c_block_arch of c_block is
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
     );
-    end component Accumulator;
+    end component accumulator_wrapper;
 
     signal A_internal : std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0) := (others => '0');
     signal B_internal : std_logic_vector ((EL_SIZE*A_IDX)-1 downto 0) := (others => '0');
@@ -166,7 +166,7 @@ begin
     end process MAIN_PROC;
     
     
-    MULTI_INSTANCE_1 : Multiplier
+    MULTI_INSTANCE_1 : multiplier_wrapper
     port map(
         aclk                    => clk,            
         aresetn                 => resetn,
@@ -180,7 +180,7 @@ begin
         m_axis_result_tlast     => multi_out_1_tlast
     );
 
-    MULTI_INSTANCE_2 : Multiplier
+    MULTI_INSTANCE_2 : multiplier_wrapper
     port map(
         aclk                    => clk,            
         aresetn                 => resetn,
@@ -194,7 +194,7 @@ begin
         m_axis_result_tlast     => open
     );
 
-    ADDER_INSTANCE : Adder
+    ADDER_INSTANCE : adder_wrapper
     port map(
         aclk                    => clk,
         aresetn                 => resetn,
@@ -208,7 +208,7 @@ begin
         m_axis_result_tlast     => adder_out_tlast
     );
 
-    ACCUM_INSTANCE : Accumulator
+    ACCUM_INSTANCE : accumulator_wrapper
     port map(
         aclk                    => clk,
         aresetn                 => resetn,

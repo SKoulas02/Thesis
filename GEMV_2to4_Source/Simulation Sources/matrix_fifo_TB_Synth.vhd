@@ -17,12 +17,6 @@ architecture matrix_fifo_synthesis_TB of matrix_fifo_TB is
             A_valid_in  : in std_logic;
 
             rd_en       : in std_logic_vector (16-1 downto 0);
-            
-            
-            --Temp
-            write_en_out    : out std_logic_vector (16-1 downto 0);
-            write_reg_out   : out std_logic_vector (16-1 downto 0);
-
 
             A_out           : out std_logic_vector ((16*64)-1 downto 0);
             A_valid_out     : out std_logic_vector (16-1 downto 0);
@@ -44,9 +38,6 @@ architecture matrix_fifo_synthesis_TB of matrix_fifo_TB is
     signal A_valid_out  : std_logic_vector(16-1 downto 0);
     signal empty        : std_logic_vector(16-1 downto 0);
 
-    signal write_en     : std_logic_vector(16-1 downto 0);
-    signal write_reg    : std_logic_vector(16-1 downto 0);
-
 begin
 
     DUT: matrix_fifo
@@ -58,10 +49,7 @@ begin
         rd_en         => rd_en,
         A_out         => A_out_flat,
         A_valid_out   => A_valid_out,
-        empty         => empty,
-
-        write_en_out  => write_en,
-        write_reg_out => write_reg
+        empty         => empty
     );
 
     UNPACK_MATRIX : for i in 0 to 16-1 generate

@@ -24,7 +24,7 @@ end entity adder_tree;
 
 architecture adder_tree_arch of adder_tree is
 
-    component Adder is
+    component adder_wrapper is
     port(
         aclk                    : in std_logic;
         aresetn                 : in std_logic;
@@ -37,9 +37,9 @@ architecture adder_tree_arch of adder_tree is
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
     );
-    end component Adder;
+    end component adder_wrapper;
 
-    constant LEVELS : integer := integer(ceil(log2(real(EL_NUM))));    -- Number of Levels in Adder Tree
+    constant LEVELS : integer := integer(ceil(log2(real(EL_NUM))));    -- Number of Levels in adder_wrapper Tree
 
     type tree_data_type is array (0 to LEVELS) of std_logic_vector ((EL_SIZE*EL_NUM)-1 downto 0);
     type tree_valid_type is array (0 to LEVELS) of std_logic_vector (EL_NUM-1 downto 0);
@@ -62,7 +62,7 @@ begin
     GEN_LEVELS : for i in 0 to LEVELS-1 generate
         GEN_ADDERS : for j in 0 to (EL_NUM/(2**(i+1)))-1 generate
             TLAST_ADDER : if j = 0 generate
-                adder_inst : Adder
+                adder_inst : adder_wrapper
                 port map(
                     aclk                    => clk,
                     aresetn                 => resetn,
@@ -81,7 +81,7 @@ begin
             end generate;
 
             OTHER_ADDERS : if j > 0 generate
-                adder_inst : Adder
+                adder_inst : adder_wrapper
                 port map(
                     aclk                    => clk,
                     aresetn                 => resetn,

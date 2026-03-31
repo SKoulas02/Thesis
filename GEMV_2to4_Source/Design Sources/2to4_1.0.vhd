@@ -83,11 +83,6 @@ architecture two2four_arch of two2four is
 
             rd_en       : in std_logic_vector (A_ROWS-1 downto 0);
 
-
-            --Temp
-            write_en_out    : out std_logic_vector (A_rows-1 downto 0);
-            write_reg_out   : out std_logic_vector (A_rows-1 downto 0);
-
             A_out           : out std_logic_vector ((A_ROWS*64)-1 downto 0);
             A_valid_out     : out std_logic_vector (A_ROWS-1 downto 0);
             empty           : out std_logic_vector (A_ROWS-1 downto 0)
@@ -170,11 +165,6 @@ architecture two2four_arch of two2four is
     signal A_matrix_fifo        : std_logic_vector ((A_ROWS*64)-1 downto 0) := (others => '0');
     signal A_valid_fifo         : std_logic_vector (A_ROWS-1 downto 0) := (others => '0');
     signal empty_matrix_fifo    : std_logic_vector (A_ROWS-1 downto 0) := (others => '0');
-
-    -- Temporary Matrix Signals
-
-    signal wr_en_out_matrix     : std_logic_vector (A_ROWS-1 downto 0) := (others => '0');
-    signal wr_reg_out_matrix    : std_logic_vector (A_ROWS-1 downto 0) := (others => '0');
 
     -- Internal Signals Indices FIFO
 
@@ -309,9 +299,6 @@ begin
         A_valid_in  => A_valid,
         
         rd_en       => rd_en_matrix,        -- Control Signal
-
-        write_en_out    => wr_en_out_matrix, 
-        write_reg_out   => wr_reg_out_matrix,
         
         A_out           => A_matrix_fifo,   -- *** INTERNAL SIGNAL INPUT OF C ROWS ***
         A_valid_out     => A_valid_fifo,

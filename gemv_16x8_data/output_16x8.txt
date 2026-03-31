@@ -1,0 +1,434 @@
+--- GEMV 16x8 Compressed (16x16 Dense) bfloat16 Hardware Model Output ---
+
+--- Row 0 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 0 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 1 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 1 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 2 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 2 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 3 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 3 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 4 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 4 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 5 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 5 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 6 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 6 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 7 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 7 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 8 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 8 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 9 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 9 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 10 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 10 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 11 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 11 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 12 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 12 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 13 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 13 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 14 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 14 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
+--- Row 15 ---
+  Chunk 0:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 1:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  Chunk 2:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 3 -> Selected B: [2.0000, 2.0000]
+    Multiplier out      : [4.0000, 4.0000] (bfloat16)
+    Adder/Accum out     : 8.0000 (bfloat16)
+  Chunk 3:
+    A Input             : [2.0000, 2.0000]
+    B Input             : [1.0000, 2.0000, 2.0000, 1.0000]
+    Index               : 5 -> Selected B: [2.0000, 1.0000]
+    Multiplier out      : [4.0000, 2.0000] (bfloat16)
+    Adder/Accum out     : 6.0000 (bfloat16)
+  => Row 15 Final Accumulation: 28.0000 (bfloat16)
+----------------------------------------
