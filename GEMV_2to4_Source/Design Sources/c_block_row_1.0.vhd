@@ -2,6 +2,16 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to calculate the output of a row of 2:4 GEMV operations.
+-- Input is one row of elements of Matrix A and row*2 elements of Vector B.
+-- It is made up of c blocks that are fully pipelined.
+-- The module can be reused for different GEMV operations and has a through-put of 1 cycle.
+-- ----------------------------------------------------------------------------
+
 entity c_block_row is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element
@@ -67,6 +77,9 @@ architecture c_block_row_arch of c_block_row is
 
 begin
 
+    -- Generate c_block instances according to the number of elements that can fit on the bus.
+    -- The First block instance has the tlast and valid signals connected to the output and the other blocks calculate
+    
     C_BLOCK_GEN : for i in 0 to (BUS_EL/B_IDX)-1 generate
         
         C_FIRST : if i = 0 generate

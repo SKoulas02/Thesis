@@ -2,6 +2,16 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to store and retrieve matrix elements for GEMV operations.
+-- Input is a bus of matrix elements for all rows and output is a bus of elements for each row of the matrix.
+-- It is made up of FIFOs parallel to the number of matrix rows.
+-- The module can be reused for different GEMV operations.
+-- ----------------------------------------------------------------------------
+
 entity matrix_fifo is
     generic(
         EL_SIZE     : integer := 16;    -- Bits of each Element
@@ -59,6 +69,8 @@ begin
         A_out(((i+1) * 64) - 1 downto i * 64) <= A_out_internal(i);
     end generate;
 
+    -- Logic to write to FIFOs in Round Robin fashion
+
     ROUND_ROBIN : process(clk)
     begin
         if rising_edge(clk) then
@@ -71,6 +83,8 @@ begin
             end if;
         end if;
     end process;
+
+    -- Generate FIFOs for each row of the matrix and connect even and odd indexed rows to different halves of the input bus
 
     FIFO_GEN : for i in 0 to A_ROWS-1 generate
 

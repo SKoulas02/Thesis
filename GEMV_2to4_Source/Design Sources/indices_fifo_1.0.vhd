@@ -2,6 +2,16 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to store and retrieve indices for GEMV operations.
+-- Input is a bus of indices for all rows of the matrix and output is a bus of indices for each row of the matrix.
+-- It is made up of FIFOs parallel to the number of matrix rows.
+-- The module can be reused for different GEMV operations.
+-- ----------------------------------------------------------------------------
+
 entity indices_fifo is
     generic(
         IND_NUM     : integer := 3;     -- Number of Indeces Bits
@@ -54,6 +64,7 @@ begin
         indices_out(((i+1) * IND_NUM * 2) - 1 downto i * IND_NUM * 2) <= indices_out_int(i);
     end generate;
 
+    -- Generate FIFOs for each row of the matrix
     FIFO_GEN : for i in 0 to A_ROWS-1 generate
 
         FIFO_IND : fifo_gen_ind

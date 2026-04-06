@@ -2,6 +2,17 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to calculate the output of a single 2:4 GEMV operation.
+-- Input is 2 elements of Matrix A and 4 elements of Vector B.
+-- It is made up of 2 multipliers, 1 adder and 1 accumulator that are fully pipelined.
+-- The module can be reused for different GEMV operations and has a through-put of 1 cycle.
+-- ----------------------------------------------------------------------------
+
 entity c_block is
     generic(
         EL_SIZE : integer := 16;    -- Bit size of each element
@@ -104,7 +115,7 @@ begin
     MAIN_PROC : process (clk)
     begin
         if rising_edge(clk) then
-            if resetn = '0' then
+            if resetn = '0' then                    -- Check for reset and initialize all signals
                 A_internal <= (others => '0');
                 B_internal <= (others => '0');
 
@@ -120,7 +131,7 @@ begin
                 
             else
 
-                case Indices is
+                case Indices is                     -- Select the appropriate 2 elements of B based on the Indices input
                     when "000" => 
 
                         B_internal <= B_in ((EL_SIZE*2)-1 downto EL_SIZE) & B_in (EL_SIZE-1 downto 0);
@@ -148,7 +159,8 @@ begin
                     when others =>
                         B_internal <= (others => '0');
                 end case;
-
+                
+                -- Set signals according to the input values and pass them to the multipliers and pass-through registers.
                 A_internal <= A_in;
 
                 A_valid_internal <= A_valid;
@@ -165,7 +177,7 @@ begin
         end if;
     end process MAIN_PROC;
     
-    
+    -- 2 Multipliers => Adder => Accumulator Dataflow
     MULTI_INSTANCE_1 : multiplier_wrapper
     port map(
         aclk                    => clk,            

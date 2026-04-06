@@ -2,6 +2,16 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to calculate the output of a 2:4 GEMV calculation.
+-- Input is elements for Matrix A, Vector B and the Indices needed for the calculations.
+-- It is made up of FIFOs, an array of c_block_row components and an adder tree.
+-- The module can be reused for different GEMV operations and is fully pipelined.
+-- ----------------------------------------------------------------------------
+
 entity two2four is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element

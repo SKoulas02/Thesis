@@ -3,6 +3,16 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.math_real.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to calculate the output of a single output element of a 2:4 GEMV operation.
+-- Input is a bus of partial sums of the output element.
+-- It is made up of an adder tree that is fully pipelined.
+-- The module can be reused for different GEMV operations and has a through-put of 1 cycle.
+-- ----------------------------------------------------------------------------
+
 entity adder_tree is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element
@@ -41,6 +51,7 @@ architecture adder_tree_arch of adder_tree is
 
     constant LEVELS : integer := integer(ceil(log2(real(EL_NUM))));    -- Number of Levels in adder_wrapper Tree
 
+    -- Create the signals for each level of the adder tree.
     type tree_data_type is array (0 to LEVELS) of std_logic_vector ((EL_SIZE*EL_NUM)-1 downto 0);
     type tree_valid_type is array (0 to LEVELS) of std_logic_vector (EL_NUM-1 downto 0);
     
@@ -58,7 +69,9 @@ begin
         tree_data(0)((i+1)*EL_SIZE-1 downto i*EL_SIZE) <= in_elements((i+1)*EL_SIZE-1 downto i*EL_SIZE);
         tree_valid(0)(i) <= in_valid;
     end generate;
-
+    
+    -- Generate the adder tree levels. 
+    -- Each level has half the number of adders to the previous level.
     GEN_LEVELS : for i in 0 to LEVELS-1 generate
         GEN_ADDERS : for j in 0 to (EL_NUM/(2**(i+1)))-1 generate
             TLAST_ADDER : if j = 0 generate

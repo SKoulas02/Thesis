@@ -2,6 +2,16 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to store and retrieve vector elements for GEMV operations.
+-- Input is a bus of vector elements and output is a bus of elements for GEMV operations.
+-- It is made up of one FIFO.
+-- The module can be reused for different GEMV operations.
+-- ----------------------------------------------------------------------------
+
 entity vector_fifo is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element
