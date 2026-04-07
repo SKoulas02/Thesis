@@ -247,24 +247,25 @@ begin
                 case adder_state is
                 when RESET =>
 
-                    if c_valid_internal(0) = '1' then
+                    if c_tlast_internal(0) = '1' then
                         adder_reg <= c_internal(0);
-                        adder_reg_valid <= c_valid_internal(0);
-                        adder_reg_tlast <= c_tlast_internal(0);
+                        adder_reg_valid <= '1';
+                        adder_reg_tlast <= '0';
                         adder_state <= ADDING;
                         counter_adder <= 1;
+                    else
+                        adder_reg <= (others => '0');
+                        adder_reg_valid <= '0';
+                        adder_reg_tlast <= '0';
                     end if;
                 when ADDING =>
                     if counter_adder = A_ROWS-1 then
                         adder_reg <= c_internal(A_ROWS-1);
-                        adder_reg_valid <= c_valid_internal(A_ROWS-1);
-                        adder_reg_tlast <= c_tlast_internal(A_ROWS-1);
+                        adder_reg_tlast <= '1';
                         adder_state <= RESET;
                     else
                         counter_adder <= counter_adder + 1;
                         adder_reg <= c_internal(counter_adder);
-                        adder_reg_valid <= c_valid_internal(counter_adder);
-                        adder_reg_tlast <= c_tlast_internal(counter_adder);
                     end if;
                 when others =>
                 end case; 

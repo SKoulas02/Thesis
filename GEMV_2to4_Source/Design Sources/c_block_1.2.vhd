@@ -127,7 +127,7 @@ begin
                 Bout        <= (others => '0');
                 tlast_out   <= '0';
                 B_valid_out <= '0';
-                B_reg       <= (others => '0');
+                -- B_reg       <= (others => '0');
                 
             else
 
@@ -168,15 +168,15 @@ begin
 
                 tlast_internal   <= tlast_in;
 
-                B_reg       <= B_in;
-                Bout        <= B_reg;
-                tlast_out   <= tlast_internal;
-                B_valid_out <= B_valid_internal;
+                -- B_reg       <= B_in;
+                Bout        <= B_in;
+                tlast_out   <= tlast_in;
+                B_valid_out <= B_valid;
 
             end if;
         end if;
     end process MAIN_PROC;
-    
+
     -- 2 Multipliers => Adder => Accumulator Dataflow
     MULTI_INSTANCE_1 : multiplier_wrapper
     port map(

@@ -55,14 +55,28 @@ architecture vector_fifo_arch of vector_fifo is
     signal din      : std_logic_vector (128 downto 0);
     signal dout     : std_logic_vector (128 downto 0);
 
+    signal tlast_delay : std_logic:= '0';
+
 begin
 
     reset   <= NOT resetn;
     din     <= B_vector_in & tlast_in;
     
     B_vector_out    <= dout(128 downto 1);
-    tlast_out       <= dout(0);
     
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if resetn = '0' then
+                tlast_delay <= '0';
+            else
+                tlast_delay <= dout(0);
+            end if;
+        end if;
+    end process;
+
+    tlast_out   <= dout(0) AND (NOT tlast_delay);
+
     FIFO_VECTOR : fifo_gen_vector
     port map(
         clk     => clk,

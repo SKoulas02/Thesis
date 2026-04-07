@@ -119,7 +119,7 @@ begin
         
         -- Wait for reset to finish
         wait until resetn = '1';
-        wait for clk_period;
+        wait for clk_period * 10;
         
         while not endfile(file_B) loop
             wait until falling_edge(clk);
@@ -154,7 +154,7 @@ begin
         A_valid <= '0';
         
         wait until resetn = '1';
-        wait for clk_period;
+        wait for clk_period * 10;
         
         while not endfile(file_A) loop
             wait until falling_edge(clk);
@@ -181,7 +181,7 @@ begin
         ind_valid <= '0';
         
         wait until resetn = '1';
-        wait for clk_period;
+        wait for clk_period * 10;
         
         while not endfile(file_Indices) loop
             wait until falling_edge(clk);
