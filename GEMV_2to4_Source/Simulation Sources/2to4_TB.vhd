@@ -157,12 +157,19 @@ begin
         wait for clk_period * 10;
         
         while not endfile(file_A) loop
-            wait until falling_edge(clk);
             readline(file_A, v_line_A);
             hread(v_line_A, v_data_A);
-            
+            wait until rising_edge(clk);
             A_in <= v_data_A;
             A_valid <= '1';
+            wait until rising_edge(clk);
+            A_valid <= '0';
+            wait until rising_edge(clk);
+            A_valid <= '0';
+            wait until rising_edge(clk);
+            A_valid <= '0';
+            wait until rising_edge(clk);
+            A_valid <= '0';
         end loop;
         
         wait until falling_edge(clk);

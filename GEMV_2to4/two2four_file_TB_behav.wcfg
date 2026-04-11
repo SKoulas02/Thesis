@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,704.001 ns"></ZoomEndTime>
-      <Cursor1Time time="265.000 ns"></Cursor1Time>
+      <ZoomStartTime time="53.014 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,085.535 ns"></ZoomEndTime>
+      <Cursor1Time time="235.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="275"></NameColumnWidth>
-      <ValueColumnWidth column_width="126"></ValueColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="18" />
+   <WVObjectSize size="20" />
    <wvobject fp_name="/two2four_file_TB/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -110,6 +110,7 @@
    <wvobject fp_name="group767" type="group">
       <obj_property name="label">Matrix FIFO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/two2four_file_TB/DUT/MATRIX_FIFO_INSTACNE/A_in" type="array">
          <obj_property name="ElementShortName">A_in[127:0]</obj_property>
          <obj_property name="ObjectShortName">A_in[127:0]</obj_property>
@@ -127,12 +128,12 @@
          <obj_property name="ObjectShortName">rd_en[15:0]</obj_property>
          <obj_property name="CustomSignalColor">#00FF7F</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group765" type="group">
       <obj_property name="label">Indices FIFO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/two2four_file_TB/DUT/INDICES_FIFO_INSTANCE/indices" type="array">
          <obj_property name="ElementShortName">indices[95:0]</obj_property>
          <obj_property name="ObjectShortName">indices[95:0]</obj_property>
@@ -185,15 +186,51 @@
       <obj_property name="label">C First Row</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/block_flag" type="logic">
+         <obj_property name="ElementShortName">block_flag</obj_property>
+         <obj_property name="ObjectShortName">block_flag</obj_property>
+      </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/B_vector_in" type="array">
          <obj_property name="ElementShortName">B_vector_in[127:0]</obj_property>
          <obj_property name="ObjectShortName">B_vector_in[127:0]</obj_property>
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/B_vector_in" type="array">
+         <obj_property name="ElementShortName">B_vector_in[127:0]</obj_property>
+         <obj_property name="ObjectShortName">B_vector_in[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/B_valid_in" type="logic">
+         <obj_property name="ElementShortName">B_valid_in</obj_property>
+         <obj_property name="ObjectShortName">B_valid_in</obj_property>
+         <obj_property name="CustomSignalColor">#0000FF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/B_valid_in" type="logic">
+         <obj_property name="ElementShortName">B_valid_in</obj_property>
+         <obj_property name="ObjectShortName">B_valid_in</obj_property>
+      </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/tlast_in" type="logic">
          <obj_property name="ElementShortName">tlast_in</obj_property>
          <obj_property name="ObjectShortName">tlast_in</obj_property>
+         <obj_property name="CustomSignalColor">#0000FF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/tlast_in" type="logic">
+         <obj_property name="ElementShortName">tlast_in</obj_property>
+         <obj_property name="ObjectShortName">tlast_in</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/A_valid" type="logic">
+         <obj_property name="ElementShortName">A_valid</obj_property>
+         <obj_property name="ObjectShortName">A_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/A_valid" type="logic">
+         <obj_property name="ElementShortName">A_valid</obj_property>
+         <obj_property name="ObjectShortName">A_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/Indices" type="array">
+         <obj_property name="ElementShortName">Indices[5:0]</obj_property>
+         <obj_property name="ObjectShortName">Indices[5:0]</obj_property>
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
@@ -203,11 +240,9 @@
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
-      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/Indices" type="array">
-         <obj_property name="ElementShortName">Indices[5:0]</obj_property>
-         <obj_property name="ObjectShortName">Indices[5:0]</obj_property>
-         <obj_property name="CustomSignalColor">#0000FF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/A_row" type="array">
+         <obj_property name="ElementShortName">A_row[63:0]</obj_property>
+         <obj_property name="ObjectShortName">A_row[63:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/B_vector_out" type="array">
          <obj_property name="ElementShortName">B_vector_out[127:0]</obj_property>
@@ -215,11 +250,27 @@
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/B_vector_out" type="array">
+         <obj_property name="ElementShortName">B_vector_out[127:0]</obj_property>
+         <obj_property name="ObjectShortName">B_vector_out[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/B_valid_out" type="logic">
+         <obj_property name="ElementShortName">B_valid_out</obj_property>
+         <obj_property name="ObjectShortName">B_valid_out</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/B_valid_out" type="logic">
+         <obj_property name="ElementShortName">B_valid_out</obj_property>
+         <obj_property name="ObjectShortName">B_valid_out</obj_property>
+      </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/tlast_out" type="logic">
          <obj_property name="ElementShortName">tlast_out</obj_property>
          <obj_property name="ObjectShortName">tlast_out</obj_property>
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/tlast_out" type="logic">
+         <obj_property name="ElementShortName">tlast_out</obj_property>
+         <obj_property name="ObjectShortName">tlast_out</obj_property>
       </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/Cout" type="array">
          <obj_property name="ElementShortName">Cout[31:0]</obj_property>
@@ -227,11 +278,19 @@
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/Cout" type="array">
+         <obj_property name="ElementShortName">Cout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Cout[31:0]</obj_property>
+      </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/Cvalid" type="logic">
          <obj_property name="ElementShortName">Cvalid</obj_property>
          <obj_property name="ObjectShortName">Cvalid</obj_property>
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/Cvalid" type="logic">
+         <obj_property name="ElementShortName">Cvalid</obj_property>
+         <obj_property name="ObjectShortName">Cvalid</obj_property>
       </wvobject>
       <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(0)\/c_first_row/C_FIRST_ROW_INSTANCE/Ctlast" type="logic">
          <obj_property name="ElementShortName">Ctlast</obj_property>
@@ -239,11 +298,46 @@
          <obj_property name="CustomSignalColor">#0000FF</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
-      <wvobject fp_name="/two2four_file_TB/DUT/b_vectors_internal" type="array">
-         <obj_property name="ElementShortName">b_vectors_internal[1:16][127:0]</obj_property>
-         <obj_property name="ObjectShortName">b_vectors_internal[1:16][127:0]</obj_property>
-         <obj_property name="CustomSignalColor">#0000FF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/Ctlast" type="logic">
+      <obj_property name="ElementShortName">Ctlast</obj_property>
+      <obj_property name="ObjectShortName">Ctlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="group1993" type="group">
+      <obj_property name="label">C Second Row</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/Cout" type="array">
+         <obj_property name="ElementShortName">Cout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Cout[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/Cvalid" type="logic">
+         <obj_property name="ElementShortName">Cvalid</obj_property>
+         <obj_property name="ObjectShortName">Cvalid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/A_internal" type="array">
+         <obj_property name="ElementShortName">A_internal[31:0]</obj_property>
+         <obj_property name="ObjectShortName">A_internal[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/B_internal" type="array">
+         <obj_property name="ElementShortName">B_internal[31:0]</obj_property>
+         <obj_property name="ObjectShortName">B_internal[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/A_valid_internal" type="logic">
+         <obj_property name="ElementShortName">A_valid_internal</obj_property>
+         <obj_property name="ObjectShortName">A_valid_internal</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/B_valid_internal" type="logic">
+         <obj_property name="ElementShortName">B_valid_internal</obj_property>
+         <obj_property name="ObjectShortName">B_valid_internal</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/adder_out_data" type="array">
+         <obj_property name="ElementShortName">adder_out_data[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adder_out_data[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/two2four_file_TB/DUT/\C_ARRAY_GEN(1)\/c_rest_array/C_ROWS_INSTANCE/\C_BLOCK_GEN(0)\/c_first/C_BLOCK_FIRST/adder_out_tlast" type="logic">
+         <obj_property name="ElementShortName">adder_out_tlast</obj_property>
+         <obj_property name="ObjectShortName">adder_out_tlast</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
