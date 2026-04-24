@@ -30,6 +30,10 @@ __pycache__/
 *.gen/
 work/
 
+# Claude AI
+
+CLAUDE.md
+
 # IP Generated Files
 *.vho
 *.veo
