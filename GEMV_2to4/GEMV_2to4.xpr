@@ -60,7 +60,7 @@
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSABoardId" Val="zcu106"/>
-    <Option Name="WTXSimLaunchSim" Val="159"/>
+    <Option Name="WTXSimLaunchSim" Val="160"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -91,6 +91,12 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/2to4_2.0.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/accumulator_wrapper.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -139,13 +145,19 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/skidbuffer.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/vector_fifo_1.0.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/2to4_2.0.vhd">
+      <File Path="$PPRDIR/../GEMV_2to4_Source/Design Sources/2to4_wrapper.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -153,7 +165,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="two2four"/>
+        <Option Name="TopModule" Val="wrapper_2to4"/>
         <Option Name="dataflowViewerSettings" Val="min_width=16"/>
       </Config>
     </FileSet>
@@ -239,6 +251,13 @@
       <File Path="$PPRDIR/../gemv_16x8_data/A_hex.txt"/>
       <File Path="$PPRDIR/two2four_file_TB_behav.wcfg">
         <FileInfo>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../GEMV_2to4_Source/Simulation Sources/wrapper_2to4_TB.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
