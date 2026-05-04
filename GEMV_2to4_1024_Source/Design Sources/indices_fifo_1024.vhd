@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use IEEE.MATH_REAL.all;
+use IEEE.math_real.all;
 
 -- ----------------------------------------------------------------------------
 -- Engineer: Sozos Koulas @ National Technical University of Athens
@@ -88,7 +88,7 @@ begin
     end process;
 
     -- Generate FIFOs for each row of the matrix
-    FIFO_GEN : for i in 0 to A_ROWS/IND_ROWS-1 generate
+    FIFO_GEN : for i in 0 to (A_ROWS/IND_ROWS)-1 generate
 
         FIFO_REP : for j in 0 to IND_ROWS-1 generate
             
@@ -100,7 +100,7 @@ begin
                 din     => indices(((j+1)*IND_NUM*BUS_EL/B_IDX)-1 downto j*IND_NUM*BUS_EL/B_IDX),
                 wr_en   => write_en(i*IND_ROWS+j),
                 rd_en   => rd_en(i*IND_ROWS+j),
-                dout    => indices_out_int(i),
+                dout    => indices_out_int(i*IND_ROWS+j),
 
                 empty   => empty(i*IND_ROWS+j),
                 valid   => ind_valid_out(i*IND_ROWS+j)
@@ -108,39 +108,5 @@ begin
         end generate;
     end generate;
 
-    -- FIFO_GEN : for i in 0 to A_ROWS-1 generate
-
-    --     EVEN_INSTANCE : if i MOD 2 = 0 generate
-    --         FIFO_EVEN : fifo_gen_matrix
-    --         port map(
-    --             clk     => clk,
-    --             srst    => reset,
-
-    --             din     => A_in((BUS_EL*EL_SIZE/2)-1 downto 0),
-    --             wr_en   => write_en(i),
-    --             rd_en   => rd_en(i),
-    --             dout    => A_out_internal(i),
-
-    --             empty   => empty(i),
-    --             valid   => A_valid_out(i)
-    --         );
-    --     end generate;
-
-    --     ODD_INSTANCE : if i MOD 2 = 1 generate
-    --         FIFO_ODD : fifo_gen_matrix
-    --         port map(
-    --             clk     => clk,
-    --             srst    => reset,
-
-    --             din     => A_in(BUS_EL*EL_SIZE-1 downto BUS_EL*EL_SIZE/2),
-    --             wr_en   => write_en(i),
-    --             rd_en   => rd_en(i),
-    --             dout    => A_out_internal(i),
-
-    --             empty   => empty(i),
-    --             valid   => A_valid_out(i)
-    --         );
-    --     end generate;
-    -- end generate;
 
 end architecture indices_fifo_arch;
