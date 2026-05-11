@@ -1,9 +1,9 @@
 import random
 
 # --- Configuration ---
-ROWS              = 16     # Number of rows to generate (128 matrix rows * 256 cols / 128 elems-per-line)
-ELEMENTS_PER_ROW  = 128    # Number of 3-bit indices per row
-OUTPUT_FILE       = "indices_128x64.txt"
+ROWS              = 128      # Number of rows to generate (128 matrix rows * 256 cols / 128 elems-per-line)
+ELEMENTS_PER_ROW  = 32      # Number of 3-bit indices per row
+OUTPUT_FILE       = "Indices_128x32_SW.txt"
 
 # Valid index set: {000, 001, 010, 011, 100, 101} -> integers 0..5
 VALID_INDICES = [0, 1, 2, 3, 4, 5]

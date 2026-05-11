@@ -19,7 +19,7 @@ architecture wrapper_2to4_arch_TB of wrapper_2to4_1024_TB is
         B_IDX       : integer := 4;     -- Number of vector elements
         IND_NUM     : integer := 3;     -- Number of indices Bits
 
-        A_ROWS      : integer := 1024   -- Number of Rows of Matrix A
+        A_ROWS      : integer := 128    -- Number of Rows of Matrix A
     );
     port(
         clk         : in  std_logic;
@@ -53,11 +53,7 @@ architecture wrapper_2to4_arch_TB of wrapper_2to4_1024_TB is
     constant BUS_SIZE   : integer := 512;  -- Number of bits in Bus
     constant IND_SIZE   : integer := 384;  -- Number of bits in Indices
     constant EL_SIZE    : integer := 16;   -- Bit size of each element
-
-    -- Reduce SIM_A_ROWS (e.g. 32 or 64) for low-RAM elaboration smoke tests.
-    -- Use 1024 only with xsim.elaborate.debug_level = off (Project Settings -> Simulation -> Elaboration).
-    constant SIM_A_ROWS : integer := 1024;
-
+    constant A_ROWS     : integer := 128;  -- Number of Rows of Matrix A
 
     -- Signals
     signal clk         : std_logic := '0';
@@ -82,10 +78,10 @@ architecture wrapper_2to4_arch_TB of wrapper_2to4_1024_TB is
     signal C_tready    : std_logic := '1';
 
     -- File Declarations
-    file file_A       : text open read_mode is "A_1024x512.txt";
-    file file_B       : text open read_mode is "B_1024x1.txt";
-    file file_Indices : text open read_mode is "indices_1024x512.txt";
-    file file_Output  : text open write_mode is "Output_Simulation_1024.txt";
+    file file_A       : text open read_mode is "A_128x64.txt";
+    file file_B       : text open read_mode is "B_128x1.txt";
+    file file_Indices : text open read_mode is "indices_128x32.txt";
+    file file_Output  : text open write_mode is "Output_128_512B.txt";
 
 begin
 
@@ -96,7 +92,7 @@ begin
         A_IDX   => 2,
         B_IDX   => 4,
         IND_NUM => 3,
-        A_ROWS  => SIM_A_ROWS
+        A_ROWS  => A_ROWS
     )
     port map (
         clk         => clk,
@@ -222,7 +218,7 @@ begin
 
         while not endfile(file_Indices) loop
             readline(file_Indices, v_line_I);
-            hread(v_line_I, v_data_I);
+            read(v_line_I, v_data_I);
 
             wait until falling_edge(clk);
             ind_tdata  <= v_data_I;
@@ -250,6 +246,7 @@ begin
 
                 if C_tlast = '1' then
                     report "Simulation complete: C_tlast asserted" severity note;
+                    file_close(file_Output);
                     std.env.finish;
                 end if;
             end if;

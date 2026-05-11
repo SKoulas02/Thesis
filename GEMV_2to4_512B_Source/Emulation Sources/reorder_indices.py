@@ -14,11 +14,11 @@ from pathlib import Path
 
 # ---- Configuration ---------------------------------------------------------
 M           = 128                                  # matrix rows
-N           = 64                                   # matrix cols
+N           = 32                                   # matrix cols
 IND_CHARS   = 3                                     # bits per index element
 CHUNK_SIZE  = 8                                     # elements per chunk (one row at a time)
-INPUT_FILE  = Path(__file__).parent / "indices_128x64.txt"
-OUTPUT_FILE = Path(__file__).parent / f"indices_{M}x{N}_reordered.txt"
+INPUT_FILE  = Path(__file__).parent / "indices_128x32_reversed.txt"
+OUTPUT_FILE = Path(__file__).parent / f"indices_{M}x{N}_reordered2.txt"
 # ---------------------------------------------------------------------------
 
 
