@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="c_block_TB_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="c_block_TB" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="452.120 ns"></ZoomStartTime>
+      <ZoomEndTime time="763.321 ns"></ZoomEndTime>
+      <Cursor1Time time="610.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="402"></NameColumnWidth>
+      <ValueColumnWidth column_width="147"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="31" />
+   <wvobject fp_name="/c_block_TB/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/resetn" type="logic">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/A_in" type="array">
+      <obj_property name="ElementShortName">A_in[63:0]</obj_property>
+      <obj_property name="ObjectShortName">A_in[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Indices" type="array">
+      <obj_property name="ElementShortName">Indices[7:0]</obj_property>
+      <obj_property name="ObjectShortName">Indices[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/B_in" type="array">
+      <obj_property name="ElementShortName">B_in[63:0]</obj_property>
+      <obj_property name="ObjectShortName">B_in[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/valid" type="logic">
+      <obj_property name="ElementShortName">valid</obj_property>
+      <obj_property name="ObjectShortName">valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/block_flag" type="logic">
+      <obj_property name="ElementShortName">block_flag</obj_property>
+      <obj_property name="ObjectShortName">block_flag</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT/block_flag_int" type="logic">
+      <obj_property name="ElementShortName">block_flag_int</obj_property>
+      <obj_property name="ObjectShortName">block_flag_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT/clk_en" type="logic">
+      <obj_property name="ElementShortName">clk_en</obj_property>
+      <obj_property name="ObjectShortName">clk_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/tlast_in" type="logic">
+      <obj_property name="ElementShortName">tlast_in</obj_property>
+      <obj_property name="ObjectShortName">tlast_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cout1" type="array">
+      <obj_property name="ElementShortName">Cout1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">Cout1[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cvalid1" type="logic">
+      <obj_property name="ElementShortName">Cvalid1</obj_property>
+      <obj_property name="ObjectShortName">Cvalid1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Ctlast1" type="logic">
+      <obj_property name="ElementShortName">Ctlast1</obj_property>
+      <obj_property name="ObjectShortName">Ctlast1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cout2" type="array">
+      <obj_property name="ElementShortName">Cout2[15:0]</obj_property>
+      <obj_property name="ObjectShortName">Cout2[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cvalid2" type="logic">
+      <obj_property name="ElementShortName">Cvalid2</obj_property>
+      <obj_property name="ObjectShortName">Cvalid2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Ctlast2" type="logic">
+      <obj_property name="ElementShortName">Ctlast2</obj_property>
+      <obj_property name="ObjectShortName">Ctlast2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cout3" type="array">
+      <obj_property name="ElementShortName">Cout3[15:0]</obj_property>
+      <obj_property name="ObjectShortName">Cout3[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Cvalid3" type="logic">
+      <obj_property name="ElementShortName">Cvalid3</obj_property>
+      <obj_property name="ObjectShortName">Cvalid3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/Ctlast3" type="logic">
+      <obj_property name="ElementShortName">Ctlast3</obj_property>
+      <obj_property name="ObjectShortName">Ctlast3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT/A_internal" type="array">
+      <obj_property name="ElementShortName">A_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">A_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT/B_internal" type="array">
+      <obj_property name="ElementShortName">B_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">B_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/valid1" type="logic">
+      <obj_property name="ElementShortName">valid1</obj_property>
+      <obj_property name="ObjectShortName">valid1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/tlast1" type="logic">
+      <obj_property name="ElementShortName">tlast1</obj_property>
+      <obj_property name="ObjectShortName">tlast1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT2/A_internal" type="array">
+      <obj_property name="ElementShortName">A_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">A_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT2/B_internal" type="array">
+      <obj_property name="ElementShortName">B_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">B_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/valid2" type="logic">
+      <obj_property name="ElementShortName">valid2</obj_property>
+      <obj_property name="ObjectShortName">valid2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/tlast2" type="logic">
+      <obj_property name="ElementShortName">tlast2</obj_property>
+      <obj_property name="ObjectShortName">tlast2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT3/A_internal" type="array">
+      <obj_property name="ElementShortName">A_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">A_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/DUT3/B_internal" type="array">
+      <obj_property name="ElementShortName">B_internal[31:0]</obj_property>
+      <obj_property name="ObjectShortName">B_internal[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/valid3" type="logic">
+      <obj_property name="ElementShortName">valid3</obj_property>
+      <obj_property name="ObjectShortName">valid3</obj_property>
+   </wvobject>
+   <wvobject fp_name="/c_block_TB/tlast3" type="logic">
+      <obj_property name="ElementShortName">tlast3</obj_property>
+      <obj_property name="ObjectShortName">tlast3</obj_property>
+   </wvobject>
+</wave_config>
