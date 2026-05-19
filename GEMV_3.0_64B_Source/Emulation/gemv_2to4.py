@@ -2,51 +2,42 @@
 
 Computes y = A_sparse * x where A_sparse is a logical M x K_LOGICAL matrix
 stored in 2:4 packed form: each group of 4 logical columns keeps only 2 dense
-values, plus a 3-bit index identifying which 2 of the 4 positions are kept.
+values, plus a 4-bit index identifying which 2 of the 4 positions are kept.
 
 Inputs (one element per hex/bit field, no separators):
   A_FILE   : M rows x K_DENSE bfloat16 (4 hex chars each).
              K_DENSE = K_LOGICAL / 2.
-  IND_FILE : M rows x (K_DENSE / 2) 3-bit indices (0..5).
+  IND_FILE : M rows x (K_DENSE / 2) 4-bit indices (0..15).
   B_FILE   : K_LOGICAL bfloat16 elements (4 hex chars), one per line.
 
 Output:
   OUTPUT_FILE : M bfloat16 elements (4 hex chars), one per line.
 
 Per-operation rounding: every multiply and every add is rounded to bfloat16
-(matches the hardware datapath in Design Sources/c_block_2.0.vhd).
+(matches the hardware datapath in Design Sources/c_block_3.0.vhd).
 
-Index encoding (low_position, high_position) within each 4-element B group,
-taken from c_block_2.0.vhd lines 131-154:
-  000 -> (0, 1)   001 -> (0, 2)   010 -> (0, 3)
-  011 -> (1, 2)   100 -> (1, 3)   101 -> (2, 3)
+Index encoding (per c_block_3.0.vhd lines 156-169): each 4-bit index packs
+two 2-bit B positions for one A pair:
+  bits [3:2] (MSB) -> position (0..3) of B paired with the first A element
+  bits [1:0] (LSB) -> position (0..3) of B paired with the second A element
 """
 
 from pathlib import Path
 import torch
 
 # ---- Configuration ---------------------------------------------------------
-A_FILE      = Path(__file__).parent / "A_128x64_SW.txt"
-IND_FILE    = Path(__file__).parent / "Indices_128x32_SW.txt"
-B_FILE      = Path(__file__).parent / "B_128x1_SW.txt"
-OUTPUT_FILE = Path(__file__).parent / "C_128x1_SW.txt"
+A_FILE      = Path(__file__).parent / "A_8x4_SW.txt"
+IND_FILE    = Path(__file__).parent / "Indices_8x2_SW.txt"
+B_FILE      = Path(__file__).parent / "B_8x1_SW.txt"
+OUTPUT_FILE = Path(__file__).parent / "C_8x1_SW.txt"
 
-M           = 128   # output vector length / matrix rows
-K_DENSE     = 64    # kept (non-zero) cols per row
-K_LOGICAL   = 128   # logical x length (must equal 2 * K_DENSE for 2:4)
+M           = 8     # output vector length / matrix rows
+K_DENSE     = 4     # kept (non-zero) cols per row
+K_LOGICAL   = 8     # logical x length (must equal 2 * K_DENSE for 2:4)
 
 HEX_CHARS   = 4      # hex chars per bfloat16 element
-IND_CHARS   = 3      # bits per index element
+IND_CHARS   = 4      # bits per index element
 # ---------------------------------------------------------------------------
-
-INDEX_TO_PAIR = {
-    0: (0, 1),
-    1: (0, 2),
-    2: (0, 3),
-    3: (1, 2),
-    4: (1, 3),
-    5: (2, 3),
-}
 
 
 def hex_to_bf16_tensor(hex_chunks: list[str]) -> torch.Tensor:
@@ -106,11 +97,21 @@ def load_indices(path: Path, rows: int, cols: int) -> list[list[int]]:
     return matrix
 
 
+def fp32_to_bf16_truncate(x: torch.Tensor) -> torch.Tensor:
+    """Cast float32 -> bf16 by truncating low 16 mantissa bits (round toward zero).
+    Matches the Xilinx FP IP rounding mode used in the hardware datapath."""
+    raw = x.float().contiguous().view(torch.int32)
+    upper = ((raw >> 16) & 0xFFFF).to(torch.int16)
+    return upper.view(torch.bfloat16)
+
+
 def bf16_mul(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    # Multiplier IP uses Round-to-Nearest-Even.
     return (a.float() * b.float()).bfloat16()
 
 
 def bf16_add(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
+    # Adder IP uses Round-to-Nearest-Even.
     return (a.float() + b.float()).bfloat16()
 
 
@@ -130,9 +131,10 @@ def main() -> None:
         b_hi_idx = torch.empty(pairs_per_row, dtype=torch.long)
         for p in range(pairs_per_row):
             idx = IND[i][p]
-            if idx not in INDEX_TO_PAIR:
+            if not 0 <= idx < 16:
                 raise ValueError(f"Invalid index {idx} at row {i}, pair {p}")
-            pos_lo, pos_hi = INDEX_TO_PAIR[idx]
+            pos_lo = (idx >> 2) & 0x3   # MSB 2 bits: position of B for first A element
+            pos_hi = idx & 0x3          # LSB 2 bits: position of B for second A element
             b_lo_idx[p] = 4 * p + pos_lo
             b_hi_idx[p] = 4 * p + pos_hi
 
@@ -145,11 +147,10 @@ def main() -> None:
         prod_hi  = bf16_mul(a_hi, b_hi)
         pair_sum = bf16_add(prod_lo, prod_hi)        # one bf16 add per pair
 
-        acc = torch.zeros((), dtype=torch.bfloat16)
+        acc = torch.zeros((), dtype=torch.float32)
         for p in range(pairs_per_row):
-            acc = bf16_add(acc, pair_sum[p])         # sequential bf16 accumulation
-
-        y[i] = acc
+            acc = acc + pair_sum[p].float()  # sequential bf16 accumulation
+        y[i] = fp32_to_bf16_truncate(acc)
 
     with OUTPUT_FILE.open("w") as f:
         for i in range(M):

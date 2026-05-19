@@ -7,7 +7,6 @@ entity multiplier_wrapper is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -25,7 +24,6 @@ architecture multiplier_wrapper_arch of multiplier_wrapper is
     component Multiplier is
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -43,7 +41,6 @@ begin
     MULTIPLIER_INST : Multiplier
     port map (  
         aclk                    => aclk,
-        aclken                  => aclken,
         aresetn                 => aresetn,
         s_axis_a_tvalid         => s_axis_a_tvalid,
         s_axis_a_tdata          => s_axis_a_tdata,

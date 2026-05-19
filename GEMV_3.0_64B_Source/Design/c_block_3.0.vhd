@@ -28,8 +28,7 @@ entity c_block is
         Indices     : in std_logic_vector (IND_NUM-1 downto 0);             -- Indices Input
         B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);     -- Vector Input
         
-        valid       : in std_logic;
-        block_flag  : in std_logic;                                         -- Stop Flag
+        valid       : in std_logic;                                     
         tlast_in    : in std_logic;
 
         Bout        : out std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);    -- Vector Output
@@ -52,7 +51,6 @@ architecture c_block_arch of c_block is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -71,7 +69,6 @@ architecture c_block_arch of c_block is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -90,7 +87,6 @@ architecture c_block_arch of c_block is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -116,12 +112,11 @@ architecture c_block_arch of c_block is
     signal adder_tlast          : std_logic := '0';
     signal adder_data           : std_logic_vector (EL_SIZE-1 downto 0) := (others => '0');
 
-    signal clk_en               : std_logic := '1';
-    signal block_flag_int       : std_logic := '0';
-    
-begin
+    signal C_accum              : std_logic_vector (EL_SIZE-1 downto 0) := (others => '0');
+    signal C_valid_accum        : std_logic := '0';
+    signal C_tlast_accum        : std_logic := '0';
 
-    clk_en <= not block_flag_int;
+begin
 
     MAIN_PROC : process (clk)
     begin
@@ -130,7 +125,7 @@ begin
 
                 A_internal <= (others => '0');
                 B_internal <= (others => '0');
-                
+
                 valid_internal <= '0';
                 tlast_internal   <= '0';
 
@@ -138,20 +133,39 @@ begin
                 tlast_out   <= '0';
                 valid_out   <= '0';
 
-                block_flag_int <= '0';
+                Cout        <= (others => '0');
+                Cvalid      <= '0';
+                Ctlast      <= '0';
+
             else
 
-                block_flag_int <= block_flag;
-
-                if block_flag = '0'  then
+                -- latch when `valid` (= rd_en_matrix_d(i) from the top level)
+                -- pulses high. That pulse is high for exactly one cycle per FIFO
+                -- pop (= the cycle the popped data is on A_in / B_in), so each
+                -- beat is captured exactly once.
+                -- On idle (valid='0') we hold the data/B-vector/tlast registers
+                -- so they propagate down the chain when the next row latches.
+                -- Only valid_internal / valid_out are forced low on idle so the
+                -- AXI Stream tvalid handshake doesn't re-consume held data.
+                if C_valid_accum = '1' then
+                    Cout <= C_accum;
+                    Cvalid <= '1';
+                    Ctlast <= C_tlast_accum;
+                else
+                    Cout <= (others => '0');
+                    Cvalid <= '0';
+                    Ctlast <= '0';
+                end if;
+                
+                if valid = '1' then
 
                     A_internal          <= A_in;
-                    valid_internal      <= valid;
+                    valid_internal      <= '1';
                     tlast_internal      <= tlast_in;
 
                     Bout                <= B_in;
                     tlast_out           <= tlast_in;
-                    valid_out           <= valid;
+                    valid_out           <= '1';
 
                     for i in 0 to (A_IDX-1) loop
                         case Indices(IND_NUM-((i*2)+1) downto IND_NUM-((i*2)+2)) is
@@ -168,6 +182,13 @@ begin
                         end case;
                     end loop;
 
+                else
+
+                    valid_internal      <= '0';
+                    valid_out           <= '0';
+                    -- A_internal, B_internal, Bout, tlast_internal, tlast_out:
+                    -- intentionally not assigned so they hold their last value.
+
                 end if;
             end if;
         end if;
@@ -182,8 +203,7 @@ begin
                 EL_SIZE => EL_SIZE
             )
             port map(
-                aclk                    => clk,   
-                aclken                  => clk_en,         
+                aclk                    => clk,          
                 aresetn                 => resetn,
                 s_axis_a_tvalid         => valid_internal,
                 s_axis_a_tdata          => A_internal ((EL_SIZE*(i+1))-1 downto EL_SIZE*i),
@@ -203,8 +223,7 @@ begin
                 EL_SIZE => EL_SIZE
             )
             port map(
-                aclk                    => clk,   
-                aclken                  => clk_en,         
+                aclk                    => clk,           
                 aresetn                 => resetn,
                 s_axis_a_tvalid         => valid_internal,
                 s_axis_a_tdata          => A_internal ((EL_SIZE*(i+1))-1 downto EL_SIZE*i),
@@ -225,7 +244,6 @@ begin
     )
     port map(
         aclk                    => clk,
-        aclken                  => clk_en,
         aresetn                 => resetn,
         s_axis_a_tvalid         => multi_valid,
         s_axis_a_tdata          => multi_array(0),
@@ -244,15 +262,14 @@ begin
     )
     port map(
         aclk                    => clk,
-        aclken                  => clk_en,
         aresetn                 => resetn,
         s_axis_a_tvalid         => adder_valid,
         s_axis_a_tdata          => adder_data,
         s_axis_a_tlast          => adder_tlast,
 
-        m_axis_result_tvalid    => Cvalid,
-        m_axis_result_tdata     => Cout,
-        m_axis_result_tlast     => Ctlast
+        m_axis_result_tvalid    => C_valid_accum,
+        m_axis_result_tdata     => C_accum,
+        m_axis_result_tlast     => C_tlast_accum
     );
 end architecture c_block_arch;
 

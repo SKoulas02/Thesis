@@ -30,7 +30,6 @@ entity c_block_row is
 
         valid_in    : in std_logic;
         tlast_in    : in std_logic;
-        block_flag  : in std_logic;
         
         B_vector_out: out std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
         valid_out   : out std_logic;
@@ -60,8 +59,7 @@ architecture c_block_row_arch of c_block_row is
         Indices     : in std_logic_vector (IND_NUM-1 downto 0);             -- Indices Input
         B_in        : in std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);     -- Vector Input
         
-        valid       : in std_logic;
-        block_flag  : in std_logic;                                         -- Stop Flag
+        valid       : in std_logic;                                        
         tlast_in    : in std_logic;
 
         Bout        : out std_logic_vector ((EL_SIZE*B_IDX)-1 downto 0);    -- Vector Output
@@ -95,7 +93,6 @@ begin
                 resetn      => resetn,
 
                 A_in        => A_row (EL_SIZE*A_IDX*(i+1)-1 downto i*EL_SIZE*A_IDX),        -- Matrix Input for Each Block
-                block_flag  => block_flag,
                 Indices     => Indices (((i+1)*IND_NUM)-1 downto i*IND_NUM),                  -- Indices for Each Block
 
                 B_in        => B_vector_in (EL_SIZE*B_IDX*(i+1)-1 downto i*EL_SIZE*B_IDX),  -- Vector Input for Each Block
@@ -126,7 +123,6 @@ begin
                 resetn      => resetn,
 
                 A_in        => A_row (EL_SIZE*A_IDX*(i+1)-1 downto i*EL_SIZE*A_IDX),     -- Matrix Input for Each Block
-                block_flag  => block_flag,
                 Indices     => Indices (((i+1)*IND_NUM)-1 downto i*IND_NUM),            -- Indices for Each Block
 
                 B_in        => B_vector_in (EL_SIZE*B_IDX*(i+1)-1 downto i*EL_SIZE*B_IDX),    -- Vector Input for Each Block

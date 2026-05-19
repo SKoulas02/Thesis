@@ -7,7 +7,6 @@ entity accumulator_wrapper is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -23,7 +22,6 @@ architecture accumulator_wrapper_arch of accumulator_wrapper is
     component Accumulator is
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -39,7 +37,6 @@ begin
     ACCUMULATOR_INST : Accumulator
     port map (  
         aclk                    => aclk,
-        aclken                  => aclken,
         aresetn                 => aresetn,
         s_axis_a_tvalid         => s_axis_a_tvalid,
         s_axis_a_tdata          => s_axis_a_tdata,

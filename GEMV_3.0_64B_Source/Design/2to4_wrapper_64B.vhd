@@ -6,13 +6,13 @@ use IEEE.math_real.all;
 entity wrapper_2to4 is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element
-        BUS_EL      : integer := 32;    -- Maximum number of elements on bus
+        BUS_EL      : integer := 4;     -- Maximum number of elements on bus
 
         A_IDX       : integer := 2;     -- Number of matrix elements
         B_IDX       : integer := 4;     -- Number of vector elements
-        IND_NUM     : integer := 3;     -- Number of indices Bits
+        IND_NUM     : integer := 4;     -- Number of indices Bits
 
-        A_ROWS      : integer := 128   -- Number of Rows of Matrix A
+        A_ROWS      : integer := 8    -- Number of Rows of Matrix A
     );
     port(
         clk         : in  std_logic;
@@ -30,7 +30,7 @@ entity wrapper_2to4 is
         A_tready    : out std_logic;
 
         -- Indices AXI-Stream slave
-        ind_tdata   : in  std_logic_vector ( (2 ** integer(floor(log2(real((B_IDX*EL_SIZE)/IND_NUM))))) * IND_NUM*BUS_EL/B_IDX -1 downto 0);
+        ind_tdata   : in  std_logic_vector (31 downto 0);
         ind_tvalid  : in  std_logic;
         ind_tready  : out std_logic;
 
@@ -48,13 +48,13 @@ architecture wrapper_arch of wrapper_2to4 is
     component two2four is
     generic(
         EL_SIZE     : integer := 16;    -- Bit size of each element
-        BUS_EL      : integer := 32;    -- Maximum number of elements on bus
+        BUS_EL      : integer := 4;    -- Maximum number of elements on bus
 
         A_IDX       : integer := 2;     -- Number of matrix elements
         B_IDX       : integer := 4;     -- Number of vector elements
-        IND_NUM     : integer := 3;     -- Number of indices Bits
+        IND_NUM     : integer := 4;     -- Number of indices Bits
 
-        A_ROWS      : integer := 1024   -- Number of Rows of Matrix A
+        A_ROWS      : integer := 8      -- Number of Rows of Matrix A
     );
     port(
         clk         : in std_logic;
@@ -67,7 +67,7 @@ architecture wrapper_arch of wrapper_2to4 is
         A_in        : in std_logic_vector ((BUS_EL*EL_SIZE)-1 downto 0);
         A_valid     : in std_logic;
         
-        indices     : in std_logic_vector ( (2 ** integer(floor(log2(real((B_IDX*EL_SIZE)/IND_NUM))))) * IND_NUM*BUS_EL/B_IDX -1 downto 0);
+        indices     : in std_logic_vector (31 downto 0);
         ind_valid   : in std_logic;
 
         Cout        : out std_logic_vector (EL_SIZE-1 downto 0);
@@ -111,7 +111,7 @@ architecture wrapper_arch of wrapper_2to4 is
     signal skb_B_valid      : std_logic := '0';
 
     -- Indices skid buffer signals (master side feeds two2four)
-    signal skb_ind_data     : std_logic_vector( (2 ** integer(floor(log2(real((B_IDX*EL_SIZE)/IND_NUM))))) * IND_NUM*BUS_EL/B_IDX -1 downto 0) := (others => '0');
+    signal skb_ind_data     : std_logic_vector(31 downto 0) := (others => '0');
     signal skb_ind_valid    : std_logic := '0';
 
     -- C output: two2four core outputs feed slave side of output skid buffer
@@ -182,7 +182,7 @@ begin
     generic map(
         OPT_OUTREG      => '1',
         OPT_PASSTHROUGH => '0',
-        DATA_WIDTH      => (2 ** integer(floor(log2(real((B_IDX*EL_SIZE)/IND_NUM))))) * IND_NUM*BUS_EL/B_IDX
+        DATA_WIDTH      => 32
     )
     port map(
         aclk       => clk,

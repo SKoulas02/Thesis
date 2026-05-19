@@ -109,14 +109,18 @@ begin
     begin
         if rising_edge(clk) then
             if resetn = '0' then
-                write_reg_data   <= ((A_ROWS-1) => '1', others => '0');
-                write_reg_indices <= (A_ROWS-1 downto (A_ROWS-IND_PACK) => '1', others => '0');
+                write_reg_data   <= ((0) => '1', others => '0');
+                write_reg_indices <= (IND_PACK-1 downto 0 => '1', others => '0');
             else
                 if A_valid_in = '1' then
                     write_reg_data   <= write_reg_data (A_ROWS-2 downto 0) & write_reg_data (A_ROWS-1);
+                else
+                    write_reg_data   <= write_reg_data;
                 end if;
                 if ind_valid = '1' then
                     write_reg_indices <= write_reg_indices (A_ROWS-IND_PACK-1 downto 0) & write_reg_indices (A_ROWS-1 downto A_ROWS-IND_PACK);
+                else
+                    write_reg_indices <= write_reg_indices; 
                 end if;
             end if;
         end if;

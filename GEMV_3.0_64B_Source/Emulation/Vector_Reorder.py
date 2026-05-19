@@ -2,21 +2,21 @@
 
 Input  : a text file with one bfloat16 element per line (4 hex chars each).
 Output : a text file where each line contains CHUNK_SIZE elements taken
-         from the input in order, but reversed inside the chunk. Elements
+         from the input in order. Elements
          are concatenated with no separators.
 
 Example (CHUNK_SIZE = 4):
   Input lines : 0, 1, 2, 3, 4, 5, 6, 7
-  Output line1: 3210
-  Output line2: 7654
+  Output line1: 0123
+  Output line2: 4567
 """
 
 from pathlib import Path
 
 # ---- Configuration ---------------------------------------------------------
-INPUT_FILE  = Path(__file__).parent / "B_128x1_SW.txt"
-OUTPUT_FILE = Path(__file__).parent / "B_128x1_HW.txt"
-CHUNK_SIZE  = 32    # elements per output line
+INPUT_FILE  = Path(__file__).parent / "B_8x1_SW.txt"
+OUTPUT_FILE = Path(__file__).parent / "B_8x1_HW.txt"
+CHUNK_SIZE  = 4    # elements per output line
 HEX_CHARS   = 4    # hex chars per bfloat16 element
 # ---------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ def reverse_chunks(input_path: Path, output_path: Path,
     with output_path.open("w") as f:
         for start in range(0, len(elements), chunk_size):
             chunk = elements[start:start + chunk_size]
-            f.write("".join(reversed(chunk)) + "\n")
+            f.write("".join(chunk) + "\n")
 
     print(
         f"Read {len(elements)} elements from {input_path.name}; "

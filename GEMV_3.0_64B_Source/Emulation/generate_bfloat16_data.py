@@ -1,11 +1,11 @@
 import torch
 
 # --- Configuration ---
-ROWS              = 128      # Number of rows to generate
+ROWS              = 8      # Number of rows to generate
 ELEMENTS_PER_ROW  = 1      # Number of bfloat16 elements per row
 VALUE_MIN         = 0.0    # Minimum value (inclusive)
-VALUE_MAX         = 0.5    # Maximum value (exclusive)
-OUTPUT_FILE       = "B_128x1_SW.txt"
+VALUE_MAX         = 1.5    # Maximum value (exclusive)
+OUTPUT_FILE       = "B_8x1_SW.txt"
 
 
 def main():

@@ -1,8 +1,8 @@
 import torch
 
 # Variables you can easily change
-input_filename = "C_128x1.txt"
-output_filename = "C_128x1_decimal.txt"
+input_filename = "C_8x1_SW.txt"
+output_filename = "C_8x1_SW_decimal.txt"
 
 def process_bfloat16_file(input_file, output_file):
     with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:

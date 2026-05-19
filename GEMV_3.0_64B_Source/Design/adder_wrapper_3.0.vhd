@@ -7,7 +7,6 @@ entity adder_wrapper is
     );
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -25,7 +24,6 @@ architecture adder_wrapper_arch of adder_wrapper is
     component Adder is
     port(
         aclk                    : in std_logic;
-        aclken                  : in std_logic;
         aresetn                 : in std_logic;
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
@@ -43,7 +41,6 @@ begin
     ADDER_INST : Adder
     port map (  
         aclk                    => aclk,
-        aclken                  => aclken,
         aresetn                 => aresetn,
         s_axis_a_tvalid         => s_axis_a_tvalid,
         s_axis_a_tdata          => s_axis_a_tdata,

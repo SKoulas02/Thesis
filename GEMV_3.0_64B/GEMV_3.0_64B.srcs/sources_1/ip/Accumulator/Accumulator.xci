@@ -17,8 +17,8 @@
         "Result_Precision_Type": [ { "value": "Custom", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
         "C_Result_Exponent_Width": [ { "value": "8", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_Result_Fraction_Width": [ { "value": "8", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "C_Accum_Msb": [ { "value": "31", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "C_Accum_Lsb": [ { "value": "0", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_Accum_Msb": [ { "value": "25", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_Accum_Lsb": [ { "value": "-7", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_Accum_Input_Msb": [ { "value": "15", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_Optimization": [ { "value": "Speed_Optimized", "resolve_type": "user", "usage": "all" } ],
         "C_Mult_Usage": [ { "value": "Medium_Usage", "value_src": "user", "resolve_type": "user", "usage": "all" } ],
@@ -27,9 +27,9 @@
         "Axi_Optimize_Goal": [ { "value": "Resources", "resolve_type": "user", "usage": "all" } ],
         "Has_RESULT_TREADY": [ { "value": "false", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "Maximum_Latency": [ { "value": "true", "resolve_type": "user", "format": "bool", "usage": "all" } ],
-        "C_Latency": [ { "value": "17", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
+        "C_Latency": [ { "value": "18", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
         "C_Rate": [ { "value": "1", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
-        "Has_ACLKEN": [ { "value": "true", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
+        "Has_ACLKEN": [ { "value": "false", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "Has_ARESETn": [ { "value": "true", "value_src": "user", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "C_Has_UNDERFLOW": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
         "C_Has_OVERFLOW": [ { "value": "false", "resolve_type": "user", "format": "bool", "usage": "all" } ],
@@ -87,21 +87,21 @@
         "C_RESULT_WIDTH": [ { "value": "16", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_RESULT_FRACTION_WIDTH": [ { "value": "8", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_COMPARE_OPERATION": [ { "value": "8", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_LATENCY": [ { "value": "17", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_LATENCY": [ { "value": "18", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_OPTIMIZATION": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_MULT_USAGE": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_BRAM_USAGE": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_RATE": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_ACCUM_INPUT_MSB": [ { "value": "15", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_ACCUM_MSB": [ { "value": "31", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_ACCUM_LSB": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_ACCUM_MSB": [ { "value": "25", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_ACCUM_LSB": [ { "value": "-7", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_UNDERFLOW": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_OVERFLOW": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_INVALID_OP": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_DIVIDE_BY_ZERO": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_ACCUM_OVERFLOW": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_ACCUM_INPUT_OVERFLOW": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
-        "C_HAS_ACLKEN": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
+        "C_HAS_ACLKEN": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_ARESETN": [ { "value": "1", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_THROTTLE_SCHEME": [ { "value": "3", "resolve_type": "generated", "format": "long", "usage": "all" } ],
         "C_HAS_A_TUSER": [ { "value": "0", "resolve_type": "generated", "format": "long", "usage": "all" } ],
@@ -159,7 +159,6 @@
     "boundary": {
       "ports": {
         "aclk": [ { "direction": "in", "driver_value": "0x0" } ],
-        "aclken": [ { "direction": "in", "driver_value": "0x1" } ],
         "aresetn": [ { "direction": "in", "driver_value": "0x1" } ],
         "s_axis_a_tvalid": [ { "direction": "in", "driver_value": "0x0" } ],
         "s_axis_a_tdata": [ { "direction": "in", "size_left": "15", "size_right": "0", "driver_value": "0" } ],
@@ -231,9 +230,6 @@
           "mode": "slave",
           "parameters": {
             "POLARITY": [ { "value": "ACTIVE_HIGH", "value_src": "constant", "usage": "all" } ]
-          },
-          "port_maps": {
-            "CE": [ { "physical_name": "aclken" } ]
           }
         },
         "M_AXIS_RESULT": {
