@@ -3,8 +3,8 @@ import sys
 
 # ── Configure paths here ──────────────────────────────────────────────────────
 SW_FILE  = r"C:\Koulas\ECE\Thesis\Code\GEMV_3.0_512B_Source\Emulation\C_64x1_SW.txt"
-HW_FILE  = r"C:\Koulas\ECE\Thesis\Code\GEMV_3.0_512B_Source\Emulation\Output_2to4_512B.txt"
-OUT_FILE = r"C:\Koulas\ECE\Thesis\Code\GEMV_3.0_512B_Source\Emulation\compare_output.txt"
+HW_FILE  = r"C:\Koulas\ECE\Thesis\Code\GEMV_3.0_512B_Source\Emulation\Output_2to4_512B2.txt"
+OUT_FILE = r"C:\Koulas\ECE\Thesis\Code\GEMV_3.0_512B_Source\Emulation\compare_output2.txt"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -40,14 +40,19 @@ def main():
         n = min(len(sw), len(hw))
         sw, hw = sw[:n], hw[:n]
 
+    max_rel = 0.0
     with open(OUT_FILE, "w") as out:
-        out.write(f"{'SW (dec)':>15}  {'HW (dec)':>15}  {'|SW - HW|':>15}\n")
-        out.write("-" * 51 + "\n")
+        out.write(f"{'SW (dec)':>15}  {'HW (dec)':>15}  {'|SW - HW|':>15}  {'Rel. error (%)':>15}\n")
+        out.write("-" * 68 + "\n")
         for s, h in zip(sw, hw):
             diff = abs(s - h)
-            out.write(f"{s:>15.6f}  {h:>15.6f}  {diff:>15.6f}\n")
+            rel = (diff / abs(s) * 100.0) if s != 0 else float("inf")
+            if rel > max_rel:
+                max_rel = rel
+            out.write(f"{s:>15.6f}  {h:>15.6f}  {diff:>15.6f}  {rel:>14.4f}%\n")
 
     print(f"Done. {len(sw)} rows written to:\n  {OUT_FILE}")
+    print(f"Max relative error: {max_rel:.4f}%")
 
 
 if __name__ == "__main__":

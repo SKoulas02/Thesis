@@ -1,0 +1,95 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+-- ----------------------------------------------------------------------------
+-- Engineer: Sozos Koulas @ National Technical University of Athens
+-- 
+-- Description:
+-- This Module is used to store and retrieve vector elements for GEMV operations.
+-- Input is a bus of vector elements and output is a bus of elements for GEMV operations.
+-- It is made up of one FIFO.
+-- The module can be reused for different GEMV operations.
+-- ----------------------------------------------------------------------------
+
+entity vector_fifo_512 is
+    generic(
+        EL_SIZE     : integer := 16;    -- Bit size of each element
+        BUS_EL      : integer := 32     -- Max elements on Bus
+    );
+    port(
+        clk         : in std_logic;
+        resetn      : in std_logic;
+
+        A_vector_in : in std_logic_vector((EL_SIZE*BUS_EL)-1 downto 0);
+        A_valid_in  : in std_logic;
+        tlast_in    : in std_logic;
+
+        rd_en       : in std_logic;
+
+        A_vector_out    : out std_logic_vector ((EL_SIZE*BUS_EL)-1 downto 0);
+        A_valid_out     : out std_logic;
+
+        tlast_out       : out std_logic;
+        empty           : out std_logic
+    );
+end entity vector_fifo_512;
+
+architecture vector_fifo_arch of vector_fifo_512 is
+
+    component fifo_gen_vector is
+        port(
+            clk     : IN STD_LOGIC;
+            srst    : IN STD_LOGIC;
+
+            din     : IN STD_LOGIC_VECTOR(EL_SIZE*BUS_EL DOWNTO 0);
+            wr_en   : IN STD_LOGIC;
+            rd_en   : IN STD_LOGIC;
+            dout    : OUT STD_LOGIC_VECTOR(EL_SIZE*BUS_EL DOWNTO 0);
+            
+            empty   : OUT STD_LOGIC;
+            valid   : OUT STD_LOGIC
+        );
+    end component fifo_gen_vector;
+
+    signal reset    : std_logic;
+    signal din      : std_logic_vector (EL_SIZE*BUS_EL downto 0);
+    signal dout     : std_logic_vector (EL_SIZE*BUS_EL downto 0);
+
+    signal tlast_delay : std_logic:= '0';
+
+begin
+
+    reset   <= NOT resetn;
+    din     <= A_vector_in & tlast_in;
+
+    A_vector_out    <= dout(EL_SIZE*BUS_EL downto 1);
+    tlast_out   <= dout(0) AND (NOT tlast_delay);
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if resetn = '0' then
+                tlast_delay <= '0';
+            else
+                tlast_delay <= dout(0);
+            end if;
+        end if;
+    end process;
+
+
+    FIFO_VECTOR : fifo_gen_vector
+    port map(
+        clk     => clk,
+        srst    => reset,
+
+        din     => din,
+        wr_en   => A_valid_in,
+        rd_en   => rd_en,
+        dout    => dout,
+
+        empty   => empty,
+        valid   => A_valid_out
+    );
+
+end architecture vector_fifo_arch;
