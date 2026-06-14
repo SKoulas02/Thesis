@@ -29,7 +29,7 @@ entity c_core is
         Indices     : in std_logic_vector ((BLOCKS_NUM*IND_NUM)-1 downto 0);
         A_vector    : in std_logic_vector ((A_IDX*EL_SIZE)-1 downto 0);
 
-        sparsity_lock: in std_logic; -- Sparsity Lock Signal for correct calculations
+        sparsity_lock   : in std_logic; -- Sparsity Lock Signal for correct calculations
 
         valid_in    : in std_logic;
         tlast_in    : in std_logic;
