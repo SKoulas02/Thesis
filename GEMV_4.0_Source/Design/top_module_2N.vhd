@@ -191,21 +191,40 @@ architecture two2N_arch of two2N is
     end component c_fifo;
 
 
-    -- Internal Signals Weights FIFO
+    -- Internal Signals Weights FIFO (head = the FIFO join output, combinational)
 
-    signal rd_en_int_w     : std_logic;
-    signal ready_int_w     : std_logic;
-    signal tlast_int_w     : std_logic;   -- end-of-calc marker (last weight beat popped)
-    signal W_row_int       : std_logic_vector ((W_PCS*PC_WIDTH)-1 downto 0);
-    signal Indices_int     : std_logic_vector (IND_BITS-1 downto 0);
-    signal Sparsity        : std_logic_vector (1 downto 0);
+    signal w_head_ready    : std_logic;   -- FIFO join: all 11 PCs have a beat NOW
+    signal w_head_tlast    : std_logic;   -- FIFO join tlast (pop-gated -> valid on fill cycles)
+    signal W_head          : std_logic_vector ((W_PCS*PC_WIDTH)-1 downto 0);
+    signal Ind_head        : std_logic_vector (IND_BITS-1 downto 0);
+    signal Sparsity        : std_logic_vector (1 downto 0);   -- FIFO head sparsity (combinational)
 
-    -- Internal Signals Activation FIFO
+    -- Weights/indices output STAGE (1-deep register slice, see fix note above MAIN_PROC)
 
-    signal rd_en_int_a     : std_logic;
-    signal ready_int_a     : std_logic;
-    signal A_vector_int_a  : std_logic_vector ((A_PCS*PC_WIDTH)-1 downto 0);
-    signal tlast_int_a     : std_logic;
+    signal w_fill          : std_logic;   -- FIFO head -> stage load strobe (also pops the FIFO)
+    signal w_stage_valid   : std_logic := '0';
+    signal w_stage_tlast   : std_logic := '0';   -- the staged beat is the weight-matrix end
+    signal spar_stage      : std_logic_vector (1 downto 0) := (others => '0');
+    signal rd_en_int_w     : std_logic;   -- stage consumption strobe (registered in MAIN_PROC)
+    signal ready_int_w     : std_logic;   -- avail-next: a beat is GUARANTEED present next cycle
+    signal tlast_int_w     : std_logic;   -- end-of-calc pulse: last weight beat CONSUMED this cycle
+    signal W_row_int       : std_logic_vector ((W_PCS*PC_WIDTH)-1 downto 0);   -- stage data -> cores
+    signal Indices_int     : std_logic_vector (IND_BITS-1 downto 0);           -- stage data -> cores
+    signal sparsity_next   : std_logic_vector (1 downto 0);   -- sparsity of the beat consumed NEXT cycle
+
+    -- Internal Signals Activation FIFO (head) + output STAGE
+
+    signal a_head_ready    : std_logic;   -- FIFO join: both activation PCs have a beat NOW
+    signal a_head_tlast    : std_logic;   -- FIFO join tlast (raw head, un-gated)
+    signal A_head          : std_logic_vector ((A_PCS*PC_WIDTH)-1 downto 0);
+
+    signal a_fill          : std_logic;   -- FIFO head -> stage load strobe (also pops the FIFO)
+    signal a_stage_valid   : std_logic := '0';
+    signal rd_en_int_a     : std_logic;   -- stage consumption strobe (registered in MAIN_PROC)
+    signal ready_int_a     : std_logic;   -- avail-next: a window is GUARANTEED present next cycle
+    signal A_vector_int_a  : std_logic_vector ((A_PCS*PC_WIDTH)-1 downto 0);   -- stage data
+    signal tlast_int_a     : std_logic := '0';                                 -- stage tlast (end-of-vector)
+    signal a_tlast_next    : std_logic;   -- tlast of the window consumed NEXT cycle
 
     -- Internal Signals Activation Cycle
 
@@ -245,16 +264,89 @@ begin
 
     m_axis_tlast <= tlast_end AND Ctlast_int;
 
-    -- Activation window mux: COMBINATIONAL so it tracks the same FIFO head cycle as
-    -- the combinational weights bus (W_row_int). A registered mux lags one cycle and
-    -- mispairs windows when 2:32 (no freeze) reads a new window every cycle.
+    -- Activation window mux: COMBINATIONAL so it tracks the same beat cycle as the
+    -- weights bus (W_row_int). A registered mux lags one cycle and mispairs windows
+    -- when 2:32 (no freeze) reads a new window every cycle.
     A_vector_int <= A_vector_int_c when cycle_en_int = '1' else A_vector_int_a;
 
+    -- ------------------------------------------------------------------------
+    -- Ingress output STAGES (FWFT drain-hazard fix).
+    --
+    -- MAIN_PROC decides at edge N (sampling 'ready') but the beat is consumed
+    -- during cycle N (registered rd_en/valid). The FIFO join's raw all_valid
+    -- stays high through the cycle its LAST beat is popped, so under input
+    -- bubbles a decision could commit a consumption for a cycle where the FIFO
+    -- is already empty -> the cores would re-accumulate the stale head (the
+    -- stress-test corruption). A 1-deep register stage in front of the consumer
+    -- closes the skew: it holds the beat being consumed, and
+    --     ready = head_ready OR (stage_valid AND NOT rd_en)
+    -- equals stage_valid of the NEXT cycle exactly, so every commit is
+    -- guaranteed a real beat. Full throughput is preserved: with data present
+    -- the stage refills on every consumption cycle (fill = pop-through).
+    --
+    --   * w_fill/a_fill pop the FIFO join into the stage whenever the stage is
+    --     empty or being consumed this cycle (autonomous, like a FIFO extension).
+    --   * rd_en_int_w/rd_en_int_a are now the STAGE consumption strobes; the
+    --     replay-buffer path (ready_int_c/tlast_int_c) is unchanged -- during
+    --     replay wr_en = rd_en keeps its occupancy constant, it cannot drain.
+    --   * Decision-time metadata (counter_lock case, last_win) uses the
+    --     *_next view = metadata of the beat present next cycle; consumption-
+    --     time metadata (flush_2to32, tlast_int_w) uses the stage itself.
+    -- ------------------------------------------------------------------------
+    w_fill <= w_head_ready AND ((NOT w_stage_valid) OR rd_en_int_w);
+    a_fill <= a_head_ready AND ((NOT a_stage_valid) OR rd_en_int_a);
+
+    ready_int_w <= w_head_ready OR (w_stage_valid AND (NOT rd_en_int_w));
+    ready_int_a <= a_head_ready OR (a_stage_valid AND (NOT rd_en_int_a));
+
+    -- Metadata of the beat that will be in the stage NEXT cycle: the staged beat
+    -- if it is kept, else the FIFO head (the refill). Only meaningful when the
+    -- matching ready is '1' -- exactly when MAIN_PROC may commit.
+    sparsity_next <= spar_stage  when (w_stage_valid = '1' AND rd_en_int_w = '0') else Sparsity;
+    a_tlast_next  <= tlast_int_a when (a_stage_valid = '1' AND rd_en_int_a = '0') else a_head_tlast;
+
+    -- End-of-calc pulse: the last weight beat is consumed (from the stage) this
+    -- cycle. rd_en is only ever asserted with the stage guaranteed valid.
+    tlast_int_w <= rd_en_int_w AND w_stage_tlast;
+
+    STAGE_PROC : process(clk)
+    begin
+        if rising_edge(clk) then
+            if resetn = '0' then
+                w_stage_valid <= '0';
+                w_stage_tlast <= '0';
+                spar_stage    <= (others => '0');
+                a_stage_valid <= '0';
+                tlast_int_a   <= '0';
+            else
+                if w_fill = '1' then
+                    W_row_int     <= W_head;
+                    Indices_int   <= Ind_head;
+                    spar_stage    <= Sparsity;
+                    w_stage_tlast <= w_head_tlast;   -- pop-gated join tlast = head tlast on fill cycles
+                    w_stage_valid <= '1';
+                elsif rd_en_int_w = '1' then
+                    w_stage_valid <= '0';
+                end if;
+
+                if a_fill = '1' then
+                    A_vector_int_a <= A_head;
+                    tlast_int_a    <= a_head_tlast;
+                    a_stage_valid  <= '1';
+                elsif rd_en_int_a = '1' then
+                    a_stage_valid  <= '0';
+                end if;
+            end if;
+        end if;
+    end process STAGE_PROC;
+
     -- 2:32 combinational flush: with no freeze, the vector-end window is processed the
-    -- same cycle its FIFO head is popped, so its tlast must reach the cores co-timed.
+    -- same cycle its beat is consumed, so its tlast must reach the cores co-timed.
     -- (The registered tlast_in_int decision is one cycle late for back-to-back reads.)
+    -- Consumption-cycle metadata: the STAGE holds the beat being consumed (spar_stage /
+    -- tlast_int_a); the replay head (tlast_int_c) is popped this cycle -- also consumed.
     -- valid_in_int guards idle/settle cycles and makes the FIRST window commit (NWIN=1).
-    flush_2to32 <= '1' when (Sparsity = "11" AND valid_in_int = '1' AND
+    flush_2to32 <= '1' when (spar_stage = "11" AND valid_in_int = '1' AND
                              ((cycle_en_int = '0' AND tlast_int_a = '1') OR
                               (cycle_en_int = '1' AND tlast_int_c = '1')))
                    else '0';
@@ -290,9 +382,9 @@ begin
                 end if;
 
                 if settle = '1' then
-                    -- One-cycle lap-boundary bubble. The previous lap's terminal popped its
-                    -- last weight beat this-1 cycle; hold now so the weights-FIFO head advances
-                    -- to the next group's FIRST beat before its Sparsity is sampled. Without this
+                    -- One-cycle lap-boundary bubble. The previous lap's terminal consumed its
+                    -- last weight beat this-1 cycle; hold now so the weights STAGE refills with
+                    -- the next group's FIRST beat before its Sparsity is sampled. Without this
                     -- a group whose sparsity differs from the previous one loads the wrong freeze
                     -- length (runtime 2:M reconfiguration). cycle_en / counter_lock hold.
                     settle       <= '0';
@@ -326,15 +418,15 @@ begin
                         -- (tlast_int_w). Exception: 2:32 has no freeze, so the load cycle
                         -- IS where the final beat is processed.
                         elsif ready_int_w = '1' AND ready_int_a = '1' AND prog_full_int = '0'
-                           AND (Sparsity = "11" OR tlast_int_w = '0') then  -- inputs ready + output not near-full + not past end
+                           AND (sparsity_next = "11" OR tlast_int_w = '0') then  -- inputs ready + output not near-full + not past end
 
                             rd_en_int_w <= '1';
                             rd_en_int_a <= '1';
                             sparsity_lock <= '0';
                             valid_in_int <= '1';
-                            last_win <= tlast_int_a;   -- latch whether the window being loaded is the last
+                            last_win <= a_tlast_next;   -- latch whether the window being loaded is the last
 
-                            case Sparsity is
+                            case sparsity_next is
                                 when "00" =>    -- 2:4 Sparsity => 8 Cycles Freeze
                                     counter_lock <= 7;
                                 when "01" =>    -- 2:8 Sparsity => 4 Cycles Freeze
@@ -424,15 +516,18 @@ begin
                         -- Do not start a new replay lap once the weight matrix has ended
                         -- (tlast_int_w). Exception: 2:32 processes its final beat here.
                         elsif ready_int_w = '1' AND ready_int_c = '1' AND prog_full_int = '0'
-                           AND (Sparsity = "11" OR tlast_int_w = '0') then  -- inputs ready + output not near-full + not past end
+                           AND (sparsity_next = "11" OR tlast_int_w = '0') then  -- inputs ready + output not near-full + not past end
 
                             rd_en_int_w <= '1';
                             rd_en_int_c <= '1';
                             sparsity_lock <= '0';
                             valid_in_int <= '1';
                             last_win <= tlast_int_c;   -- latch whether the window being loaded is the last
+                                                       -- (replay head is un-staged: in freeze modes rd_en_int_c
+                                                       -- was 0 last cycle so the head IS the next window; at
+                                                       -- 2:32 last_win is unused -- flush_2to32 covers the lap end)
 
-                            case Sparsity is
+                            case sparsity_next is
                                 when "00" =>    -- 2:4 Sparsity => 8 Cycles Freeze
                                     counter_lock <= 7;
                                 when "01" =>    -- 2:8 Sparsity => 4 Cycles Freeze
@@ -519,11 +614,11 @@ begin
             s_axis_ind_tvalid => s_axis_ind_tvalid,
             s_axis_ind_tready => s_axis_ind_tready,
 
-            rd_en           => rd_en_int_w,
-            ready           => ready_int_w,
-            tlast_out       => tlast_int_w,
-            W_out           => W_row_int,
-            indices_out     => Indices_int,
+            rd_en           => w_fill,          -- stage refill pops the join
+            ready           => w_head_ready,
+            tlast_out       => w_head_tlast,
+            W_out           => W_head,
+            indices_out     => Ind_head,
             Sparsity_out    => Sparsity
         );
 
@@ -541,10 +636,10 @@ begin
             s_axis_a_tready => s_axis_a_tready,
             s_axis_a_tlast  => s_axis_a_tlast,
 
-            rd_en           => rd_en_int_a,
-            ready           => ready_int_a,
-            A_vector_out    => A_vector_int_a,
-            tlast_out       => tlast_int_a
+            rd_en           => a_fill,          -- stage refill pops the join
+            ready           => a_head_ready,
+            A_vector_out    => A_head,
+            tlast_out       => a_head_tlast
         );
 
     ACTIVATION_CYCLE_INST : vector_cycle_512

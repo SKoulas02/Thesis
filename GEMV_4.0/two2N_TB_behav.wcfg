@@ -12,19 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="125.805 ns"></ZoomStartTime>
-      <ZoomEndTime time="416.267 ns"></ZoomEndTime>
-      <Cursor1Time time="505.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="84.000001 us"></ZoomEndTime>
+      <Cursor1Time time="65.925000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="357"></NameColumnWidth>
+      <NameColumnWidth column_width="351"></NameColumnWidth>
       <ValueColumnWidth column_width="90"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="40" />
-   <wvobject fp_name="/two2N_TB/clk" type="logic">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
    <wvobject fp_name="/two2N_TB/resetn" type="logic">
       <obj_property name="ElementShortName">resetn</obj_property>
       <obj_property name="ObjectShortName">resetn</obj_property>
@@ -96,6 +92,10 @@
    <wvobject type="divider" fp_name="divider51">
       <obj_property name="label">Block</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
    <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/valid_internal" type="logic">
       <obj_property name="ElementShortName">valid_internal</obj_property>
