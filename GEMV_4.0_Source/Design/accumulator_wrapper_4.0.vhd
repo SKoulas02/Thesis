@@ -11,6 +11,7 @@ entity accumulator_wrapper is
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_a_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -26,6 +27,7 @@ architecture accumulator_wrapper_arch of accumulator_wrapper is
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_a_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -41,6 +43,7 @@ begin
         s_axis_a_tvalid         => s_axis_a_tvalid,
         s_axis_a_tdata          => s_axis_a_tdata,
         s_axis_a_tlast          => s_axis_a_tlast,
+        m_axis_result_tready    => m_axis_result_tready,
         m_axis_result_tvalid    => m_axis_result_tvalid,
         m_axis_result_tdata     => m_axis_result_tdata,
         m_axis_result_tlast     => m_axis_result_tlast

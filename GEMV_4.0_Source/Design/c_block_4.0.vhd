@@ -53,6 +53,7 @@ architecture c_block_arch of c_block is
         s_axis_b_tvalid         : in std_logic;
         s_axis_b_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_b_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -71,6 +72,7 @@ architecture c_block_arch of c_block is
         s_axis_b_tvalid         : in std_logic;
         s_axis_b_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_b_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -87,6 +89,7 @@ architecture c_block_arch of c_block is
         s_axis_a_tvalid         : in std_logic;
         s_axis_a_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_a_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -133,10 +136,10 @@ begin
 
             else
 
-                if accum_valid = '1' then
+                if accum_tlast = '1' then
                     Cout <= accum_data;
                     Cvalid <= '1';
-                    Ctlast <= accum_tlast;
+                    Ctlast <= '1';
                 else
                     Cout <= (others => '0');
                     Cvalid <= '0';
@@ -150,19 +153,19 @@ begin
                     tlast_internal      <= tlast_in;
 
                     for i in 0 to (W_IDX-1) loop
-                        -- Little-endian gather: index value k selects activation element k,
-                        -- which (matching HBM/AXI byte order) lives at A_in[EL_SIZE*k+EL_SIZE-1 : EL_SIZE*k].
-                        A_internal ((EL_SIZE*W_IDX)-(EL_SIZE*i)-1 downto EL_SIZE*W_IDX-(EL_SIZE*(i+1)))
-                            <= A_in (EL_SIZE*(to_integer(unsigned(Indices((IND_NUM-1)-(i*(IND_NUM/W_IDX)) downto IND_NUM-((i+1)*(IND_NUM/W_IDX)))))+1)-1
+                        -- Little-endian gather: slot i takes index i (both LSB-first); index
+                        -- value k selects activation element k at A_in[EL_SIZE*k+EL_SIZE-1 : EL_SIZE*k].
+                        A_internal (EL_SIZE*(i+1)-1 downto EL_SIZE*i)
+                            <= A_in (EL_SIZE*(to_integer(unsigned(Indices(((i+1)*(IND_NUM/W_IDX))-1 downto i*(IND_NUM/W_IDX))))+1)-1
                                      downto
-                                     EL_SIZE*to_integer(unsigned(Indices((IND_NUM-1)-(i*(IND_NUM/W_IDX)) downto IND_NUM-((i+1)*(IND_NUM/W_IDX))))));
+                                     EL_SIZE*to_integer(unsigned(Indices(((i+1)*(IND_NUM/W_IDX))-1 downto i*(IND_NUM/W_IDX)))));
                     end loop;
 
                 else
 
                     valid_internal      <= '0';
-                    -- W_internal, A_internal, tlast_internal:
-                    -- intentionally not assigned so they hold their last value.
+                    tlast_internal      <= '0';   -- clear the tlast sideband when no beat;
+                                                  -- only W_internal / A_internal legitimately hold (data).
 
                 end if;
             end if;
@@ -186,6 +189,7 @@ begin
                 s_axis_b_tdata          => A_internal ((EL_SIZE*(i+1))-1 downto EL_SIZE*i),
                 s_axis_b_tlast          => tlast_internal,
 
+                m_axis_result_tready    => '1',          -- always ready: one result per cycle, no backpressure
                 m_axis_result_tvalid    => multi_valid,
                 m_axis_result_tdata     => multi_array(i),
                 m_axis_result_tlast     => multi_tlast
@@ -207,6 +211,7 @@ begin
                 s_axis_b_tdata          => A_internal ((EL_SIZE*(i+1))-1 downto EL_SIZE*i),
                 s_axis_b_tlast          => tlast_internal,
 
+                m_axis_result_tready    => '1',          -- always ready: one result per cycle, no backpressure
                 m_axis_result_tvalid    => open, 
                 m_axis_result_tdata     => multi_array(i),
                 m_axis_result_tlast     => open  
@@ -227,6 +232,7 @@ begin
         s_axis_b_tdata          => multi_array(1),
         s_axis_b_tlast          => multi_tlast,
 
+        m_axis_result_tready    => '1',          -- always ready: one result per cycle, no backpressure
         m_axis_result_tvalid    => adder_valid,
         m_axis_result_tdata     => adder_data,
         m_axis_result_tlast     => adder_tlast
@@ -242,6 +248,7 @@ begin
         s_axis_a_tvalid         => adder_valid,
         s_axis_a_tdata          => adder_data,
         s_axis_a_tlast          => adder_tlast,
+        m_axis_result_tready    => '1',          -- always ready: one result per cycle, no backpressure
         m_axis_result_tvalid    => accum_valid,
         m_axis_result_tdata     => accum_data,
         m_axis_result_tlast     => accum_tlast

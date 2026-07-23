@@ -13,6 +13,7 @@ entity multiplier_wrapper is
         s_axis_b_tvalid         : in std_logic;
         s_axis_b_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_b_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -30,6 +31,7 @@ architecture multiplier_wrapper_arch of multiplier_wrapper is
         s_axis_b_tvalid         : in std_logic;
         s_axis_b_tdata          : in std_logic_vector (EL_SIZE-1 downto 0);
         s_axis_b_tlast          : in std_logic;
+        m_axis_result_tready    : in std_logic;
         m_axis_result_tvalid    : out std_logic;
         m_axis_result_tdata     : out std_logic_vector (EL_SIZE-1 downto 0);
         m_axis_result_tlast     : out std_logic
@@ -47,6 +49,7 @@ begin
         s_axis_b_tvalid         => s_axis_b_tvalid,
         s_axis_b_tdata          => s_axis_b_tdata,
         s_axis_b_tlast          => s_axis_b_tlast,
+        m_axis_result_tready    => m_axis_result_tready,
         m_axis_result_tvalid    => m_axis_result_tvalid,
         m_axis_result_tdata     => m_axis_result_tdata,
         m_axis_result_tlast     => m_axis_result_tlast

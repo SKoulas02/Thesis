@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="two2N_TB_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="two2N_TB" />
+            <top_module name="vcomponents" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="125.805 ns"></ZoomStartTime>
+      <ZoomEndTime time="416.267 ns"></ZoomEndTime>
+      <Cursor1Time time="505.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="357"></NameColumnWidth>
+      <ValueColumnWidth column_width="90"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="40" />
+   <wvobject fp_name="/two2N_TB/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/resetn" type="logic">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_w_tdata" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tdata[2047:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tdata[2047:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_w_tvalid" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tvalid[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tvalid[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_w_tready" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tready[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tready[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_w_tlast" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tlast[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tlast[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_ind_tdata" type="array">
+      <obj_property name="ElementShortName">s_axis_ind_tdata[767:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ind_tdata[767:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_ind_tvalid" type="array">
+      <obj_property name="ElementShortName">s_axis_ind_tvalid[2:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ind_tvalid[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_ind_tready" type="array">
+      <obj_property name="ElementShortName">s_axis_ind_tready[2:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ind_tready[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_a_tdata" type="array">
+      <obj_property name="ElementShortName">s_axis_a_tdata[511:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_a_tdata[511:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_a_tvalid" type="array">
+      <obj_property name="ElementShortName">s_axis_a_tvalid[1:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_a_tvalid[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_a_tlast" type="array">
+      <obj_property name="ElementShortName">s_axis_a_tlast[1:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_a_tlast[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/s_axis_a_tready" type="array">
+      <obj_property name="ElementShortName">s_axis_a_tready[1:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_a_tready[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/m_axis_c_tdata" type="array">
+      <obj_property name="ElementShortName">m_axis_c_tdata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_c_tdata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/m_axis_c_tvalid" type="array">
+      <obj_property name="ElementShortName">m_axis_c_tvalid[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_c_tvalid[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/m_axis_c_tlast" type="array">
+      <obj_property name="ElementShortName">m_axis_c_tlast[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_c_tlast[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/m_axis_c_tready" type="array">
+      <obj_property name="ElementShortName">m_axis_c_tready[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_c_tready[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/CLK_PERIOD" type="other">
+      <obj_property name="ElementShortName">CLK_PERIOD</obj_property>
+      <obj_property name="ObjectShortName">CLK_PERIOD</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider51">
+      <obj_property name="label">Block</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/valid_internal" type="logic">
+      <obj_property name="ElementShortName">valid_internal</obj_property>
+      <obj_property name="ObjectShortName">valid_internal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/adder_valid" type="logic">
+      <obj_property name="ElementShortName">adder_valid</obj_property>
+      <obj_property name="ObjectShortName">adder_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/adder_tlast" type="logic">
+      <obj_property name="ElementShortName">adder_tlast</obj_property>
+      <obj_property name="ObjectShortName">adder_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/multi_valid" type="logic">
+      <obj_property name="ElementShortName">multi_valid</obj_property>
+      <obj_property name="ObjectShortName">multi_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/multi_tlast" type="logic">
+      <obj_property name="ElementShortName">multi_tlast</obj_property>
+      <obj_property name="ObjectShortName">multi_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/accum_valid" type="logic">
+      <obj_property name="ElementShortName">accum_valid</obj_property>
+      <obj_property name="ObjectShortName">accum_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/accum_tlast" type="logic">
+      <obj_property name="ElementShortName">accum_tlast</obj_property>
+      <obj_property name="ObjectShortName">accum_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/Cout" type="array">
+      <obj_property name="ElementShortName">Cout[15:0]</obj_property>
+      <obj_property name="ObjectShortName">Cout[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/Cvalid" type="logic">
+      <obj_property name="ElementShortName">Cvalid</obj_property>
+      <obj_property name="ObjectShortName">Cvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/\CORES_GEN(0)\/c_core_inst_first/C_CORE_FIRST/\C_CORE(0)\/c_block_first/C_BLOCK_INST_FIRST/Ctlast" type="logic">
+      <obj_property name="ElementShortName">Ctlast</obj_property>
+      <obj_property name="ObjectShortName">Ctlast</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider146">
+      <obj_property name="label">General</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/valid_in_int" type="logic">
+      <obj_property name="ElementShortName">valid_in_int</obj_property>
+      <obj_property name="ObjectShortName">valid_in_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/tlast_in_int" type="logic">
+      <obj_property name="ElementShortName">tlast_in_int</obj_property>
+      <obj_property name="ObjectShortName">tlast_in_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/ready_int_w" type="logic">
+      <obj_property name="ElementShortName">ready_int_w</obj_property>
+      <obj_property name="ObjectShortName">ready_int_w</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/rd_en_int_w" type="logic">
+      <obj_property name="ElementShortName">rd_en_int_w</obj_property>
+      <obj_property name="ObjectShortName">rd_en_int_w</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/ready_int_c" type="logic">
+      <obj_property name="ElementShortName">ready_int_c</obj_property>
+      <obj_property name="ObjectShortName">ready_int_c</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/cycle_en_int" type="logic">
+      <obj_property name="ElementShortName">cycle_en_int</obj_property>
+      <obj_property name="ObjectShortName">cycle_en_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/counter_lock" type="other">
+      <obj_property name="ElementShortName">counter_lock</obj_property>
+      <obj_property name="ObjectShortName">counter_lock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/prog_full_int" type="logic">
+      <obj_property name="ElementShortName">prog_full_int</obj_property>
+      <obj_property name="ObjectShortName">prog_full_int</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/s_axis_w_tvalid" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tvalid[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tvalid[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/two2N_TB/DUT/s_axis_w_tready" type="array">
+      <obj_property name="ElementShortName">s_axis_w_tready[7:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_w_tready[7:0]</obj_property>
+   </wvobject>
+</wave_config>
