@@ -44,6 +44,7 @@ architecture sim of two2N_TB is
     constant IPATH : string := "C:\Koulas\ECE\Thesis\Code\GEMV_4.0_Source\Emulation\indices.hex";
     constant APATH : string := "C:\Koulas\ECE\Thesis\Code\GEMV_4.0_Source\Emulation\activations.hex";
     constant OPATH : string := "C:\Koulas\ECE\Thesis\Code\GEMV_4.0_Source\Emulation\output.txt";
+    constant TPATH : string := "C:\Koulas\ECE\Thesis\Code\GEMV_4.0_Source\Emulation\tlast.txt";
 
     signal clk    : std_logic := '0';
     signal resetn : std_logic := '0';
@@ -217,9 +218,17 @@ begin
     end process STIM;
 
     -- ---- monitor: dump each real output transfer (tvalid AND tready) ----
+    -- output.txt : 64 data lanes per beat (checked against golden.txt)
+    -- tlast.txt  : ONE line per beat recording that beat's TLAST -- the
+    --              end-of-calculation marker. Only the FINAL beat may carry it.
+    --              Without this the data compare passes while the marker sits on
+    --              the wrong beat (it is a sideband, invisible in output.txt).
+    --              'X' = the 4 output PCs disagreed -> fork desync.
     MON : process(clk)
         file outfile : text open write_mode is OPATH;
+        file tlfile  : text open write_mode is TPATH;
         variable ol : line;
+        variable tl : line;
     begin
         if rising_edge(clk) then
             if (m_axis_c_tvalid AND m_axis_c_tready) /= "0000" then
@@ -228,6 +237,15 @@ begin
                     hwrite(ol, m_axis_c_tdata(16*r+15 downto 16*r));
                     writeline(outfile, ol);
                 end loop;
+
+                if m_axis_c_tlast = "1111" then
+                    write(tl, string'("1"));
+                elsif m_axis_c_tlast = "0000" then
+                    write(tl, string'("0"));
+                else
+                    write(tl, string'("X"));
+                end if;
+                writeline(tlfile, tl);
             end if;
         end if;
     end process MON;

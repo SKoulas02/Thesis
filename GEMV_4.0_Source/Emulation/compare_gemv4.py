@@ -14,6 +14,7 @@ import struct
 HERE   = Path(__file__).parent
 GOLDEN = HERE / "golden.txt"
 HWOUT  = HERE / "output.txt"
+TLAST  = HERE / "tlast.txt"
 REPORT = HERE / "compare_gemv4_report.txt"
 
 
@@ -24,6 +25,46 @@ def bf16_hex_to_float(h: str) -> float:
 
 def load(path: Path) -> list[str]:
     return [ln.strip().upper().zfill(4) for ln in path.open() if ln.strip()]
+
+
+def check_tlast(n_rows: int) -> bool:
+    """The end-of-calculation marker must ride the FINAL output beat and no other.
+
+    TLAST is an AXIS sideband, so it never appears in output.txt -- a data-only
+    compare passes happily while the marker sits on the wrong beat. Downstream
+    that tells the HBM write engine the transfer ended early.
+    """
+    if not TLAST.exists():
+        print("\nTLAST : tlast.txt not found -- rebuild/rerun the TB to enable this check")
+        return True                      # not a failure, just uninstrumented
+
+    flags = [ln.strip() for ln in TLAST.open() if ln.strip()]
+    nbeats = n_rows // 64
+    ok = True
+
+    if "X" in flags:
+        bad = [i for i, f in enumerate(flags) if f == "X"]
+        print(f"\nTLAST : FAIL -- output PCs disagreed on beat(s) {bad} (fork desync)")
+        return False
+
+    tagged = [i for i, f in enumerate(flags) if f == "1"]
+    print(f"\nTLAST : {len(flags)} beat(s), marker on beat(s) {tagged if tagged else 'NONE'}"
+          f"  (expected [{nbeats - 1}] = the last)")
+
+    if len(flags) != nbeats:
+        print(f"TLAST : FAIL -- {len(flags)} tlast entries vs {nbeats} data beats")
+        ok = False
+    if len(tagged) != 1:
+        print(f"TLAST : FAIL -- expected exactly 1 tagged beat, got {len(tagged)}")
+        ok = False
+    elif tagged[0] != nbeats - 1:
+        print(f"TLAST : FAIL -- end-of-calc marker on beat {tagged[0]}, "
+              f"should be the final beat {nbeats - 1}")
+        ok = False
+
+    if ok:
+        print("TLAST : PASS -- marker on the final beat only")
+    return ok
 
 
 def main() -> None:
@@ -52,8 +93,13 @@ def main() -> None:
                     print(f"row {r:2d}: golden {gs}  hw {hs}   ({gf:g} vs {hf:g})")
             out.write(f"{r:>4}  {gs:>6}  {hs:>6}  {gf:>12.4f}  {hf:>12.4f}  {rel:>7.3f}%{flag}\n")
 
+    data_ok = (mism == 0 and len(g) == len(h))
     print(f"\ncompared {n} rows  |  {mism} mismatch(es)  |  max rel error {max_rel:.4f}%")
-    print("PASS (bit-exact)" if mism == 0 and len(g) == len(h) else "FAIL")
+    print("DATA  : PASS (bit-exact)" if data_ok else "DATA  : FAIL")
+
+    tlast_ok = check_tlast(len(h))
+
+    print(f"\n=== {'PASS' if (data_ok and tlast_ok) else 'FAIL'} ===")
     print(f"report -> {REPORT}")
 
 

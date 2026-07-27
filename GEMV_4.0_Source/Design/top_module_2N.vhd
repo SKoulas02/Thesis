@@ -252,7 +252,6 @@ architecture two2N_arch of two2N is
 
     signal counter_lock     : integer range 0 to 7 := 0;
     signal last_win         : std_logic := '0';   -- latched: the window just loaded carries the vector tlast
-    signal tlast_end        : std_logic := '0';
     signal settle           : std_logic := '0';   -- lap-boundary bubble: hold one cycle so the weights-FIFO
                                                    -- head advances to the next group's first beat before its
                                                    -- Sparsity is sampled (needed for runtime 2:M reconfiguration)
@@ -260,9 +259,41 @@ architecture two2N_arch of two2N is
 
     signal flush_2to32      : std_logic;          -- combinational 2:32 vector-end flush (no-freeze path)
     signal tlast_in_core    : std_logic;          -- cores' tlast_in = registered terminals OR 2:32 flush
+
+    -- ---- end-of-calculation TLAST alignment (flush accounting) --------------
+    -- The last weight beat is CONSUMED ~41 cycles before the results already in
+    -- the pipeline DRAIN (mult 9 + add 9 + accum 20 + 3 register stages). The
+    -- previous logic latched 'tlast_end' on tlast_int_w and tagged the next
+    -- flush to appear -- the WRONG beat whenever the final lap is shorter than
+    -- the drain latency. The 1024x1024 run ends with a 2:32 group at 32
+    -- beats/lap, so it tagged flush 14 of 16. (It only looked correct under the
+    -- stress testbench, whose input bubbles stretch a lap to ~80 cycles and let
+    -- the pipeline empty first -- i.e. the stress run MASKED the bug, and
+    -- full-rate back-to-back streaming is the case that exposes it.)
+    --
+    -- Instead, count flushes ISSUED to the cores and flushes DRAINED from them.
+    -- The final flush trigger always coincides with tlast_int_w -- in the freeze
+    -- modes the terminal branch drives tlast_in_int and rd_en_int_w together,
+    -- and at 2:32 the flush_2to32 cycle is the very cycle its beat is consumed --
+    -- so when tlast_int_w fires the run's TOTAL flush count is already known and
+    -- we can tag the drained flush whose index matches. Immune to pipeline
+    -- depth, lap length and sparsity mode.
+    --
+    -- NOTE: counts tlast_in_core (= tlast_in_int OR flush_2to32), so BOTH flush
+    -- paths are covered. They are mutually exclusive, so it stays a clean
+    -- one-pulse-per-flush strobe.
+    signal flush_issued     : unsigned(15 downto 0) := (others => '0');
+    signal flush_drained    : unsigned(15 downto 0) := (others => '0');
+    signal flush_total      : unsigned(15 downto 0) := (others => '0');
+    signal total_known      : std_logic := '0';
 begin
 
-    m_axis_tlast <= tlast_end AND Ctlast_int;
+    -- Tag ONLY the final flush: the one draining now is number flush_drained+1
+    -- (flush_drained counts those already gone), and flush_total is the run's
+    -- total, known once the last weight beat has been consumed.
+    m_axis_tlast <= '1' when (total_known = '1' AND Ctlast_int = '1' AND
+                              (flush_drained + 1) = flush_total)
+                    else '0';
 
     -- Activation window mux: COMBINATIONAL so it tracks the same beat cycle as the
     -- weights bus (W_row_int). A registered mux lags one cycle and mispairs windows
@@ -370,15 +401,34 @@ begin
 
                 counter_lock    <= 0;
                 last_win        <= '0';
-                tlast_end       <= '0';
                 settle          <= '0';
+
+                flush_issued    <= (others => '0');
+                flush_drained   <= (others => '0');
+                flush_total     <= (others => '0');
+                total_known     <= '0';
 
             else
 
+                -- ---- flush accounting (see the note at the declarations) ----
+                if tlast_in_core = '1' then
+                    flush_issued <= flush_issued + 1;
+                end if;
+
+                if Ctlast_int = '1' then
+                    flush_drained <= flush_drained + 1;
+                end if;
+
                 if tlast_int_w = '1' then
-                    tlast_end <= '1';
-                elsif tlast_end = '1' AND Ctlast_int = '1' then
-                    tlast_end <= '0';   -- final tagged beat emitted; clear for the next run
+                    -- Total = flushes issued before this cycle, plus the final
+                    -- lap's own flush when it is triggered on this very cycle
+                    -- (the normal case, on both the freeze and 2:32 paths).
+                    if tlast_in_core = '1' then
+                        flush_total <= flush_issued + 1;
+                    else
+                        flush_total <= flush_issued;
+                    end if;
+                    total_known <= '1';
                 end if;
 
                 if settle = '1' then
