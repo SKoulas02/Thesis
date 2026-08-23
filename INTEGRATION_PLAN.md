@@ -66,9 +66,11 @@ tooling or hardware access.
    `xilinx_u280_gen3x16_xdma_1_202211_1` is built for 2022.2; Vitis 2021.1 cannot parse its
    `.xpfm` and fails with *"failed to parse the XPFM file"*. Because `platforminfo -l` scans
    the whole repo and dies on the first bad file, its mere presence breaks platform
-   discovery. Fix: symlink only the good platform into `~/platforms_2021` and point
-   `PLATFORM_REPO_PATHS` there; in build scripts pass the absolute `.xpfm` to
-   `v++ --platform` rather than relying on the scan.
+   discovery. **Scope corrected 2026-08-22: this affects `platforminfo -l` only.** A `v++`
+   compile enumerated all 15 installed platforms, the 2022.2 one included, without error --
+   so no symlink workaround is needed for builds. Just pass the absolute `.xpfm`:
+   `/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm`
+   (v++-verified). Keep the symlink trick in reserve only for `platforminfo`.
 3. **The HBM-vs-DDR sweep (§7.2) is viable on this single platform** — a `connectivity.cfg`
    change only, no re-platforming.
 4. The board is **on the build server**, so no `.xclbin` shuffling between machines.

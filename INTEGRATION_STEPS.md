@@ -17,12 +17,17 @@ Environment, sourced in every shell:
 ```bash
 source /opt/Xilinx/Vitis/2021.1/settings64.sh
 source /opt/xilinx/xrt/setup.sh
-export PLATFORM=~/platforms_2021/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
+export PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
 export BDF=0000:af:00.1
 ```
 
-Always pass the **absolute `.xpfm`** to `v++ --platform` — never rely on the repo scan
-(§0.1, the poison 2022.2 platform).
+Always pass the **absolute `.xpfm`** to `v++ --platform`. The path above is v++-verified
+(2026-08-22).
+
+> **Correction to §0.1:** the poison 2022.2 platform does **not** break `v++`. Its platform
+> scan enumerated all 15 installed platforms, including `xilinx_u280_gen3x16_xdma_1_202211_1`,
+> without error. The failure is specific to `platforminfo -l`. The `~/platforms_2021` symlink
+> workaround is therefore not needed for builds -- just pass the absolute path.
 
 ---
 
@@ -458,7 +463,7 @@ v++ -c -t hw_emu --platform $PLATFORM -k krnl_s2mm -o krnl_s2mm.hw_emu.xo krnl_s
 
 ## Stage E — link and hardware emulation (where the real debugging happens)
 
-### S15 [C] — `dense_hbm.cfg`
+### S15 [C] ✅ **DONE** — `dense_hbm.cfg`
 
 ```ini
 [connectivity]
@@ -482,7 +487,7 @@ The explicit `nk=` CU names are not cosmetic: without them every `sp=` and
 `stream_connect=` refers to `krnl_mm2s_1`…`krnl_mm2s_10` by position, and one transposed
 digit silently binds a weight PC to an activation stream.
 
-### S16 [C] — `host.cpp` (OpenCL / `xcl2`)
+### S16 [C] ✅ **DONE** — `host.cpp` (OpenCL, self-contained)
 
 Per §4, as decided in §0.2e. I vendor `xcl2.cpp`/`xcl2.hpp` from the examples repo
 (Apache-2.0) and write the host to drive **14 CUs** — 10 `krnl_mm2s` + 4 `krnl_s2mm` — with
@@ -500,7 +505,7 @@ silent-wrong-answer or deadlock bug otherwise:
 
 Plus a `--tiny` mode (1 window, 1 lap) for emulation.
 
-### S17 [S] — build for hw_emu
+### S17 [S] ✅ **DONE 2026-08-22** — build for hw_emu
 
 ```bash
 emconfigutil --platform $PLATFORM --nd 1        # generates emconfig.json — do not skip
@@ -519,7 +524,7 @@ g++ -Wall -O0 -g -std=c++1y -I./xcl2 -I$XILINX_XRT/include \
 **Pass:** link completes. Read the log for stream-connection warnings — a mistyped port name
 in `stream_connect` is a *warning*, not an error, and it leaves the stream dangling.
 
-### S18 [S] ⛔⛔ — run hw_emu, tiny case
+### S18 [S] ✅✅ **PASSED 2026-08-22** — run hw_emu, tiny case
 
 ```bash
 export XCL_EMULATION_MODE=hw_emu
@@ -543,11 +548,48 @@ Expect to spend real time here. If it **hangs**, the likely causes in order:
 corollary, if an experiment seems to require changing it, the cause is almost certainly in
 the engine or the link config.
 
+**STAGE E COMPLETE 2026-08-22.**
+
+- Link: 14/14 `stream_connect` resolved, 14/14 `sp=` bindings, 15 CUs, no warnings.
+- hw_emu run: 14 CUs launched and completed, 64 rows written.
+- `compare_dense_py36.py`: **64 rows, 0 mismatches, DATA: PASS (bit-exact)**.
+
+The whole memory path is proven: host -> HBM -> 10 mover CUs -> AXIS -> engine -> AXIS ->
+4 mover CUs -> HBM -> host, through the real interconnect, validated by the unchanged
+golden model.
+
+**Gotchas found and fixed in this stage, all recorded above:**
+- `[clock]` in the link config is rejected by this platform (2019.2-era, no fixed reference
+  clocks) -- use `--kernel_frequency` instead.
+- The platform's default `KERNEL_CLK` is **500 MHz**. Harmless in emulation; on hardware it
+  becomes the timing target and the engine cannot meet it. **`--kernel_frequency 300` is
+  mandatory at S19**, not optional tuning.
+- XRT warns `unaligned host pointer` once per buffer -- an extra memcpy per transfer.
+  Irrelevant to correctness and to emulation, but it lands inside any wall-clock number, so
+  fix it with `posix_memalign(4096, ...)` before reporting throughput at S22.
+
 ---
 
 ## Stage F — dense on hardware
 
-### S19 [S] — rebuild the mover `.xo` for `-t hw`, then link
+### S19 [S] ✅ **DONE 2026-08-23** — rebuild the mover `.xo` for `-t hw`, then link
+
+**RESULT:** `gemv_dense.xclbin` 45 MB, no errors, no critical warnings.
+**Post-route timing MET at 300 MHz:** WNS **+0.022 ns**, TNS 0.000, **0 failing endpoints**
+(821,238 total); hold and pulse-width clean.
+
+Two things learned the hard way:
+
+- **The first attempt died mid-route overnight.** Not OOM (the only logged kill was 2 days
+  earlier and hit `vitis_hls`) and not disk (the build used 2.9 GB against 62 GB free) --
+  almost certainly the X2Go session being torn down, since `nohup` only shields against
+  SIGHUP. **Run long builds inside `tmux`**, which is immune to every kind of disconnect.
+  Detach with Ctrl-B then D; `tail -f link_hw.log` to check progress without attaching.
+- **22 ps of margin is very tight.** The engine alone made +0.108 ns at *450* MHz
+  out-of-context; in-system at *300* MHz it barely closes. The cost is the system around it
+  -- 15 CUs, the interconnect to 14 HBM channels, and router-reported CLB congestion.
+  **Before drawing any Fmax conclusion at S22, find out which clock domain owns the critical
+  path** -- it may well be the memory system, not the compute datapath.
 
 ```bash
 v++ -c -t hw --platform $PLATFORM -k krnl_mm2s -o krnl_mm2s.hw.xo krnl_mm2s.cpp
@@ -561,14 +603,14 @@ v++ -t hw --platform $PLATFORM --config dense_hbm.cfg --kernel_frequency 300 \
 **Hours per build. Batch them overnight**, and check for card contention first — the machine
 is shared.
 
-### S20 [S] — check the card
+### S20 [S] ✅ **DONE 2026-08-23** — check the card
 
 ```bash
 xbutil examine --device $BDF --report all
 xbutil validate --device $BDF
 ```
 
-### S21 [S] ⛔ — first hardware run
+### S21 [S] ✅ **PASSED 2026-08-23** — first hardware run
 
 ```bash
 unset XCL_EMULATION_MODE
@@ -577,6 +619,95 @@ unset XCL_EMULATION_MODE
 
 **Pass:** bit-exact. Then walk the ladder without skipping: tiny → full 1024-element vector,
 1 lap → full 1024×1024, 16 laps.
+
+**FIRST HARDWARE RUN PASSED 2026-08-23.** Tiny case (V=64, 1 lap, 64 rows) on the physical
+U280 at BDF `0000:af:00.1`: 14 CUs launched and completed, `compare_dense_py36.py` reports
+**64 rows, 0 mismatches, DATA: PASS (bit-exact)**.
+
+The verification chain is unbroken end to end -- the same Python golden model validates
+behavioural sim, post-implementation sim, hw_emu, and hardware.
+
+**Card-sharing note:** `xbutil examine` showed someone else's **Vitis AI DPU** xclbin loaded
+before the run (`DPUCAHX8H_*:dpu_0/1/2`, all IDLE). Loading ours reprogrammed over it. With
+13 users on that machine, **check the Compute Units list is idle or empty before every
+hardware run** -- a `load_xclbin` while another user's design is mid-flight pulls it out from
+under them. Card health at the time: Device Ready yes, firewall GOOD, FPGA 36 C, ~30 W idle.
+
+**No rebuild is needed to change problem size.** The host derives every count from the image
+files, so the ladder below is regenerate + pack + run, with the same `.xclbin`.
+
+**LADDER COMPLETE 2026-08-23** (each run preceded by `xbutil reset`):
+
+| Rung | nwin | nlaps | V | rows | Result |
+|---|---|---|---|---|---|
+| 1 | 2 | 1 | 64 | 64 | ✅ bit-exact |
+| 2 | 2 | 32 | 64 | 2048 | ✅ bit-exact -- replay buffer over 32 laps |
+| 3 | 32 | 1 | 1024 | 64 | ✅ bit-exact -- 32-window load path |
+| 4 | 32 | 16 | 1024 | **1024** | ✅ bit-exact -- **both together, the §7.1 configuration** |
+
+Dense is correct on hardware across every geometry tested. Rung 4 is the first to exercise
+the multi-window load path and the replay buffer in the same run.
+
+### ⚠ S21b — **THE ENGINE IS SINGLE-SHOT PER PROGRAMMING** (found 2026-08-23)
+
+**Symptom.** The first hardware run after an xclbin load is bit-exact. Every run after that
+is wrong, with two different signatures:
+
+| Second run uses | Error |
+|---|---|
+| same geometry, different data | few percent (2.4%, 7.1%) -- right magnitude, wrong values |
+| different `nwin` | huge; output ~constant ~780 regardless of problem size |
+| same geometry, same data | **passes** -- the stale vector happens to be the right one |
+
+**Proof.** Byte-identical seed-222 stimulus, run twice. Without reset: FAIL (64/64, 7.09%).
+After `xbutil reset`: PASS bit-exact. The reset was the only variable.
+
+**Root cause.** `krnl_gemv_dense` is `ap_ctrl_none`, so the host cannot reset it -- `ap_rst_n`
+asserts only on FPGA programming. And the engine does not self-restore: `cycle_en_int` is set
+to '1' at the first lap boundary (`top_module_dense.vhd:448`) and cleared **only by resetn**,
+while the activation-load branch (`:414`) is guarded by `cycle_en_int = '0'`. So run 2 never
+loads a new vector -- it recirculates run 1's.
+
+**Why no testbench caught it:** simulation always starts from reset and runs exactly once.
+Both the sequential and the concurrent TB pass on stimulus that fails on hardware.
+
+**WORKAROUND, mandatory for every hardware run until fixed:**
+
+```bash
+xbutil reset --device 0000:af:00.1     # answer Y; do NOT paste it inside a command block
+./host gemv_dense.xclbin <emu_dir>
+```
+
+Consequences: a reset costs a full reconfiguration (seconds), it resets the card for **all**
+users, and repeat runs for timing statistics each need their own reset -- so the "run it 3x
+and take the best" advice in `host.cpp` only holds with a reset between runs.
+
+**The same bug is in `two2N`** -- identical control structure. It will bite at S24 unless
+fixed first.
+
+**DECISION 2026-08-23: take the workaround, defer the fix.** Reset before every hardware
+run; do not touch the RTL now. Rationale: dense correctness on hardware is already
+established, what remains in Stage F is measurement, and a reset per measured run is
+tolerable. Editing verified RTL on one afternoon's diagnosis -- with the sparse path still
+untouched -- is the worse trade. One calculation per programming is also a defensible
+operating model for a free-running accelerator, so it can be *documented* in the thesis
+rather than hidden.
+
+**DEFERRED FIX (Option B), if time allows -- revisit at S24:**
+
+1. Clear `cycle_en_int`, `counter_lock` and `last_win` when the end-of-calculation weight
+   TLAST is consumed, so the engine returns to its initial state.
+2. **Also drain or reset the activation replay FIFO** (`vector_cycle_512` /
+   `fifo_gen_vector_cycle`). Without this the next load *appends* to the stale vector and
+   you get a differently-corrupted result instead of a fixed one. This is the part that
+   makes it real RTL work rather than a one-line change.
+3. Re-verify: S3 simulation, both stress settings, plus a NEW test the current TBs cannot
+   express -- **two consecutive calculations in one simulation**, which is exactly the case
+   no testbench has ever exercised.
+4. Rebuild (`.xo` + multi-hour link), then repeat all of it for `two2N`.
+
+Reconsider it at S24: if sparse bring-up needs many hardware iterations, the fix pays for
+itself there. If sparse comes up as smoothly as dense did, the workaround is enough.
 
 ### S22 [S] — record dense baseline
 
