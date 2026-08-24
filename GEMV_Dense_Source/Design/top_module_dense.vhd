@@ -156,6 +156,7 @@ architecture dense_gemv_arch of dense_gemv is
 
             rd_en        : in  std_logic;
             cycle_en     : in  std_logic;
+            flush        : in  std_logic;
 
             ready        : out std_logic;
             A_vector_out : out std_logic_vector(A_PCS*PC_WIDTH-1 downto 0);
@@ -269,6 +270,26 @@ architecture dense_gemv_arch of dense_gemv is
     signal flush_total      : unsigned(15 downto 0) := (others => '0');
     signal total_known      : std_logic := '0';
 
+    -- ---- end-of-calculation TEARDOWN (re-runnability) -----------------------
+    -- The engine is free-running (ap_ctrl_none): the host cannot reset it, and
+    -- ap_rst_n asserts only when the FPGA is programmed. So a second calculation
+    -- had to start from whatever state the first one left behind.
+    --
+    -- cycle_en_int is already cleared at tlast_int_w (see the replay branch), so
+    -- the control DOES return to load mode. What was missing: the replay FIFO
+    -- still held the previous vector, so the next load appended behind it and the
+    -- head read back was stale -- run 2 computed new weights against OLD
+    -- activations. On hardware that showed up as a few-percent error with the same
+    -- geometry, and as garbage when the vector length changed.
+    --
+    -- Teardown waits until every result has DRAINED (flush_drained = flush_total)
+    -- before flushing, so the end-of-calc TLAST tagging above is untouched, then
+    -- pulses cyc_flush long enough for fifo_generator's synchronous reset and
+    -- clears the accounting for the next run.
+    signal end_pending      : std_logic := '0';
+    signal cyc_flush        : std_logic := '0';
+    signal flush_cnt        : integer range 0 to 15 := 0;
+
 begin
 
     -- Tag ONLY the final flush: the one draining now is number flush_drained+1
@@ -373,7 +394,40 @@ begin
                 flush_total     <= (others => '0');
                 total_known     <= '0';
 
+                end_pending     <= '0';
+                cyc_flush       <= '0';
+                flush_cnt       <= 0;
+
             else
+
+                -- ---- end-of-calculation teardown (see note at declarations) --
+                if tlast_int_w = '1' then
+                    end_pending <= '1';
+                end if;
+
+                if cyc_flush = '1' then
+                    if flush_cnt > 1 then
+                        flush_cnt <= flush_cnt - 1;
+                    else
+                        -- flush window over: the replay FIFO is empty and the
+                        -- accounting is cleared, so the next calculation starts
+                        -- exactly as it would after a power-on reset.
+                        cyc_flush     <= '0';
+                        flush_cnt     <= 0;
+                        end_pending   <= '0';
+                        flush_issued  <= (others => '0');
+                        flush_drained <= (others => '0');
+                        flush_total   <= (others => '0');
+                        total_known   <= '0';
+                        last_win      <= '0';
+                        settle        <= '0';
+                    end if;
+                elsif end_pending = '1' AND total_known = '1' AND
+                      flush_drained = flush_total then
+                    -- every result is out; safe to empty the replay buffer
+                    cyc_flush <= '1';
+                    flush_cnt <= 8;              -- >= 3 cycles of srst, with margin
+                end if;
 
                 -- ---- flush accounting (see the note at the declarations) ----
                 if tlast_in_int = '1' then
@@ -606,6 +660,7 @@ begin
 
             rd_en       => rd_en_int_c,
             cycle_en    => cycle_en_int,
+            flush       => cyc_flush,
 
             ready           => ready_int_c,
             A_vector_out    => A_vector_int_c,
