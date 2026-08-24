@@ -412,6 +412,21 @@ begin
                         -- flush window over: the replay FIFO is empty and the
                         -- accounting is cleared, so the next calculation starts
                         -- exactly as it would after a power-on reset.
+                        --
+                        -- cycle_en_int MUST be cleared here, not only in the
+                        -- replay branch. That branch has its own
+                        --     if tlast_int_w = '1' then cycle_en_int <= '0';
+                        -- but it sits under
+                        --     if settle='1' then <bubble> elsif cycle_en_int='0'
+                        --     then <load> else <replay>
+                        -- and the final lap's terminal sets settle <= '1' the
+                        -- cycle BEFORE tlast_int_w goes high -- so the bubble
+                        -- branch runs instead and the clear is skipped exactly
+                        -- when it is needed. That is the original cause of the
+                        -- engine being single-shot: stuck in replay AND holding a
+                        -- stale vector. This teardown is outside that if/elsif
+                        -- chain, so it always executes.
+                        cycle_en_int  <= '0';
                         cyc_flush     <= '0';
                         flush_cnt     <= 0;
                         end_pending   <= '0';
@@ -471,9 +486,12 @@ begin
 
                     if counter_lock = 0 then    -- New read from Activations vector
 
-                        -- Do not start a new window once the weight matrix has ended.
+                        -- Do not start a new window once the weight matrix has ended,
+                        -- and never during the end-of-calculation flush: the replay
+                        -- FIFO is held in reset there, so a load would consume an
+                        -- activation beat from the ingress stage and lose it.
                         if ready_int_w = '1' AND ready_int_a = '1' AND prog_full_int = '0'
-                           AND tlast_int_w = '0' then  -- inputs ready + output not near-full + not past end
+                           AND tlast_int_w = '0' AND cyc_flush = '0' then
 
                             rd_en_int_w <= '1';
                             rd_en_int_a <= '1';

@@ -685,7 +685,39 @@ and take the best" advice in `host.cpp` only holds with a reset between runs.
 **The same bug is in `two2N`** -- identical control structure. It will bite at S24 unless
 fixed first.
 
-**DECISION 2026-08-23: take the workaround, defer the fix.** Reset before every hardware
+**FIX IMPLEMENTED AND VERIFIED IN SIMULATION 2026-08-24.** Two causes, not one -- and they
+hid each other:
+
+1. **`cycle_en_int` was never cleared at end-of-calculation.** The replay branch does carry
+   `if tlast_int_w = '1' then cycle_en_int <= '0';` -- but it sits under
+   `if settle='1' then <bubble> elsif cycle_en_int='0' then <load> else <replay>`, and the
+   final lap's terminal sets `settle <= '1'` the cycle BEFORE `tlast_int_w` goes high. The
+   bubble branch runs instead, so the clear is skipped exactly when it is needed. The engine
+   stayed in replay mode forever.
+2. **The activation replay FIFO was never emptied**, so replay mode found the previous
+   vector and produced plausible-looking wrong numbers.
+
+Either alone would have been obvious: stuck-in-replay with an empty FIFO deadlocks (no
+output at all); a stale FIFO with a working mode reset is harmless. Together they produced
+new weights x old activations -- which is why it took a hardware run with *different data at
+the same geometry* to expose it.
+
+**Fix:** an end-of-calc teardown in `top_module_dense.vhd` that waits for
+`flush_drained = flush_total` (so TLAST tagging is untouched), then clears **`cycle_en_int`**,
+the flush accounting, `last_win` and `settle`, and pulses a new `flush` input on
+`vector_cycle_512` for 8 cycles -- that port ORs into the FIFO's `srst` and gates its enables.
+The teardown lives OUTSIDE the settle/load/replay chain, so it always executes. The load
+branch is blocked while flushing so an early-arriving next run cannot lose a beat.
+
+**Verified 2026-08-24 with `dense_gemv_axis_rerun_TB`** (new): two calculations, different
+seeds, one continuous simulation, no reset. Result: 4 beats, **TLAST seen 2 times**, and
+**256 rows bit-exact**. Single-calculation regression also bit-exact (128 rows).
+
+**STILL TO DO:** the other stress setting on the single-run regression; apply the same fix to
+`two2N` (identical structure, same bug); rebuild the `.xo` and `.xclbin`. Until the rebuild
+lands, the `xbutil reset` workaround below remains in force on hardware.
+
+**Superseded decision (2026-08-23): take the workaround, defer the fix.** Reset before every hardware
 run; do not touch the RTL now. Rationale: dense correctness on hardware is already
 established, what remains in Stage F is measurement, and a reset per measured run is
 tolerable. Editing verified RTL on one afternoon's diagnosis -- with the sparse path still
