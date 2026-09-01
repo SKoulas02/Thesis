@@ -1,19 +1,29 @@
 # ----------------------------------------------------------------------------
-# gen_xo_dense.tcl  --  S8b: package the DENSE GEMV engine as a Vitis RTL kernel
+# gen_xo_sparse.tcl  --  S23: package the 2:M SPARSE GEMV engine as a Vitis
+#                             RTL kernel
 #
-#   krnl_gemv_dense.xo   (ap_ctrl_none, free-running, 14 AXI4-Stream ports)
+#   krnl_gemv_sparse.xo  (ap_ctrl_none, free-running, 17 AXI4-Stream ports)
+#
+# Structurally identical to gen_xo_dense.tcl -- same six phases, same IP block.
+# That last point is not incidental: create_sparse_2021.tcl and
+# create_dense_2021.tcl instantiate the same 7 cores with the same settings,
+# which is what makes the sparse-vs-dense area comparison mean anything. Keep
+# all three in sync.
+#
+# Deltas from the dense script: 17 streams instead of 14 (the 3 index PCs),
+# two2N_axis instead of dense_gemv_axis, and 12 design files instead of 11.
 #
 # FLOW (INTEGRATION_PLAN.md 0.2c / 3.2, following the 2021.1 reference example
 # rtl_streaming_free_running_k2k/src/gen_xo.tcl):
 #   1. RTL Kernel Wizard IP   -> AXIS-conformant kernel shell + kernel.xml
 #   2. Open IP Example Design -> a normal Vivado project we can put real RTL in
-#   3. Swap the placeholder   -> our krnl_gemv_dense.v drives dense_gemv_axis
+#   3. Swap the placeholder   -> our krnl_gemv_sparse.v drives two2N_axis
 #   4. Add design sources+IP  -> the verified engine, IP regenerated natively
 #   5. Re-package the core    -> so component.xml lists the files we added
 #   6. package_xo             -> the .xo
 #
 # GUI USAGE (preferred) -- Vivado Tcl Console, with NO project open:
-#   source /home/skoulas/gen_xo_dense.tcl
+#   source /home/skoulas/gen_xo_sparse.tcl
 #
 # To re-run only some phases (e.g. after fixing one by hand), set this first:
 #   set ::GEN_XO_PHASES {5 6}
@@ -28,13 +38,26 @@
 
 # ---- configuration ---------------------------------------------------------
 set part   "xcu280-fsvh2892-2L-e"
-set kname  "krnl_gemv_dense"
+set kname  "krnl_gemv_sparse"
 
-# server layout; edit if the tree moves
-set repo   "/home/skoulas/GEMV_Dense"
-set src    "$repo/GEMV_Dense_Source"
-set build  "$repo/xo_build"
-set xo_out "$repo/$kname.xo"
+# server layout; edit if the tree moves.
+# NOTE the asymmetry, confirmed 2026-08-25: the sparse project ROOT is
+# GEMV_Sparse (NOT GEMV_4.0, which is the Vivado project dir inside it), but the
+# source folder under it IS GEMV_4.0_Source. Dense is GEMV_Dense/GEMV_Dense_Source.
+set repo   "/home/skoulas/GEMV_Sparse"
+set src    "$repo/GEMV_4.0_Source"
+
+# Build dir and output path are OVERRIDABLE so a second, experimental .xo can be
+# produced without clobbering the one an in-flight v++ link is using. Set these
+# BEFORE sourcing this script:
+#
+#   set ::GEN_XO_TAG _fix        -> xo_build_fix/ and krnl_gemv_sparse_fix.xo
+#
+# Two concurrent builds MUST NOT share a directory: v++ and this script both use
+# fixed subdirectories, and two writers in one tree corrupt each other silently.
+if {![info exists ::GEN_XO_TAG]} { set ::GEN_XO_TAG "" }
+set build  "$repo/xo_build$::GEN_XO_TAG"
+set xo_out "$repo/${kname}$::GEN_XO_TAG.xo"
 
 if {![info exists ::GEN_XO_PHASES]} { set ::GEN_XO_PHASES {1 2 3 4 5 6} }
 proc phase {n} { return [expr {[lsearch -exact $::GEN_XO_PHASES $n] >= 0}] }
@@ -46,15 +69,15 @@ if {![file isdirectory $src]} {
 }
 
 # ---- pre-flight: every file this script needs, checked up front ------------
-# Cheaper to fail here than three phases in. krnl_gemv_dense.v and
-# dense_gemv_axis.vhd are the two most likely to be missing -- they are new.
+# Cheaper to fail here than three phases in. krnl_gemv_sparse.v and
+# two2N_axis.vhd are the two most likely to be missing -- they are new.
 set need_files {
-    Design/krnl_gemv_dense.v
-    Design/dense_gemv_axis.vhd
-    Design/top_module_dense.vhd
-    Design/c_core_dense.vhd
-    Design/c_block_dense.vhd
-    Design/weights_fifo_dense.vhd
+    Design/krnl_gemv_sparse.v
+    Design/two2N_axis.vhd
+    Design/top_module_2N.vhd
+    Design/c_core_4.0.vhd
+    Design/c_block_4.0.vhd
+    Design/weights_fifo_4.0_2k.vhd
     Design/multiplier_wrapper_4.0.vhd
     Design/adder_wrapper_4.0.vhd
     Design/accumulator_wrapper_4.0.vhd
@@ -73,6 +96,7 @@ if {[llength $missing]} {
     return
 }
 say "pre-flight ok: all [llength $need_files] source files present"
+if {$::GEN_XO_TAG ne ""} { say "  TAG    = $::GEN_XO_TAG  (separate build dir + .xo name)" }
 say "  repo   = $repo"
 say "  src    = $src"
 say "  build  = $build"
@@ -108,18 +132,24 @@ if {[phase 1]} {
         CONFIG.NUM_RESETS     {1} \
         CONFIG.NUM_INPUT_ARGS {0} \
         CONFIG.NUM_M_AXI      {0} \
-        CONFIG.NUM_AXIS       {14} \
+        CONFIG.NUM_AXIS       {17} \
     ]
 
     # index -> {interface_name mode}.  32 bytes = 256 bits = one HBM pseudo-channel.
+    # 13 slaves (8 weight + 3 index + 2 activation) then 4 masters.
+    # Order must match the wizard's AXISnn slots and the names must match
+    # two2N_axis's port prefixes exactly -- the same strings key the
+    # stream_connect lines in sparse_hbm.cfg.
     set streams {
-        00 {s_axis_w0 read_only}   01 {s_axis_w1 read_only}
-        02 {s_axis_w2 read_only}   03 {s_axis_w3 read_only}
-        04 {s_axis_w4 read_only}   05 {s_axis_w5 read_only}
-        06 {s_axis_w6 read_only}   07 {s_axis_w7 read_only}
-        08 {s_axis_a0 read_only}   09 {s_axis_a1 read_only}
-        10 {m_axis_c0 write_only}  11 {m_axis_c1 write_only}
-        12 {m_axis_c2 write_only}  13 {m_axis_c3 write_only}
+        00 {s_axis_w0   read_only}   01 {s_axis_w1   read_only}
+        02 {s_axis_w2   read_only}   03 {s_axis_w3   read_only}
+        04 {s_axis_w4   read_only}   05 {s_axis_w5   read_only}
+        06 {s_axis_w6   read_only}   07 {s_axis_w7   read_only}
+        08 {s_axis_ind0 read_only}   09 {s_axis_ind1 read_only}
+        10 {s_axis_ind2 read_only}   11 {s_axis_a0   read_only}
+        12 {s_axis_a1   read_only}   13 {m_axis_c0   write_only}
+        14 {m_axis_c1   write_only}  15 {m_axis_c2   write_only}
+        16 {m_axis_c3   write_only}
     }
     foreach {idx spec} $streams {
         lassign $spec nm md
@@ -129,7 +159,7 @@ if {[phase 1]} {
     }
 
     set_property -dict $cfg [get_ips $kname]
-    say "  configured: ap_ctrl_none, 0 m_axi, 0 args, 14 x 256-bit AXIS, reset on"
+    say "  configured: ap_ctrl_none, 0 m_axi, 0 args, 17 x 256-bit AXIS, reset on"
 
     generate_target {instantiation_template} [get_files ${kname}.xci]
     generate_target all                      [get_files ${kname}.xci]
@@ -159,7 +189,7 @@ if {[phase 3]} {
     }
 
     # Replace the generated top with ours. Same module name, parameters and
-    # ports -- only the body differs (see the header of krnl_gemv_dense.v),
+    # ports -- only the body differs (see the header of krnl_gemv_sparse.v),
     # which is exactly what the generated comments invite.
     set gen_top [get_files -quiet "${kname}.v"]
     if {[llength $gen_top]} {
@@ -181,11 +211,11 @@ if {[phase 4]} {
     say "phase 4: add design sources and IP"
 
     add_files -norecurse [list \
-        "$src/Design/dense_gemv_axis.vhd" \
-        "$src/Design/top_module_dense.vhd" \
-        "$src/Design/c_core_dense.vhd" \
-        "$src/Design/c_block_dense.vhd" \
-        "$src/Design/weights_fifo_dense.vhd" \
+        "$src/Design/two2N_axis.vhd" \
+        "$src/Design/top_module_2N.vhd" \
+        "$src/Design/c_core_4.0.vhd" \
+        "$src/Design/c_block_4.0.vhd" \
+        "$src/Design/weights_fifo_4.0_2k.vhd" \
         "$src/Design/multiplier_wrapper_4.0.vhd" \
         "$src/Design/adder_wrapper_4.0.vhd" \
         "$src/Design/accumulator_wrapper_4.0.vhd" \
@@ -194,7 +224,7 @@ if {[phase 4]} {
         "$src/Design/c_fifo_4.0.vhd" \
     ]
 
-    # ---- IP: byte-identical to create_dense_2021.tcl. KEEP THE TWO IN SYNC.
+    # ---- IP: byte-identical to create_sparse_2021.tcl. KEEP THE TWO IN SYNC.
     # Non-default settings that silently change behaviour if wrong:
     #   Flow_Control Blocking + Has_RESULT_TREADY -> else duplicate output beats
     #   TLAST propagation                         -> else elaboration fails
@@ -412,9 +442,9 @@ if {[phase 5]} {
     source -notrace $pk
 
     # package_project does the whole job:
-    #   ipx::package_project -import_files   -> pulls in the 11 VHDL files and
+    #   ipx::package_project -import_files   -> pulls in the 12 VHDL files and
     #                                           the 7 IP cores we added
-    #   edit_core                            -> re-applies all 14 AXIS interface
+    #   edit_core                            -> re-applies all 17 AXIS interface
     #                                           definitions, clock/reset assoc,
     #                                           and the ap_ctrl_none model
     #   check_integrity -kernel / -xrt       -> validates against XRT's rules
@@ -447,7 +477,7 @@ if {[phase 6]} {
     }
     say "  packaging from: $core_dir"
     file delete -force $xo_out
-    # kernel.xml was generated by the wizard for this exact kernel (14 stream
+    # kernel.xml was generated by the wizard for this exact kernel (17 stream
     # ports, ap_ctrl_none, no s_axi_control) -- use it rather than letting
     # package_xo re-derive one.
     package_xo -force -xo_path $xo_out -kernel_name $kname \

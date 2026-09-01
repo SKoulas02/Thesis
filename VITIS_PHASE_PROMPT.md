@@ -1,3 +1,15 @@
+> ⚠️ **SUPERSEDED 2026-08-27 — this bootstrap prompt describes a starting state that no
+> longer exists.** It says "Phase 0.1 is done; everything after it is open". In fact the
+> whole integration is finished: BOTH architectures run bit-exact on the physical U280,
+> the sparsity ladder and runtime reconfiguration pass on hardware, and throughput AND
+> power are measured for all five configurations at 300 MHz, with power and clock-scaling
+> repeated at 325 MHz. Fmax: dense 350, sparse 325.
+>
+> **For a fresh chat, read `INTEGRATION_STEPS.md` first — that is the live status.**
+> `INTEGRATION_PLAN.md` remains valid as the *spec* (design decisions, conformance audits,
+> config formats) but not as a to-do list. Keep this file only as a record of how the phase
+> was originally framed.
+
 # Prompt for a new Claude Code chat — Vitis / system-integration phase
 
 Copy everything below the line into a fresh chat opened in `c:\Koulas\ECE\Thesis\Code`.

@@ -46,7 +46,19 @@
 //
 // RUN:
 //   hw_emu : XCL_EMULATION_MODE=hw_emu ./host gemv_dense.hw_emu.xclbin <emu_dir>
-//   hw     : ./host gemv_dense.xclbin <emu_dir>
+//   hw     : ./host gemv_dense.xclbin <emu_dir> [clock_MHz] [soak_seconds]
+//
+// CLOCK_MHZ (optional, default 300) is the frequency the .xclbin was LINKED at.
+// Dense closes at 300, so the default is right for it; the argument exists so
+// this host and host_sparse take the same command line and one measurement
+// script can drive both.
+//
+// SOAK_SECONDS (optional, default 0 = off) drives POWER MEASUREMENT. One
+// calculation lasts a few ms while `xbutil examine` takes about a second, so a
+// single run cannot be sampled. With soak_seconds > 0 the host re-enqueues all
+// 14 CUs back-to-back for that long with the buffers ALREADY RESIDENT -- no H2D
+// between iterations -- giving a sustained compute-only window, and prints its
+// bounds as epoch seconds so a sampler can clip to exactly the load.
 // ---------------------------------------------------------------------------
 
 #define CL_HPP_CL_1_2_DEFAULT_BUILD
@@ -60,6 +72,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>       // clock_gettime / struct timespec, for the power soak window
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -171,12 +184,26 @@ static cl::Device pick_u280() {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::fprintf(stderr, "usage: %s <xclbin> <emulation_dir>\n", argv[0]);
+        std::fprintf(stderr,
+            "usage: %s <xclbin> <emulation_dir> [clock_MHz] [soak_seconds]\n"
+            "  clock_MHz    : what the xclbin was LINKED at (default 300)\n"
+            "  soak_seconds : 0 = off (default). >0 re-runs the kernels "
+            "back-to-back for that long,\n"
+            "                 buffers resident, for POWER measurement.\n",
+            argv[0]);
         return 1;
     }
     const std::string xclbin_path = argv[1];
     const std::string emu = argv[2];
     const std::string bindir = emu + "/bin";
+    const double clock_mhz = (argc > 3) ? atof(argv[3]) : 300.0;
+    if (clock_mhz <= 0.0) {
+        std::fprintf(stderr, "clock_MHz must be positive\n");
+        return 1;
+    }
+    // Wall-clock DURATION, not an iteration count, so every configuration gets
+    // an identical measurement window regardless of how long one run takes.
+    const double soak_seconds = (argc > 4) ? atof(argv[4]) : 0.0;
 
     cl_int err = CL_SUCCESS;
 
@@ -278,7 +305,45 @@ int main(int argc, char** argv) {
     q.finish();
     std::printf("all CUs done\n");
 
+    // ---- POWER SOAK (optional) ---------------------------------------------
+    // Buffers stay resident: this loop enqueues ONLY the kernels, never a
+    // migration, so the card is doing compute and HBM traffic and nothing else.
+    size_t soak_iters = 0;
+    double soak_t0 = 0.0, soak_t1 = 0.0;
+    if (soak_seconds > 0.0) {
+        std::printf("\n--- power soak: %.1f s, buffers resident, compute only ---\n",
+                    soak_seconds);
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        soak_t0 = ts.tv_sec + ts.tv_nsec / 1e9;
+        std::printf("SOAK_START_EPOCH %.3f\n", soak_t0);
+        std::fflush(stdout);
+
+        double now = soak_t0;
+        while (now - soak_t0 < soak_seconds) {
+            for (int i = 0; i < C_PCS; ++i) OCL_CHECK(err, err = q.enqueueTask(k_c[i]));
+            for (int i = 0; i < A_PCS; ++i) OCL_CHECK(err, err = q.enqueueTask(k_a[i]));
+            for (int i = 0; i < W_PCS; ++i) OCL_CHECK(err, err = q.enqueueTask(k_w[i]));
+            q.finish();
+            ++soak_iters;
+            clock_gettime(CLOCK_REALTIME, &ts);
+            now = ts.tv_sec + ts.tv_nsec / 1e9;
+        }
+        soak_t1 = now;
+        std::printf("SOAK_END_EPOCH %.3f\n", soak_t1);
+        std::printf("soak: %zu consecutive calculations in %.3f s (%.3f ms each)\n",
+                    soak_iters, soak_t1 - soak_t0,
+                    (soak_t1 - soak_t0) * 1e3 / (double)soak_iters);
+        std::printf("      %.0f rows total, %.3f Mrow/s sustained\n",
+                    (double)soak_iters * n_out_beats * LANES,
+                    (double)soak_iters * n_out_beats * LANES / (soak_t1 - soak_t0) / 1e6);
+        std::fflush(stdout);
+    }
+
     // ---- device -> host ----------------------------------------------------
+    // After a soak this reads back the LAST iteration, so the usual compare
+    // verifies the engine is still bit-exact after thousands of consecutive
+    // calculations with no reset.
     cl::Event ev_d2h;
     OCL_CHECK(err, err = q.enqueueMigrateMemObjects(from_dev, CL_MIGRATE_MEM_OBJECT_HOST,
                                                     NULL, &ev_d2h));
@@ -299,8 +364,9 @@ int main(int argc, char** argv) {
     const double outb      = (double)out_bytes * C_PCS;
     const double rows      = (double)(n_out_beats * LANES);
     const double macs      = rows * (double)(n_act_beats * 32);   // rows x V
-    // At 300 MHz one weight beat should be consumed per cycle.
-    const double ideal_ns  = (double)n_weight_beats * (1000.0 / 300.0);
+    // One weight beat per cycle is the architectural roofline, so the ideal time
+    // depends on the clock this bitstream was actually built for.
+    const double ideal_ns  = (double)n_weight_beats * (1000.0 / clock_mhz);
 
     std::printf("\n--- measurements (OpenCL profiling events; excludes xclbin load) ---\n");
     std::printf("  H2D transfer   : %10.3f us   %8.3f GB/s   (%.0f bytes)\n",
@@ -315,8 +381,8 @@ int main(int argc, char** argv) {
                 (in_bytes + outb) / kernel_ns, in_bytes + outb);
     std::printf("  beats/cycle    : %10.3f      (1.000 = one weight beat per clock)\n",
                 ideal_ns / kernel_ns);
-    std::printf("  efficiency     : %10.1f %%    vs the %.3f us ideal at 300 MHz\n",
-                ideal_ns / kernel_ns * 100.0, ideal_ns / 1e3);
+    std::printf("  efficiency     : %10.1f %%    vs the %.3f us ideal at %.0f MHz\n",
+                ideal_ns / kernel_ns * 100.0, ideal_ns / 1e3, clock_mhz);
     std::printf("\n  NOTE: shared card -- run this several times and take the BEST kernel\n"
                 "        span. XRT skips reconfiguration when the same xclbin is already\n"
                 "        loaded, so repeat runs are cheap.\n");

@@ -51,7 +51,6 @@ from pathlib import Path
 import argparse
 import random
 import struct
-import torch
 
 HERE = Path(__file__).parent
 
@@ -75,16 +74,41 @@ GFILE = HERE / "golden.txt"
 SP_MAP = {"00": 4, "01": 8, "10": 16, "11": 32}
 
 
-# ---- bfloat16 helpers (torch, matching the 2:4 emulation style) ------------
-def f_to_bf16(x) -> torch.Tensor:
-    return torch.tensor(float(x), dtype=torch.float32).bfloat16()
+# ---- bfloat16 helpers (identical to the dense generator) -------------------
+# PURE PYTHON -- no torch. The university server has no PyTorch and installing it
+# for three lines of bit twiddling is not worth it. Verified BIT-IDENTICAL to the
+# previous torch implementation across the whole verification ladder (all four
+# sparsity codes, multi-window, multi-lap, runtime reconfiguration, and
+# --value-hi 100 where rounding actually bites) by diffing weights.hex /
+# indices.hex / activations.hex / golden.txt byte for byte. Do not "simplify" the
+# rounding below -- it is what makes the golden model match the Floating-Point IP.
+#
+# Values here are bf16 quantities carried in Python floats (i.e. doubles that
+# happen to hold exactly representable bf16 values), so the arithmetic is exact
+# until the explicit rounding calls.
 
-def bf16_raw(t: torch.Tensor) -> int:
-    return int(t.view(torch.int16).item()) & 0xFFFF
+def _fp32_bits(x):
+    return struct.unpack(">I", struct.pack(">f", float(x)))[0]
 
-def bf16_rne(x: torch.Tensor) -> torch.Tensor:
+def _bits_fp32(b):
+    return struct.unpack(">f", struct.pack(">I", b & 0xFFFFFFFF))[0]
+
+def _bf16_rne_raw(x):
+    """fp32 -> bf16 raw bits, round-to-nearest-EVEN (what the FP IPs do)."""
+    b = _fp32_bits(x)
+    lsb = (b >> 16) & 1                    # even/odd of the surviving mantissa
+    b = (b + 0x7FFF + lsb) & 0xFFFFFFFF    # tie goes to even
+    return (b >> 16) & 0xFFFF
+
+def f_to_bf16(x):
+    return _bits_fp32(_bf16_rne_raw(x) << 16)
+
+def bf16_raw(t) -> int:
+    return _bf16_rne_raw(t)
+
+def bf16_rne(x):
     """Round-to-Nearest-Even bf16 (Multiplier / Adder IPs)."""
-    return x.float().bfloat16()
+    return _bits_fp32(_bf16_rne_raw(x) << 16)
 
 def double_to_bf16_trunc_raw(s: float) -> int:
     """fp32 -> bf16 by truncation (Accumulator IP output); returns 16-bit hex value."""
@@ -150,9 +174,9 @@ def main() -> None:
                     win = beat_meta[gbeat][2]
                     w0, w1 = w_val[gbeat][i][b]
                     i0, i1 = idx[gbeat][i][b]
-                    p0 = bf16_rne(w0 * act_val[win][i0].float())
-                    p1 = bf16_rne(w1 * act_val[win][i1].float())
-                    add = bf16_rne(p0.float() + p1.float())
+                    p0 = bf16_rne(w0 * act_val[win][i0])
+                    p1 = bf16_rne(w1 * act_val[win][i1])
+                    add = bf16_rne(p0 + p1)
                     acc += float(add)
                 lap_out[8 * i + b] = double_to_bf16_trunc_raw(acc)
         golden.extend(lap_out)

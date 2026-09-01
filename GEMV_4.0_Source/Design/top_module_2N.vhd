@@ -160,6 +160,7 @@ architecture two2N_arch of two2N is
             
             rd_en        : in  std_logic;
             cycle_en     : in  std_logic;
+            flush        : in  std_logic;
             
             ready        : out std_logic;                                    
             A_vector_out : out std_logic_vector(A_PCS*PC_WIDTH-1 downto 0);
@@ -286,6 +287,36 @@ architecture two2N_arch of two2N is
     signal flush_drained    : unsigned(15 downto 0) := (others => '0');
     signal flush_total      : unsigned(15 downto 0) := (others => '0');
     signal total_known      : std_logic := '0';
+
+    -- ---- end-of-calculation TEARDOWN (re-runnability) -----------------------
+    -- Same fix as top_module_dense.vhd, applied 2026-08-24 for the same reason.
+    -- The engine is free-running (ap_ctrl_none): the host cannot reset it, and
+    -- ap_rst_n asserts only when the FPGA is programmed, so a second calculation
+    -- inherits whatever the first left behind. TWO causes, which hid each other:
+    --
+    --  1. cycle_en_int was never cleared. The replay branch does carry
+    --         if tlast_int_w = '1' then cycle_en_int <= '0';
+    --     but it sits under
+    --         if settle='1' then <bubble> elsif cycle_en_int='0' then <load>
+    --         else <replay>
+    --     and the final lap's terminal sets settle <= '1' the cycle BEFORE
+    --     tlast_int_w rises -- so the bubble branch (which explicitly HOLDS
+    --     cycle_en) runs instead and the clear is skipped exactly when needed.
+    --  2. The replay FIFO was never emptied, so replay mode found the previous
+    --     vector and produced new weights x OLD activations.
+    --
+    -- Alone, either is obvious: stuck-in-replay with an empty FIFO deadlocks,
+    -- a stale FIFO with a working mode reset is harmless. Together they give
+    -- plausible-looking wrong numbers, which is why hardware found this and no
+    -- testbench did (they all run one calculation from reset).
+    --
+    -- Teardown waits until every result has DRAINED (flush_drained = flush_total)
+    -- so the end-of-calc TLAST tagging above is untouched, then pulses cyc_flush
+    -- long enough for fifo_generator's synchronous reset and clears the state.
+    -- It lives OUTSIDE the settle/load/replay chain, so it always executes.
+    signal end_pending      : std_logic := '0';
+    signal cyc_flush        : std_logic := '0';
+    signal flush_cnt        : integer range 0 to 15 := 0;
 begin
 
     -- Tag ONLY the final flush: the one draining now is number flush_drained+1
@@ -408,7 +439,45 @@ begin
                 flush_total     <= (others => '0');
                 total_known     <= '0';
 
+                end_pending     <= '0';
+                cyc_flush       <= '0';
+                flush_cnt       <= 0;
+
             else
+
+                -- ---- end-of-calculation teardown (see note at declarations) --
+                if tlast_int_w = '1' then
+                    end_pending <= '1';
+                end if;
+
+                if cyc_flush = '1' then
+                    if flush_cnt > 1 then
+                        flush_cnt <= flush_cnt - 1;
+                    else
+                        -- Flush window over: replay FIFO empty, accounting clear,
+                        -- so the next calculation starts exactly as it would
+                        -- after a power-on reset.
+                        --
+                        -- cycle_en_int MUST be cleared HERE, not only in the
+                        -- replay branch -- see the note at the declarations for
+                        -- why that branch's clear is skipped.
+                        cycle_en_int  <= '0';
+                        cyc_flush     <= '0';
+                        flush_cnt     <= 0;
+                        end_pending   <= '0';
+                        flush_issued  <= (others => '0');
+                        flush_drained <= (others => '0');
+                        flush_total   <= (others => '0');
+                        total_known   <= '0';
+                        last_win      <= '0';
+                        settle        <= '0';
+                    end if;
+                elsif end_pending = '1' AND total_known = '1' AND
+                      flush_drained = flush_total then
+                    -- every result is out; safe to empty the replay buffer
+                    cyc_flush <= '1';
+                    flush_cnt <= 8;              -- >= 3 cycles of srst, with margin
+                end if;
 
                 -- ---- flush accounting (see the note at the declarations) ----
                 if tlast_in_core = '1' then
@@ -467,8 +536,12 @@ begin
                         -- Do not start a new window once the weight matrix has ended
                         -- (tlast_int_w). Exception: 2:32 has no freeze, so the load cycle
                         -- IS where the final beat is processed.
+                        -- ... and never during the end-of-calculation flush: the replay
+                        -- FIFO is held in reset there, so a load would consume an
+                        -- activation beat from the ingress stage and lose it.
                         elsif ready_int_w = '1' AND ready_int_a = '1' AND prog_full_int = '0'
-                           AND (sparsity_next = "11" OR tlast_int_w = '0') then  -- inputs ready + output not near-full + not past end
+                           AND cyc_flush = '0'
+                           AND (sparsity_next = "11" OR tlast_int_w = '0') then
 
                             rd_en_int_w <= '1';
                             rd_en_int_a <= '1';
@@ -707,6 +780,7 @@ begin
 
             rd_en       => rd_en_int_c,
             cycle_en    => cycle_en_int,
+            flush       => cyc_flush,
 
             ready           => ready_int_c,
             A_vector_out    => A_vector_int_c,

@@ -1,3 +1,11 @@
+> ⚠️ **HISTORICAL — the work this brief commissions is COMPLETE (2026-08-27).**
+> `dense_gemv` was built, verified bit-exact in simulation, packaged as a Vitis kernel, and
+> now runs on the physical U280. It has been measured against the sparse engine at all four
+> sparsities — throughput and power at 300 MHz, power and clock-scaling again at 325 MHz —
+> and its Fmax is established at **350 MHz** (sparse tops out at 325). Kept for the design
+> rationale it records; it is not a task list.
+> Live status: `INTEGRATION_STEPS.md`.
+
 # Handoff Brief — Build a Dense GEMV Variant as a Comparison Baseline
 
 ## Your role

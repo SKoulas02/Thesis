@@ -1,3 +1,20 @@
+> **STATUS 2026-09-02 — THIS PLAN IS EXECUTED. It is now a SPEC, not a to-do list.**
+> Both architectures run bit-exact on the physical U280; the sparsity ladder and runtime
+> reconfiguration pass on hardware; throughput AND power are measured for all five
+> configurations at 300 MHz, and power plus clock-scaling again at 325 MHz.
+> The design decisions, conformance audits, config formats and rationale below all remain
+> correct and worth consulting. **For what is done, what is open, and every measured
+> number, read `INTEGRATION_STEPS.md`** — that is the live document.
+>
+> Known deviations from this plan, all deliberate and recorded in the steps file:
+> Phase 1 (parameterisation audit) and §7.4 (core count) are OUT OF SCOPE; and a
+> power-measurement phase was added that this plan does not contain.
+>
+> ⚠️ **CORRECTED — an earlier version of this banner said the sparse system closes only at
+> 225 MHz.** That was true when written and is now FALSE. Two synthesis attributes plus an
+> SLR floorplan took the SAME RTL to 300 MHz, and later builds close **325 MHz on both
+> designs**. Fmax as finally established: **dense 350, sparse 325.**
+
 # Integration Plan — Getting Both GEMV Architectures Running on the Alveo U280
 
 **Status at the time of writing (2026-07-29).** Both architectures are RTL-complete,

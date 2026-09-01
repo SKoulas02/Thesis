@@ -74,6 +74,37 @@ architecture c_core_arch of c_core is
     signal valid_internal   : std_logic;
     signal tlast_internal   : std_logic;
 
+    -- ------------------------------------------------------------------------
+    -- KEEP ONE ACTIVATION-WINDOW REGISTER PER CORE.
+    --
+    -- All 8 cores latch the SAME A_vector under the SAME enable, so the eight
+    -- A_internal registers are logically identical and Vivado's
+    -- equivalent-register removal collapses them into ONE physical register.
+    -- By its own metric that is a win (it saves ~3,584 FFs out of 2.6 M); for
+    -- routing it is a disaster. Measured on the 250 MHz system build:
+    --
+    --   net A_in[109]  fo=128  ->  3.246 ns
+    --   critical path  3.758 ns total: logic 0.269 ns (7%), route 3.489 ns (93%)
+    --
+    -- fo=128 is exactly 64 blocks x 2 gather muxes -- i.e. every block in the
+    -- design hanging off one register bit, spread across the die. With the eight
+    -- copies kept apart each drives only its own 8 blocks x 2 muxes = 16 loads
+    -- and can be placed beside the core it feeds.
+    --
+    -- equivalent_register_removal, NOT dont_touch: this blocks only the
+    -- cross-core merge and leaves every other optimisation (including the
+    -- replication that max_fanout asks for) available.
+    --
+    -- Both are SYNTHESIS attributes and are inert in XSim, so simulation
+    -- semantics -- and every co-simulation result already banked -- are
+    -- unchanged. This is not a functional edit.
+    -- ------------------------------------------------------------------------
+    attribute equivalent_register_removal : string;
+    attribute equivalent_register_removal of A_internal : signal is "no";
+
+    attribute max_fanout : integer;
+    attribute max_fanout of A_internal : signal is 16;
+
 begin
 
     MAIN_PROC : process(clk)
