@@ -33,6 +33,7 @@ work/
 # Claude AI
 
 CLAUDE.md
+.claude/
 
 # IP Generated Files
 *.vho

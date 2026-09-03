@@ -1,0 +1,10 @@
+row_type,seq,sparsity_code,sparsity,freeze_cycles,beats_per_lap,laps,rows,weight_beats,us_per_beat_own_uniform_fit,predicted_compute_us,kernel_span_us,bandwidth_GBs,Mrow_s,beats_per_cycle_raw,span_best_us,span_worst_us,spread_pct,implied_overhead_us,beats_per_cycle_overhead_corrected,GFLOPS_effective
+segment,0,00,2:4,8,256,4096,262144,1048576,0.003406,3571.4,,,,,,,,,,
+segment,1,01,2:8,4,128,4096,262144,524288,0.003414,1789.9,,,,,,,,,,
+segment,2,10,2:16,2,64,4096,262144,262144,0.00344,901.8,,,,,,,,,,
+segment,3,11,2:32,1,32,4096,262144,131072,0.003459,453.4,,,,,,,,,,
+total,,,MIXED,,,16384,1048576,1966080,,6716.5,,,,,,,,,,
+repetition,1,,MIXED,,,,1048576,1966080,,,7400.701,93.796,141.686,0.886,,,,,,
+repetition,2,,MIXED,,,,1048576,1966080,,,7421.583,93.533,141.287,0.883,,,,,,
+repetition,3,,MIXED,,,,1048576,1966080,,,7429.368,93.435,141.139,0.882,,,,,,
+summary,,,MIXED,,,16384,1048576,1966080,,6716.5,7417.217,93.588,141.371,0.8837,7400.701,7429.368,0.387,700.7,0.9757,289.5

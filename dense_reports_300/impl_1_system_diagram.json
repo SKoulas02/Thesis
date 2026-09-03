@@ -1,0 +1,2055 @@
+{
+ "system_diagram_metadata": {
+  "schema_version": {
+   "major": "2",
+   "minor": "0",
+   "patch": "0"
+  },
+  "xsa": {
+   "vendor": "xilinx",
+   "board_id": "u280",
+   "name": "xdma",
+   "version_major": "201920",
+   "version_minor": "3",
+   "description": "This platform targets the U280 Acceleration Development Board. This high-performance acceleration platform features HBM, and Xilinx DMA Subsystem for PCI Express with PCIe Gen3 x16 connectivity.",
+   "generated_by": {
+    "name": "Vivado",
+    "version": "2019.2",
+    "cl": "2742762",
+    "time_stamp": "Tue Jan 21 23:21:22 2020"
+   },
+   "board": {
+    "name": "xilinx.com:au280:1.0",
+    "vendor": "xilinx.com",
+    "part": "xcu280-fsvh2892-2L-e",
+    "board_part": "xilinx.com:au280:part0:1.0"
+   },
+   "available_resources": {
+    "LUT": "1303680",
+    "REG": "2476694",
+    "BRAM": "2016",
+    "DSP": "9024",
+    "URAM": ""
+   },
+   "device_topology": [
+    {
+     "id": "0",
+     "type": "Ddr4",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[0]",
+     "slr": "",
+     "spTag": "HBM[0]"
+    },
+    {
+     "id": "1",
+     "type": "Ddr4",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[1]",
+     "slr": "",
+     "spTag": "HBM[1]"
+    },
+    {
+     "id": "2",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[2]",
+     "slr": "",
+     "spTag": "HBM[2]"
+    },
+    {
+     "id": "3",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[3]",
+     "slr": "",
+     "spTag": "HBM[3]"
+    },
+    {
+     "id": "4",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[4]",
+     "slr": "",
+     "spTag": "HBM[4]"
+    },
+    {
+     "id": "5",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[5]",
+     "slr": "",
+     "spTag": "HBM[5]"
+    },
+    {
+     "id": "6",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[6]",
+     "slr": "",
+     "spTag": "HBM[6]"
+    },
+    {
+     "id": "7",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[7]",
+     "slr": "",
+     "spTag": "HBM[7]"
+    },
+    {
+     "id": "8",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[8]",
+     "slr": "",
+     "spTag": "HBM[8]"
+    },
+    {
+     "id": "9",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[9]",
+     "slr": "",
+     "spTag": "HBM[9]"
+    },
+    {
+     "id": "10",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[10]",
+     "slr": "",
+     "spTag": "HBM[10]"
+    },
+    {
+     "id": "11",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[11]",
+     "slr": "",
+     "spTag": "HBM[11]"
+    },
+    {
+     "id": "12",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[12]",
+     "slr": "",
+     "spTag": "HBM[12]"
+    },
+    {
+     "id": "13",
+     "type": "Dram",
+     "used": "yes",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[13]",
+     "slr": "",
+     "spTag": "HBM[13]"
+    },
+    {
+     "id": "14",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[14]",
+     "slr": "",
+     "spTag": "HBM[14]"
+    },
+    {
+     "id": "15",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[15]",
+     "slr": "",
+     "spTag": "HBM[15]"
+    },
+    {
+     "id": "16",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[16]",
+     "slr": "",
+     "spTag": "HBM[16]"
+    },
+    {
+     "id": "17",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[17]",
+     "slr": "",
+     "spTag": "HBM[17]"
+    },
+    {
+     "id": "18",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[18]",
+     "slr": "",
+     "spTag": "HBM[18]"
+    },
+    {
+     "id": "19",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[19]",
+     "slr": "",
+     "spTag": "HBM[19]"
+    },
+    {
+     "id": "20",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[20]",
+     "slr": "",
+     "spTag": "HBM[20]"
+    },
+    {
+     "id": "21",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[21]",
+     "slr": "",
+     "spTag": "HBM[21]"
+    },
+    {
+     "id": "22",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[22]",
+     "slr": "",
+     "spTag": "HBM[22]"
+    },
+    {
+     "id": "23",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[23]",
+     "slr": "",
+     "spTag": "HBM[23]"
+    },
+    {
+     "id": "24",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[24]",
+     "slr": "",
+     "spTag": "HBM[24]"
+    },
+    {
+     "id": "25",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[25]",
+     "slr": "",
+     "spTag": "HBM[25]"
+    },
+    {
+     "id": "26",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[26]",
+     "slr": "",
+     "spTag": "HBM[26]"
+    },
+    {
+     "id": "27",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[27]",
+     "slr": "",
+     "spTag": "HBM[27]"
+    },
+    {
+     "id": "28",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[28]",
+     "slr": "",
+     "spTag": "HBM[28]"
+    },
+    {
+     "id": "29",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[29]",
+     "slr": "",
+     "spTag": "HBM[29]"
+    },
+    {
+     "id": "30",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[30]",
+     "slr": "",
+     "spTag": "HBM[30]"
+    },
+    {
+     "id": "31",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "HBM[31]",
+     "slr": "",
+     "spTag": "HBM[31]"
+    },
+    {
+     "id": "32",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "DDR[0]",
+     "slr": "",
+     "spTag": "DDR[0]"
+    },
+    {
+     "id": "33",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "DDR[1]",
+     "slr": "",
+     "spTag": "DDR[1]"
+    },
+    {
+     "id": "34",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[0]",
+     "slr": "",
+     "spTag": "PLRAM[0]"
+    },
+    {
+     "id": "35",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[1]",
+     "slr": "",
+     "spTag": "PLRAM[1]"
+    },
+    {
+     "id": "36",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[2]",
+     "slr": "",
+     "spTag": "PLRAM[2]"
+    },
+    {
+     "id": "37",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[3]",
+     "slr": "",
+     "spTag": "PLRAM[3]"
+    },
+    {
+     "id": "38",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[4]",
+     "slr": "",
+     "spTag": "PLRAM[4]"
+    },
+    {
+     "id": "39",
+     "type": "Dram",
+     "used": "no",
+     "sizeKB": "0x3fffff",
+     "base_address": "0x0",
+     "tag": "PLRAM[5]",
+     "slr": "",
+     "spTag": "PLRAM[5]"
+    },
+    {
+     "id": "40",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_0",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "41",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_1",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "42",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_2",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "43",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_3",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "44",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_4",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "45",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_5",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "46",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_6",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "47",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_7",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "48",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_8",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "49",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_9",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "50",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_10",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "51",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_11",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "52",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_12",
+     "slr": "",
+     "spTag": ""
+    },
+    {
+     "id": "53",
+     "type": "DirectConnection",
+     "used": "yes",
+     "sizeKB": "",
+     "base_address": "",
+     "tag": "dc_13",
+     "slr": "",
+     "spTag": ""
+    }
+   ],
+   "design_intent": [
+    "dataCenter",
+    "externalHost",
+    "serverManaged"
+   ]
+  },
+  "xclbin": {
+   "generated_by": {
+    "name": "v++",
+    "version": "2021.1",
+    "cl": "3246112",
+    "time_stamp": "2021-06-09-14:19:56",
+    "options": "/opt/Xilinx/Vitis/2021.1/bin/unwrapped/lnx64.o/v++ -l -t hw --platform /opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm --config dense_hbm.cfg --kernel_frequency 300 -o gemv_dense.xclbin krnl_mm2s.hw.xo ../krnl_gemv_dense.xo krnl_s2mm.hw.xo ",
+    "xclbin_name": "gemv_dense",
+    "uuid": "d9f4d273-8cd2-485f-8d97-eec2ac48c0b7",
+    "link_uuid": "d9f4d273-8cd2-485f-8d97-eec2ac48c0b7",
+    "package_uuid": "",
+    "system_compile_flow": false
+   },
+   "user_regions": [
+    {
+     "name": "OCL_REGION_0",
+     "type": "clc_region",
+     "instance_path": "pfm_top_i/dynamic_region",
+     "available_resources": {
+      "LUT": "1209440",
+      "REG": "2476694",
+      "BRAM": "1816",
+      "DSP": "9020",
+      "by_SLR": [
+       {
+        "name": "SLR0",
+        "LUT": "36171",
+        "REG": "88662",
+        "BRAM": "71",
+        "DSP": "357",
+        "URAM": "64"
+       },
+       {
+        "name": "SLR1",
+        "LUT": "35220",
+        "REG": "86746",
+        "BRAM": "71",
+        "DSP": "381",
+        "URAM": "64"
+       },
+       {
+        "name": "SLR2",
+        "LUT": "370136",
+        "REG": "737339",
+        "BRAM": "512",
+        "DSP": "2880",
+        "URAM": "320"
+       }
+      ],
+      "URAM": ""
+     },
+     "kernels": [
+      {
+       "name": "krnl_s2mm",
+       "estimated_resources": {
+        "LUT": "121",
+        "REG": "291",
+        "BRAM": "",
+        "DSP": "",
+        "URAM": ""
+       },
+       "ports": [
+        {
+         "name": "M_AXI_GMEM",
+         "mode": "master",
+         "range": "0xFFFFFFFF",
+         "data_width": "256",
+         "port_type": "addressable",
+         "base": "0x0",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "IN_R",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "S_AXI_CONTROL",
+         "mode": "slave",
+         "range": "0x1000",
+         "data_width": "32",
+         "port_type": "addressable",
+         "base": "0x0",
+         "direction": "DirUnknown"
+        }
+       ],
+       "arguments": [
+        {
+         "id": "0",
+         "name": "in",
+         "address_qualifier": "4",
+         "port": "IN_R",
+         "size": "0x0",
+         "offset": "0x0",
+         "host_offset": "0x0",
+         "host_size": "0x8",
+         "type": "stream\u003chls::axis\u003cap_uint\u003c256\u003e, 0, 0, 0\u003e, 0\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "1",
+         "name": "out",
+         "address_qualifier": "1",
+         "port": "M_AXI_GMEM",
+         "size": "0x8",
+         "offset": "0x10",
+         "host_offset": "0x0",
+         "host_size": "0x8",
+         "type": "void*",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "2",
+         "name": "n_beats",
+         "address_qualifier": "0",
+         "port": "S_AXI_CONTROL",
+         "size": "0x4",
+         "offset": "0x1C",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "unsigned int",
+         "direction": "DirUnknown"
+        }
+       ]
+      },
+      {
+       "name": "krnl_gemv_dense",
+       "ports": [
+        {
+         "name": "s_axis_w0",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w1",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w2",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w3",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w4",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w5",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w6",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_w7",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_a0",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "s_axis_a1",
+         "mode": "read_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "m_axis_c0",
+         "mode": "write_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "m_axis_c1",
+         "mode": "write_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "m_axis_c2",
+         "mode": "write_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "m_axis_c3",
+         "mode": "write_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        }
+       ],
+       "arguments": [
+        {
+         "id": "0",
+         "name": "s_axis_w0",
+         "address_qualifier": "4",
+         "port": "s_axis_w0",
+         "size": "0x4",
+         "offset": "0x010",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "1",
+         "name": "s_axis_w1",
+         "address_qualifier": "4",
+         "port": "s_axis_w1",
+         "size": "0x4",
+         "offset": "0x018",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "2",
+         "name": "s_axis_w2",
+         "address_qualifier": "4",
+         "port": "s_axis_w2",
+         "size": "0x4",
+         "offset": "0x020",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "3",
+         "name": "s_axis_w3",
+         "address_qualifier": "4",
+         "port": "s_axis_w3",
+         "size": "0x4",
+         "offset": "0x028",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "4",
+         "name": "s_axis_w4",
+         "address_qualifier": "4",
+         "port": "s_axis_w4",
+         "size": "0x4",
+         "offset": "0x030",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "5",
+         "name": "s_axis_w5",
+         "address_qualifier": "4",
+         "port": "s_axis_w5",
+         "size": "0x4",
+         "offset": "0x038",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "6",
+         "name": "s_axis_w6",
+         "address_qualifier": "4",
+         "port": "s_axis_w6",
+         "size": "0x4",
+         "offset": "0x040",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "7",
+         "name": "s_axis_w7",
+         "address_qualifier": "4",
+         "port": "s_axis_w7",
+         "size": "0x4",
+         "offset": "0x048",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "8",
+         "name": "s_axis_a0",
+         "address_qualifier": "4",
+         "port": "s_axis_a0",
+         "size": "0x4",
+         "offset": "0x050",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "9",
+         "name": "s_axis_a1",
+         "address_qualifier": "4",
+         "port": "s_axis_a1",
+         "size": "0x4",
+         "offset": "0x058",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "10",
+         "name": "m_axis_c0",
+         "address_qualifier": "4",
+         "port": "m_axis_c0",
+         "size": "0x4",
+         "offset": "0x060",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "11",
+         "name": "m_axis_c1",
+         "address_qualifier": "4",
+         "port": "m_axis_c1",
+         "size": "0x4",
+         "offset": "0x068",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "12",
+         "name": "m_axis_c2",
+         "address_qualifier": "4",
+         "port": "m_axis_c2",
+         "size": "0x4",
+         "offset": "0x070",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "13",
+         "name": "m_axis_c3",
+         "address_qualifier": "4",
+         "port": "m_axis_c3",
+         "size": "0x4",
+         "offset": "0x078",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "stream\u003cqdma_axis\u003c256,0,0,0\u003e\u003e&",
+         "direction": "DirUnknown"
+        }
+       ]
+      },
+      {
+       "name": "krnl_mm2s",
+       "estimated_resources": {
+        "LUT": "143",
+        "REG": "38",
+        "BRAM": "",
+        "DSP": "",
+        "URAM": ""
+       },
+       "ports": [
+        {
+         "name": "M_AXI_GMEM",
+         "mode": "master",
+         "range": "0xFFFFFFFF",
+         "data_width": "256",
+         "port_type": "addressable",
+         "base": "0x0",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "OUT_R",
+         "mode": "write_only",
+         "range": "",
+         "data_width": "256",
+         "port_type": "stream",
+         "base": "",
+         "direction": "DirUnknown"
+        },
+        {
+         "name": "S_AXI_CONTROL",
+         "mode": "slave",
+         "range": "0x1000",
+         "data_width": "32",
+         "port_type": "addressable",
+         "base": "0x0",
+         "direction": "DirUnknown"
+        }
+       ],
+       "arguments": [
+        {
+         "id": "0",
+         "name": "in",
+         "address_qualifier": "1",
+         "port": "M_AXI_GMEM",
+         "size": "0x8",
+         "offset": "0x10",
+         "host_offset": "0x0",
+         "host_size": "0x8",
+         "type": "void*",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "1",
+         "name": "out",
+         "address_qualifier": "4",
+         "port": "OUT_R",
+         "size": "0x0",
+         "offset": "0x0",
+         "host_offset": "0x0",
+         "host_size": "0x8",
+         "type": "stream\u003chls::axis\u003cap_uint\u003c256\u003e, 0, 0, 0\u003e, 0\u003e&",
+         "direction": "DirUnknown"
+        },
+        {
+         "id": "2",
+         "name": "n_beats",
+         "address_qualifier": "0",
+         "port": "S_AXI_CONTROL",
+         "size": "0x4",
+         "offset": "0x1C",
+         "host_offset": "0x0",
+         "host_size": "0x4",
+         "type": "unsigned int",
+         "direction": "DirUnknown"
+        }
+       ]
+      }
+     ],
+     "compute_units": [
+      {
+       "id": "0",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w0",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1538",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1538",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "1",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w1",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1536",
+         "REG": "2901",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1536",
+         "REG": "2901",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "2",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w2",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1533",
+         "REG": "2895",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1533",
+         "REG": "2895",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "3",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w3",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1538",
+         "REG": "2898",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1538",
+         "REG": "2898",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "4",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w4",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1536",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1536",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "5",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w5",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1541",
+         "REG": "2888",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1541",
+         "REG": "2888",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "6",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w6",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1534",
+         "REG": "2899",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1534",
+         "REG": "2899",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "7",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_w7",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1540",
+         "REG": "2888",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1540",
+         "REG": "2888",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "8",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_a0",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1534",
+         "REG": "2898",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1534",
+         "REG": "2898",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "9",
+       "kernel_name": "krnl_mm2s",
+       "cu_name": "mm2s_a1",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "1535",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "1557",
+         "REG": "2912",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "1535",
+         "REG": "2896",
+         "BRAM": "14",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "10",
+       "kernel_name": "krnl_gemv_dense",
+       "cu_name": "gemv",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "46926",
+         "REG": "79432",
+         "BRAM": "64",
+         "DSP": "512",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "50666",
+         "REG": "81126",
+         "BRAM": "64",
+         "DSP": "512",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "46926",
+         "REG": "79432",
+         "BRAM": "64",
+         "DSP": "512",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "11",
+       "kernel_name": "krnl_s2mm",
+       "cu_name": "s2mm_c0",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "2037",
+         "REG": "3175",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "2086",
+         "REG": "3242",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "2037",
+         "REG": "3175",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "12",
+       "kernel_name": "krnl_s2mm",
+       "cu_name": "s2mm_c1",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "2031",
+         "REG": "3170",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "2086",
+         "REG": "3242",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "2031",
+         "REG": "3170",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "13",
+       "kernel_name": "krnl_s2mm",
+       "cu_name": "s2mm_c2",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "2038",
+         "REG": "3176",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "2086",
+         "REG": "3242",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "2038",
+         "REG": "3176",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      },
+      {
+       "id": "14",
+       "kernel_name": "krnl_s2mm",
+       "cu_name": "s2mm_c3",
+       "base_address": "",
+       "actual_resources": [
+        {
+         "design_state": "routed",
+         "LUT": "2029",
+         "REG": "3170",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "synthesized",
+         "LUT": "2086",
+         "REG": "3242",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        },
+        {
+         "design_state": "fully_placed",
+         "LUT": "2029",
+         "REG": "3170",
+         "BRAM": "16",
+         "DSP": "0",
+         "URAM": "0"
+        }
+       ]
+      }
+     ],
+     "connectivity": [
+      {
+       "id": "0",
+       "node1": {
+        "type": "compute_unit",
+        "id": "0",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "0",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "1",
+       "node1": {
+        "type": "compute_unit",
+        "id": "1",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "1",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "2",
+       "node1": {
+        "type": "compute_unit",
+        "id": "2",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "2",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "3",
+       "node1": {
+        "type": "compute_unit",
+        "id": "3",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "3",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "4",
+       "node1": {
+        "type": "compute_unit",
+        "id": "4",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "4",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "5",
+       "node1": {
+        "type": "compute_unit",
+        "id": "5",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "5",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "6",
+       "node1": {
+        "type": "compute_unit",
+        "id": "6",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "6",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "7",
+       "node1": {
+        "type": "compute_unit",
+        "id": "7",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "7",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "8",
+       "node1": {
+        "type": "compute_unit",
+        "id": "8",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "8",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "9",
+       "node1": {
+        "type": "compute_unit",
+        "id": "9",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "9",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "10",
+       "node1": {
+        "type": "compute_unit",
+        "id": "11",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "10",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "11",
+       "node1": {
+        "type": "compute_unit",
+        "id": "12",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "11",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "12",
+       "node1": {
+        "type": "compute_unit",
+        "id": "13",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "12",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "13",
+       "node1": {
+        "type": "compute_unit",
+        "id": "14",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "memory",
+        "id": "13",
+        "kernel_argument_id": "",
+        "arg_name": "",
+        "mode": ""
+       }
+      },
+      {
+       "id": "14",
+       "node1": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "12",
+        "arg_name": "m_axis_c2",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "13",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "15",
+       "node1": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "10",
+        "arg_name": "m_axis_c0",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "11",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "16",
+       "node1": {
+        "type": "compute_unit",
+        "id": "9",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "9",
+        "arg_name": "s_axis_a1",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "17",
+       "node1": {
+        "type": "compute_unit",
+        "id": "8",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "8",
+        "arg_name": "s_axis_a0",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "18",
+       "node1": {
+        "type": "compute_unit",
+        "id": "7",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "7",
+        "arg_name": "s_axis_w7",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "19",
+       "node1": {
+        "type": "compute_unit",
+        "id": "6",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "6",
+        "arg_name": "s_axis_w6",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "20",
+       "node1": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "11",
+        "arg_name": "m_axis_c1",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "12",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "21",
+       "node1": {
+        "type": "compute_unit",
+        "id": "4",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "4",
+        "arg_name": "s_axis_w4",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "22",
+       "node1": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "13",
+        "arg_name": "m_axis_c3",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "14",
+        "kernel_argument_id": "0",
+        "arg_name": "in",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "23",
+       "node1": {
+        "type": "compute_unit",
+        "id": "0",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "0",
+        "arg_name": "s_axis_w0",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "24",
+       "node1": {
+        "type": "compute_unit",
+        "id": "2",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "2",
+        "arg_name": "s_axis_w2",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "25",
+       "node1": {
+        "type": "compute_unit",
+        "id": "3",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "3",
+        "arg_name": "s_axis_w3",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "26",
+       "node1": {
+        "type": "compute_unit",
+        "id": "1",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "1",
+        "arg_name": "s_axis_w1",
+        "mode": "Slave"
+       }
+      },
+      {
+       "id": "27",
+       "node1": {
+        "type": "compute_unit",
+        "id": "5",
+        "kernel_argument_id": "1",
+        "arg_name": "out",
+        "mode": "Master"
+       },
+       "node2": {
+        "type": "compute_unit",
+        "id": "10",
+        "kernel_argument_id": "5",
+        "arg_name": "s_axis_w5",
+        "mode": "Slave"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
+

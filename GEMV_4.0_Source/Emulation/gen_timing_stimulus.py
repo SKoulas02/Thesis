@@ -90,14 +90,30 @@ def build_index_pcs(sp_code):
 
 def write_stream(prefix, index, chunk, nbeats):
     """Write one per-PC image: nbeats copies of a 32-byte chunk."""
+    return write_segments(prefix, index, [(chunk, nbeats)])
+
+
+def write_segments(prefix, index, segments):
+    """Write one per-PC image from a list of (32-byte chunk, beat count).
+
+    A single-element list is the ordinary uniform-sparsity case. Several
+    elements produce a MIXED matrix: the beats of segment 0 first, then
+    segment 1, and so on. Because the sparsity code rides inside the index
+    beat itself, laying the index PCs out this way IS the schedule -- the
+    engine re-reads the code at every window boundary and re-derives its
+    freeze length from it (top_module_2N.vhd, `case sparsity_next`).
+    """
     path = BIN / "{}{}.bin".format(prefix, index)
+    nbeats = sum(n for _, n in segments)
     total = nbeats * PC_BYTES
     if total > HBM_PC_BYTES:
         raise SystemExit(
             "{}: {} bytes exceeds one HBM pseudo-channel ({} MB). "
             "Reduce --nlaps.".format(path.name, total, HBM_PC_BYTES // 1024 // 1024))
     # Build once, write once -- tiling a bytes object is instant even at 100s of MB.
-    path.write_bytes(chunk * nbeats)
+    with path.open("wb") as f:
+        for chunk, n in segments:
+            f.write(chunk * n)
     return total
 
 
@@ -107,7 +123,16 @@ def main():
                     help="00=2:4 01=2:8 10=2:16 11=2:32 -- sets the freeze, so it "
                          "sets the beat count and therefore the run length")
     ap.add_argument("--nwin", type=int, default=32, help="activation windows; V = 32*nwin")
-    ap.add_argument("--nlaps", type=int, required=True, help="laps = output beats")
+    ap.add_argument("--nlaps", type=int, help="laps = output beats")
+    ap.add_argument("--mix", default=None, metavar="CODE:LAPS,...",
+                    help="MIXED-SPARSITY matrix: split it into consecutive segments, "
+                         "each with its own sparsity. e.g. "
+                         "--mix 00:4096,01:4096,10:4096,11:4096 gives four equal-row "
+                         "parts at 2:4 / 2:8 / 2:16 / 2:32. One lap = 64 rows = one "
+                         "output beat, and sparsity MUST hold constant across a lap "
+                         "because a lap is one row's complete dot product -- the host "
+                         "rejects a mid-lap change. Mutually exclusive with "
+                         "--sparsity/--nlaps.")
     ap.add_argument("--freq-mhz", type=float, default=300.0,
                     help="COSMETIC ONLY -- scales the 'ideal kernel' line printed below. It "
                          "does NOT affect the generated images in any way; they are "
@@ -115,11 +140,47 @@ def main():
                          "floorplanned sparse build and dense close at 300 MHz.")
     a = ap.parse_args()
 
-    M = SP_MAP[a.sparsity]
-    freeze = 32 // M
-    beats_per_lap = a.nwin * freeze
-    n_weight_beats = a.nlaps * beats_per_lap
+    # ---- resolve the schedule: one segment, or several -----------------
+    if a.mix:
+        if a.nlaps is not None:
+            raise SystemExit("--mix and --nlaps are mutually exclusive")
+        plan = []
+        for part in a.mix.split(","):
+            part = part.strip()
+            if ":" not in part:
+                raise SystemExit("bad --mix entry {!r}; want CODE:LAPS".format(part))
+            code, laps = part.split(":", 1)
+            code = code.strip()
+            if code not in SP_MAP:
+                raise SystemExit("bad sparsity code {!r} in --mix; want one of {}"
+                                 .format(code, "/".join(sorted(SP_MAP))))
+            laps = int(laps)
+            if laps <= 0:
+                raise SystemExit("--mix segment {!r} needs a positive lap count".format(part))
+            plan.append((code, laps))
+        if len(plan) < 2:
+            raise SystemExit("--mix needs at least two segments; use --sparsity for one")
+    else:
+        if a.nlaps is None:
+            raise SystemExit("give --nlaps (single sparsity) or --mix (mixed matrix)")
+        plan = [(a.sparsity, a.nlaps)]
+
+    # per segment: beats/lap follows ITS sparsity, so a 2:4 segment costs 8x
+    # the beats of a 2:32 segment for the same number of rows.
+    seg = []
+    for code, laps in plan:
+        freeze_s = 32 // SP_MAP[code]
+        bpl = a.nwin * freeze_s
+        seg.append(dict(code=code, laps=laps, freeze=freeze_s, bpl=bpl,
+                        beats=laps * bpl, rows=laps * 64))
+
+    n_weight_beats = sum(x["beats"] for x in seg)
+    total_laps = sum(x["laps"] for x in seg)
+    total_rows = sum(x["rows"] for x in seg)
     n_act_beats = a.nwin
+    M = SP_MAP[seg[0]["code"]]
+    freeze = seg[0]["freeze"]
+    beats_per_lap = seg[0]["bpl"]
 
     BIN.mkdir(exist_ok=True)
 
@@ -127,10 +188,16 @@ def main():
     for i in range(W_PCS):
         wbytes += write_stream("weights_pc", i, W_PATTERN, n_weight_beats)
 
-    ind_chunks = build_index_pcs(a.sparsity)
+    # the index images carry the schedule
+    chunks_by_code = {}
+    for x in seg:
+        if x["code"] not in chunks_by_code:
+            chunks_by_code[x["code"]] = build_index_pcs(x["code"])
     ibytes = 0
     for i in range(IND_PCS):
-        ibytes += write_stream("ind_pc", i, ind_chunks[i], n_weight_beats)
+        ibytes += write_segments("ind_pc", i,
+                                 [(chunks_by_code[x["code"]][i], x["beats"]) for x in seg])
+    ind_chunks = chunks_by_code[seg[0]["code"]]
 
     abytes = 0
     for i in range(A_PCS):
@@ -139,25 +206,54 @@ def main():
     # Cheap self-check: the code must be readable back exactly where the host
     # will look for it. Costs nothing and catches a packing regression here
     # rather than as a wrong answer on the card.
+    for x in seg:
+        got_x = (chunks_by_code[x["code"]][2][16] & 0x3)
+        if got_x != int(x["code"], 2):
+            raise SystemExit("sparsity code landed wrong: PC2 byte 16 = {:02b}, expected {}"
+                             .format(got_x, x["code"]))
     got = (ind_chunks[2][16] & 0x3)
-    want = int(a.sparsity, 2)
-    if got != want:
-        raise SystemExit("sparsity code landed wrong: PC2 byte 16 = {:02b}, expected {}"
-                         .format(got, a.sparsity))
 
     ideal_us = n_weight_beats * (1000.0 / a.freq_mhz) / 1000.0
 
     print("SPARSE TIMING stimulus (no golden -- correctness is NOT checkable on this data)")
-    print("  sparsity       = {} (2:{}), freeze {} cyc/window".format(a.sparsity, M, freeze))
-    print("  V              = {} elements ({} windows)".format(a.nwin * 32, a.nwin))
-    print("  beats/lap      = {}".format(beats_per_lap))
-    print("  laps           = {}   -> {} output beats, {} rows".format(
-        a.nlaps, a.nlaps, a.nlaps * 64))
+    if len(seg) > 1:
+        print("  ** MIXED-SPARSITY MATRIX -- {} segments **".format(len(seg)))
+        print("  V              = {} elements ({} windows)".format(a.nwin * 32, a.nwin))
+        print("")
+        print("    {:>4}  {:<6} {:>8} {:>10} {:>12} {:>10}".format(
+            "seg", "code", "freeze", "beats/lap", "laps (rows)", "beats"))
+        for i, x in enumerate(seg):
+            print("    {:>4}  {:<6} {:>8} {:>10} {:>12} {:>10}".format(
+                i, "{} (2:{})".format(x["code"], SP_MAP[x["code"]]),
+                x["freeze"], x["bpl"],
+                "{} ({})".format(x["laps"], x["rows"]), x["beats"]))
+        print("    {:>4}  {:<6} {:>8} {:>10} {:>12} {:>10}".format(
+            "", "TOTAL", "", "", "{} ({})".format(total_laps, total_rows), n_weight_beats))
+        print("")
+        uni = [(c, total_rows // 64 * (a.nwin * (32 // SP_MAP[c]))) for c in ("00", "11")]
+        print("  for reference, the SAME {} rows uniformly:".format(total_rows))
+        for c, b in uni:
+            print("    all 2:{:<3} = {:>10} beats".format(SP_MAP[c], b))
+        print("  the mixed matrix costs {} beats -- between the two, as it must be."
+              .format(n_weight_beats))
+    else:
+        print("  sparsity       = {} (2:{}), freeze {} cyc/window".format(
+            seg[0]["code"], M, freeze))
+        print("  V              = {} elements ({} windows)".format(a.nwin * 32, a.nwin))
+        print("  beats/lap      = {}".format(beats_per_lap))
+        print("  laps           = {}   -> {} output beats, {} rows".format(
+            total_laps, total_laps, total_rows))
     print("  n_weight_beats = {}   (= n_index_beats)".format(n_weight_beats))
     print("  n_act_beats    = {}".format(n_act_beats))
     print("  images         = {:.1f} MB weights + {:.1f} MB indices + {:.3f} MB activations".format(
         wbytes / 1e6, ibytes / 1e6, abytes / 1e6))
-    print("  sparsity code  = verified at ind_pc2 byte 16 = {:02b}".format(got))
+    if len(seg) > 1:
+        print("  sparsity codes = all {} verified at ind_pc2 byte 16 of their segments"
+              .format(len(seg)))
+        print("                   the host will re-read them per lap and print its own")
+        print("                   schedule -- that printout is the proof the card saw them")
+    else:
+        print("  sparsity code  = verified at ind_pc2 byte 16 = {:02b}".format(got))
     print("  ideal kernel   = {:.3f} us at {:.0f} MHz (1 weight beat/clock)".format(
         ideal_us, a.freq_mhz))
     print("                   ^ informational only -- --freq-mhz does not change the data")

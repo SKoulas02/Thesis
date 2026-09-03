@@ -1,3 +1,12 @@
+---
+name: dense-gemv-handoff
+description: "HISTORICAL brief that commissioned the dense GEMV baseline — the work is COMPLETE (2026-08-27); kept for the design rationale it records, not as a task list"
+metadata:
+  node_type: memory
+  type: reference
+  modified: 2026-09-03T00:00:00.000Z
+---
+
 > ⚠️ **HISTORICAL — the work this brief commissions is COMPLETE (2026-08-27).**
 > `dense_gemv` was built, verified bit-exact in simulation, packaged as a Vitis kernel, and
 > now runs on the physical U280. It has been measured against the sparse engine at all four

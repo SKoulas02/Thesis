@@ -42,7 +42,23 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "GEMV_Hardware_Results.xlsx")
+DATA = os.path.join(HERE, "results")
+
+
+def _data(name):
+    # results/ first, then the repo root -- so a CSV freshly copied down from
+    # the server is still found before it has been filed away.
+    p = os.path.join(DATA, name)
+    return p if os.path.exists(p) else os.path.join(HERE, name)
+
+
+def _out(name):
+    if not os.path.isdir(DATA):
+        os.makedirs(DATA)
+    return os.path.join(DATA, name)
+
+
+OUT = _out("GEMV_Hardware_Results.xlsx")
 
 DENSE = ("dense", "dense_300MHz.csv", 300.0)
 SPARSE300 = [("2:4", "sparse_2to4_300MHz.csv"), ("2:8", "sparse_2to8_300MHz.csv"),
@@ -70,7 +86,7 @@ BOX = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 
 
 def load(path):
-    with io.open(os.path.join(HERE, path), encoding="utf-8") as f:
+    with io.open(_data(path), encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
@@ -388,7 +404,7 @@ r = para(ws, r, "This is a SEPARATE claim from the throughput result and does no
 # ===========================================================================
 # 3 -- Power and energy
 # ===========================================================================
-PWR = os.path.join(HERE, "power_results.csv")
+PWR = _data("power_results.csv")
 if os.path.exists(PWR):
     praw = load("power_results.csv")
 
@@ -559,7 +575,7 @@ if os.path.exists(PWR):
 # ===========================================================================
 # 3b -- 325 MHz: the highest clock BOTH designs close
 # ===========================================================================
-PWR325 = os.path.join(HERE, "power_results_325.csv")
+PWR325 = _data("power_results_325.csv")
 if os.path.exists(PWR325) and os.path.exists(PWR):
     XFMT = '0.00"x"'
     p325raw = load("power_results_325.csv")
@@ -819,6 +835,187 @@ if os.path.exists(PWR325) and os.path.exists(PWR):
         rr += 1
 
 # ===========================================================================
+# 3c -- Mixed sparsity (runtime reconfiguration within ONE matrix)
+# ===========================================================================
+MIXCSV = _data("mixed_sparsity_300MHz.csv")
+if os.path.exists(MIXCSV):
+    XF = '0.00"x"'
+    mrows = load("mixed_sparsity_300MHz.csv")
+    seg = [r for r in mrows if r["row_type"] == "segment"]
+    tot = [r for r in mrows if r["row_type"] == "total"][0]
+    reps = [r for r in mrows if r["row_type"] == "repetition"]
+    summ = [r for r in mrows if r["row_type"] == "summary"][0]
+
+    ws = wb.create_sheet("Mixed sparsity")
+    ws["A1"] = "Mixed-sparsity matrix - runtime reconfiguration WITHIN a single run"
+    ws["A1"].font = TITLE
+    r = 2
+    r = para(ws, r, "One matrix split into four consecutive quarters, each at a different "
+                    "sparsity: 2:4, then 2:8, then 2:16, then 2:32, with an equal number of "
+                    "rows in each. Measured on the 300 MHz bitstream. NOTHING IN THE RTL "
+                    "CHANGED for this - the engine already re-derives its freeze length from "
+                    "the sparsity code at every activation-window boundary (top_module_2N.vhd, "
+                    "`case sparsity_next`), and the host already read the code per lap. Only "
+                    "the stimulus generator gained a --mix flag.", NOTE, height=58)
+    r = para(ws, r, "THE SPLIT GRANULARITY IS THE LAP. One lap = 64 rows = one output beat, "
+                    "and sparsity must hold constant across a lap because a lap is one row's "
+                    "complete dot product - every window of the activation vector contributes "
+                    "to the same accumulation. The host rejects a mid-lap change outright.",
+             NOTE, height=30)
+
+    r += 1
+    ws.cell(row=r, column=1, value="1. THE SCHEDULE").font = SEC
+    r += 1
+    header(ws, r, ["Segment", "Sparsity", "Freeze (cyc/window)", "Beats/lap", "Laps",
+                   "Rows", "Weight beats"], widths=[10, 11, 17, 11, 10, 13, 14])
+    r += 1
+    for x in seg:
+        put(ws, r, 1, int(float(x["seq"])), "0", font=BOLD)
+        put(ws, r, 2, x["sparsity"], font=BOLD)
+        put(ws, r, 3, int(float(x["freeze_cycles"])), "0")
+        put(ws, r, 4, int(float(x["beats_per_lap"])), "#,##0")
+        put(ws, r, 5, int(float(x["laps"])), "#,##0")
+        put(ws, r, 6, int(float(x["rows"])), "#,##0")
+        put(ws, r, 7, int(float(x["weight_beats"])), "#,##0")
+        r += 1
+    put(ws, r, 1, "TOTAL", font=BOLD, fill=SUB_FILL)
+    for c in (2, 3, 4):
+        put(ws, r, c, "", fill=SUB_FILL)
+    put(ws, r, 5, int(float(tot["laps"])), "#,##0", font=BOLD, fill=SUB_FILL)
+    put(ws, r, 6, int(float(tot["rows"])), "#,##0", font=BOLD, fill=SUB_FILL)
+    put(ws, r, 7, int(float(tot["weight_beats"])), "#,##0", font=BOLD, fill=SUB_FILL)
+    r += 2
+
+    ws.cell(row=r, column=1,
+            value="2. IS THE RUN THE SUM OF ITS PARTS? - the scientific claim").font = SEC
+    r += 1
+    r = para(ws, r, "Each quarter SHOULD cost its own uniform per-beat rate. Predicting the "
+                    "whole run from the four independent uniform fits, with no fitting and no "
+                    "free parameters:", NOTE, height=15)
+    header(ws, r, ["Segment", "Weight beats", "us/beat (its own uniform fit)",
+                   "Predicted compute (us)"], widths=[11, 14, 26, 20])
+    r += 1
+    for x in seg:
+        put(ws, r, 1, x["sparsity"], font=BOLD)
+        put(ws, r, 2, int(float(x["weight_beats"])), "#,##0")
+        put(ws, r, 3, float(x["us_per_beat_own_uniform_fit"]), "0.000000")
+        put(ws, r, 4, float(x["predicted_compute_us"]), "0.0")
+        r += 1
+    put(ws, r, 1, "predicted total", font=BOLD, fill=SUB_FILL)
+    put(ws, r, 2, "", fill=SUB_FILL)
+    put(ws, r, 3, "", fill=SUB_FILL)
+    put(ws, r, 4, float(tot["predicted_compute_us"]), "0.0", font=BOLD, fill=SUB_FILL)
+    r += 2
+    for lbl, val, fmt in [("Measured kernel span (mean of 3)", float(summ["kernel_span_us"]), "0.0"),
+                          ("Measured kernel span (best of 3)", float(summ["span_best_us"]), "0.0"),
+                          ("Implied launch overhead (mean)", float(summ["implied_overhead_us"]), "0.0"),
+                          ("Launch overhead seen in uniform runs", "457.9 - 686.0 us", None)]:
+        put(ws, r, 1, lbl, font=BOLD)
+        put(ws, r, 2, val, fmt) if fmt else put(ws, r, 2, val)
+        r += 1
+    r += 1
+    r = para(ws, r, "THE MIXED MATRIX COSTS THE SUM OF ITS SEGMENTS PLUS THE ORDINARY FIXED "
+                    "OVERHEAD. The best span implies 684.0 us of overhead, inside the range "
+                    "observed across every uniform run; the mean implies 700.5 us, 2% above it "
+                    "- exactly what a mean should do when the comparison values are best-of-N "
+                    "fit intercepts. No penalty is paid at the three reconfiguration "
+                    "boundaries. Had the engine stalled to re-arm, or fallen back to the "
+                    "densest segment's freeze length, the span would be hundreds to thousands "
+                    "of microseconds longer.", NOTE, height=58)
+
+    r += 1
+    ws.cell(row=r, column=1, value="3. THE THREE REPETITIONS").font = SEC
+    r += 1
+    header(ws, r, ["Run", "Kernel span (us)", "Bandwidth (GB/s)", "Mrow/s",
+                   "beats/cycle (raw)"], widths=[8, 17, 17, 12, 18])
+    r += 1
+    for x in reps:
+        put(ws, r, 1, int(float(x["seq"])), "0", font=BOLD)
+        put(ws, r, 2, float(x["kernel_span_us"]), "0.000")
+        put(ws, r, 3, float(x["bandwidth_GBs"]), "0.000")
+        put(ws, r, 4, float(x["Mrow_s"]), "0.000")
+        put(ws, r, 5, float(x["beats_per_cycle_raw"]), "0.000")
+        r += 1
+    put(ws, r, 1, "spread", font=BOLD)
+    put(ws, r, 2, float(summ["spread_pct"]) / 100.0, "0.000%", fill=OK_FILL)
+    r += 2
+
+    ws.cell(row=r, column=1, value="4. HEADLINE, AVERAGED").font = SEC
+    r += 1
+    header(ws, r, ["Quantity", "Value"], widths=[38, 18])
+    r += 1
+    for lbl, val, fmt in [
+            ("Matrix", "1,048,576 x 1,024", None),
+            ("Latency, HBM->HBM (us, avg of 3)", float(summ["kernel_span_us"]), "0.0"),
+            ("Effective GFLOPS", float(summ["GFLOPS_effective"]), "0.0"),
+            ("HBM bandwidth (GB/s)", float(summ["bandwidth_GBs"]), "0.00"),
+            ("Throughput (Mrow/s)", float(summ["Mrow_s"]), "0.00"),
+            ("beats/cycle, OVERHEAD-CORRECTED",
+             float(summ["beats_per_cycle_overhead_corrected"]), "0.0000")]:
+        put(ws, r, 1, lbl, font=BOLD)
+        if fmt:
+            put(ws, r, 2, val, fmt, fill=(HI_FILL if "GFLOPS" in lbl else None))
+        else:
+            put(ws, r, 2, val)
+        r += 1
+    r += 1
+    r = para(ws, r, "DO NOT QUOTE THE HOST'S PRINTED beats/cycle OF 0.886 NEXT TO THE OTHER "
+                    "TABLES. That is a single-shot figure that still contains launch overhead, "
+                    "whereas every beats/cycle elsewhere in this workbook is fit-derived with "
+                    "overhead removed. Corrected the same way - 6,553.6 us ideal against "
+                    "6,716.7 us of compute - this run achieves 0.9757, indistinguishable from "
+                    "the uniform runs (0.964-0.986). It is the one number here that invites a "
+                    "wrong question.", NOTE, height=58)
+    r = para(ws, r, "WHAT THIS PROVES, AND WHAT IT DOES NOT. It proves correct runtime "
+                    "reconfiguration and correct timing in every segment. It does NOT prove "
+                    "bit-exactness: this is timing stimulus with no golden model, so the "
+                    "output.txt it writes must NOT be fed to compare_gemv4_py36.py - that "
+                    "would fail for the wrong reason. Bit-exact mixed-sparsity verification "
+                    "needs gemv4_cosim_gen.py extended to emit a segmented golden.",
+             NOTE, height=44)
+
+# ===========================================================================
+# 3d -- flat tables for charting (Master results, SLR floorplan)
+# ===========================================================================
+for fname, sheet, title, note in (
+        ("GEMV_Master_Results.csv", "Master table",
+         "Every measured configuration, one row each - the charting table",
+         "WIDE format on purpose: one row per configuration, every metric a column, so a "
+         "chart is a column selection. The `estimator` column is load-bearing - sweep_fit "
+         "numbers are marginal (launch overhead removed), power_soak numbers are sustained "
+         "(overhead included), and mixed_run_avg3 is the mean of three single runs. NEVER "
+         "chart one estimator against another; they differ by 5-6% for identical hardware."),
+        ("GEMV_Floorplan_SLR.csv", "Floorplan SLR",
+         "Per-die resource split of the routed design - the floorplan, in numbers",
+         "From impl_1_slr_util_routed.rpt of the 300 MHz SLR build. ALL 512 DSPs sit in "
+         "SLR1: the entire compute engine is on one die. SLR0 carries the movers, the HBM "
+         "interconnect (276 BRAM tiles, 41%, the highest of any die) and all 16 PCIe "
+         "transceivers. The 6,853 SLL crossings between SLR1 and SLR0 are the 17 AXIS "
+         "kernel-to-kernel streams. No routed DCP survived the Vitis link, so a device "
+         "screenshot is not available - this table is the evidence.")):
+    p_ = _data(fname)
+    if not os.path.exists(p_):
+        continue
+    rws = load(fname)
+    ws = wb.create_sheet(sheet)
+    ws.cell(row=1, column=1, value=title).font = TITLE
+    rr = para(ws, 2, note + "  Source: " + fname, NOTE, height=58)
+    cols = list(rws[0].keys())
+    header(ws, rr, cols, widths=[max(11, min(26, len(c) + 3)) for c in cols])
+    rr += 1
+    for row in rws:
+        for i, k in enumerate(cols, start=1):
+            v = row.get(k, "")
+            fv = fnum(row, k)
+            if fv is not None and k not in ("sparsity", "sparsity_code", "design",
+                                            "estimator", "row_type", "site_type", "holds"):
+                put(ws, rr, i, fv,
+                    "#,##0" if abs(fv) >= 1000 and float(fv).is_integer() else "0.####")
+            else:
+                put(ws, rr, i, v, font=(BOLD if i == 1 else None))
+        rr += 1
+
+# ===========================================================================
 # 4 -- Methodology
 # ===========================================================================
 ws = wb.create_sheet("Methodology")
@@ -923,7 +1120,7 @@ rows = [
      "quoted with them. The energy-per-row figures, which divide a LOAD power by a measured "
      "throughput, are far better conditioned.", None),
     ("* Dense was measured twice; dense_300MHz.csv is the run used here. An earlier run "
-     "recorded in INTEGRATION_STEPS.md S22 gives a 38.17 Mrow/s DIFFERENTIAL. Use the FIT "
+     "recorded in .claude/memory/INTEGRATION_STEPS.md S22 gives a 38.17 Mrow/s DIFFERENTIAL. Use the FIT "
      "(36.99), because every sparse figure is a fit and mixing estimators across the two "
      "sides of a comparison is indefensible. They agree on the physics (~1 beat/cycle).", None),
 ]

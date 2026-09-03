@@ -1,3 +1,12 @@
+---
+name: vitis-phase-prompt
+description: "SUPERSEDED 2026-08-27 bootstrap prompt for the Vitis phase — describes a starting state that no longer exists; kept only as a record of how the phase was framed"
+metadata:
+  node_type: memory
+  type: reference
+  modified: 2026-09-03T00:00:00.000Z
+---
+
 > ⚠️ **SUPERSEDED 2026-08-27 — this bootstrap prompt describes a starting state that no
 > longer exists.** It says "Phase 0.1 is done; everything after it is open". In fact the
 > whole integration is finished: BOTH architectures run bit-exact on the physical U280,
@@ -26,7 +35,7 @@ Alveo U280 and measuring them.
    the C Block / C Core / FIFO / top-module descriptions matter)
 2. `INTEGRATION_PLAN.md` — the 8-phase plan for this exact work. **This is the spec for
    this chat.** Phase 0.1 is already done and marked ✅; everything after it is open.
-3. These memory files, for state that isn't in the repo:
+3. These memory files (siblings of this one in `.claude/memory/`):
    - `gemv-server-2021-port` — the server environment, verified 2026-08-06
    - `gemv-impl-results-sparse-vs-dense` — the milestone results and where we are
    - `reference-vitis-rtl-kernel-workflow` — AMD RTL-kernel packaging reference I had you

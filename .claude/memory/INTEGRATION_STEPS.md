@@ -1,3 +1,12 @@
+---
+name: integration-steps
+description: "THE LIVE integration document — step-by-step execution guide with a pass criterion per step and every measured number; the authoritative detail behind gemv-integration-status"
+metadata:
+  node_type: memory
+  type: project
+  modified: 2026-09-03T00:00:00.000Z
+---
+
 # Integration — Step-by-Step Execution Guide
 
 Companion to [INTEGRATION_PLAN.md](INTEGRATION_PLAN.md). The plan says *what* and *why*;
@@ -130,7 +139,7 @@ transparent; stop and send me the diff.
 4. Run synthesis + implementation, then **Reports → Report Utilization** and
    **Report Timing Summary**
 
-**Pass:** **utilisation identical** to the pre-wrapper dense row in `Utilization.xlsx` --
+**Pass:** **utilisation identical** to the pre-wrapper dense row in `results/Utilization.xlsx` --
 LUT / LUTRAM / FF / DSP / BRAM / F7-F8 muxes. That is the check that proves the wrapper is
 free; a wrapper that costs LUTs is a wrapper that has logic in it.
 
@@ -786,10 +795,10 @@ slightly optimistic, 1.8% over against 2.8% measured spread. **Quote it as 1.0**
 > ⚠️ **WHICH DENSE NUMBER TO QUOTE — read this before using the figures above.**
 > TWO dense measurement runs exist and they are NOT the same data. The tables above are
 > from the first run (5 reps, best_us 1263.0 / 2222.7 / 4069.2 / 7502.8). The file
-> `dense_300MHz.csv` is a LATER, independent run (best_us 1350.0 / 2248.3 / 3962.5 /
-> 7559.1) and it is the one the §7.1 comparison and `GEMV_Hardware_Results.xlsx` use.
+> `results/dense_300MHz.csv` is a LATER, independent run (best_us 1350.0 / 2248.3 / 3962.5 /
+> 7559.1) and it is the one the §7.1 comparison and `results/GEMV_Hardware_Results.xlsx` use.
 >
-> **The authoritative dense figures are the least-squares FIT in `dense_300MHz.csv`:**
+> **The authoritative dense figures are the least-squares FIT in `results/dense_300MHz.csv`:**
 >
 > | | value |
 > |---|---|
@@ -881,14 +890,14 @@ Everything is the same shape with three deltas:
 | 18 | [C] | sparse `gen_timing_stimulus.py` + `Vitis/measure_sparse.py` | ✅ done 2026-08-26 |
 | 19 | [S] | throughput sweep, one CSV per sparsity | ✅ **DONE 2026-08-27** — R^2 >= 0.9998 on all four |
 | 20 | [S] | fanout experiment: 300 MHz + attributes + phys-opt | ✅ **FIX WORKS 2026-08-26** — broadcast no longer the critical path |
-| 21 | [C] | comparison `.xlsx` from the dense + 4 sparse CSVs | ✅ **DONE 2026-08-27** — `GEMV_Hardware_Results.xlsx` |
+| 21 | [C] | comparison `.xlsx` from the dense + 4 sparse CSVs | ✅ **DONE 2026-08-27** — `results/GEMV_Hardware_Results.xlsx` |
 | 22 | [C] | power tooling: `power_scraper.py`, `measure_power.py`, `[soak_seconds]` on both hosts | ✅ done 2026-08-27 |
 | 23 | [S] | power measurement, 5 configurations | ⛔ **next** (waiting on the floorplan build) |
 | 24 | [S] | SLR floorplan build (`slr_floorplan.cfg`) | ✅ **CLOSES 300 MHz 2026-08-31** |
 | 25 | [S] | correctness ladder on the 300 MHz bitstream | ✅ **ALL 5 PASS 2026-08-31** |
 | 26 | [S] | re-measure throughput at 300 MHz | ✅ **DONE 2026-08-31** |
 | 27 | [S] | power, 5 configurations | ✅ **DONE 2026-08-31** |
-| 28 | [C] | workbook with throughput + power, all clocks | ✅ **DONE** — `GEMV_Hardware_Results.xlsx`, **16 sheets** (225/300/325) |
+| 28 | [C] | workbook with throughput + power, all clocks | ✅ **DONE** — `results/GEMV_Hardware_Results.xlsx`, **16 sheets** (225/300/325) |
 
 **Step 7a result 2026-08-25 — PASS.** `--sparsity 10 --nwin 2 --nlaps 2`, full stress
 (gaps 4/4, tready stall 0.30): **2 output beats = 128 rows**, matching 2:16 exactly
@@ -923,7 +932,7 @@ clear the freeze counter across a sparsity change mid-stream (2 beats/window →
 utilisation **CLB LUTs 62,417 / LUT as Logic 56,657 / Registers 79,464 / F7 Muxes 8,192 /
 DSPs 512 / BRAM 74 / Bonded IOB 0**.
 
-Two things to note. First, **the July `Utilization.xlsx` sparse row is a stale baseline** —
+Two things to note. First, **the July `results/Utilization.xlsx` sparse row is a stale baseline** —
 it predates the ingress stages, the 2:32 fix, the TLAST drain fix and the teardown. Against
 it, timing is far better (−0.363 → −0.096 ns, 1,372 → 21 failing endpoints, Fmax ~387 →
 ~431 MHz) and LUTs are +47. Neither delta is attributable to the wrapper. Second, the
@@ -960,7 +969,7 @@ tool variation: the wrapper exposes 544 unused `tkeep` input bits that get trimm
 OOC boundary is not quite the same shape and synthesis decides marginally differently.
 Do not chase it.
 
-**REFRESHED SPARSE BASELINE (use this, not `Utilization.xlsx`'s July row):**
+**REFRESHED SPARSE BASELINE (use this, not `results/Utilization.xlsx`'s July row):**
 
 | | July | 2026-08-25 |
 |---|---|---|
@@ -1218,7 +1227,7 @@ architectures, unchanged throughout.
    Mrow/s and clock-normalised beats/cycle — the clock deficit is part of the result, not
    something to normalise away, but beats/cycle is what isolates the architecture from the
    frequency it happened to close at.
-2. **Dense area/timing baseline refresh** — the July `Utilization.xlsx` dense row predates
+2. **Dense area/timing baseline refresh** — the July `results/Utilization.xlsx` dense row predates
    the teardown, so it cannot be compared against the refreshed sparse numbers. One OOC
    implementation run of current-RTL `dense_gemv`.
 3. **The `A_internal` fanout experiment** — see S26b. Running as of 2026-08-26. **The §7.1
@@ -1386,8 +1395,8 @@ input bytes at every ratio.
 > routine noise, not evidence of a bad sweep. **What disqualifies a sweep is the FIT row going
 > above 1.0** — which has happened exactly once (2:4 at 325 MHz, rejected in S27h).
 
-Full workbook at the time of S27a: **`GEMV_Hardware_Results.xlsx`** (Comparison,
-Methodology, five raw-data sheets), built from `dense_300MHz.csv` +
+Full workbook at the time of S27a: **`results/GEMV_Hardware_Results.xlsx`** (Comparison,
+Methodology, five raw-data sheets), built from `results/dense_300MHz.csv` +
 `sparse_2to{4,8,16,32}_225MHz.csv`. ⚠️ **SNAPSHOT — SUPERSEDED.** The workbook has since
 grown to **16 sheets** covering 225, 300 and 325 MHz plus power at two clocks; see S27e and
 S27h for the current contents.
@@ -1592,9 +1601,9 @@ like sparse, on the reasoning that power is set by beat rate. It drew **31.30 W*
 was ignoring that these are different bitstreams with different STATIC power — the ~3.2 W
 idle gap above. The throughput half of the prediction (~35 Mrow/s) was right (35.265).
 
-Workbook: **`GEMV_Hardware_Results.xlsx`**, **16 sheets** — Comparison, Clock study, Power
+Workbook: **`results/GEMV_Hardware_Results.xlsx`**, **16 sheets** — Comparison, Clock study, Power
 and energy, power_raw, **325 MHz**, **power_raw_325**, Methodology, and nine raw sheets.
-Built by `make_comparison_xlsx.py` from the CSVs in the repo root. The two 325 sheets were
+Built by `make_comparison_xlsx.py` from the CSVs in `results/`. The two 325 sheets were
 added by S27h.
 
 ---
@@ -1673,7 +1682,7 @@ most of it; 350-vs-325 is what is left. That is the honest final statement on fr
 **WHAT THIS DOES AND DOES NOT CHANGE:**
 - The measured throughput/power comparison is at **300 MHz on both designs** and remains
   complete, self-consistent and correct. Nothing here disturbs it.
-- 325 MHz is verified correct on both designs AND **now measured for power/energy on all five configurations** (2026-09-02, `power_results_325.csv`, workbook sheet
+- 325 MHz is verified correct on both designs AND **now measured for power/energy on all five configurations** (2026-09-02, `results/power_results_325.csv`, workbook sheet
   "325 MHz"). See S27h below.
 - 350 MHz is a dense-only Fmax result. **Do not build an equal-clock comparison on it.**
 - Reporting both is honest and complementary: *at equal clock sparse is 1.98/3.96/7.86/15.63x
@@ -1687,7 +1696,7 @@ applied, at 300/325 no synthesis strategy applied at all.
 
 ### S27h ✅ **2026-09-02 — 325 MHz measured: power/energy on all five, scaling confirmed**
 
-Five 60 s soaks on the 325 MHz bitstreams (`power_results_325.csv`). **Board power is flat
+Five 60 s soaks on the 325 MHz bitstreams (`results/power_results_325.csv`). **Board power is flat
 across sparsity again — 35.45–36.34 W, a 2.5% spread across a 16× throughput range** —
 reproducing the 300 MHz mechanism. Static gap unchanged at **3.14 W** idle (sparse 30.21 vs
 dense 27.08); leakage does not care about frequency, and dynamic power duly rose in both.

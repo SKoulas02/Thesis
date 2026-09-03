@@ -1,0 +1,2 @@
+design,clock_mhz,sparsity,estimator,M_rows,N_cols,weight_beats,beats_per_row,latency_avg_us,latency_best_us,latency_worst_us,spread_pct,Mrow_s,bandwidth_avg_GBs,beats_per_cycle_raw,GFLOPS_effective,GFLOPS_actual,runs
+dense,325.0,dense,run_avg3,262144,1024,2097152,8.0,7130.17,7116.794,7141.519,0.347,36.765,75.37,0.9053,75.3,75.3,7141.519 7132.197 7116.794

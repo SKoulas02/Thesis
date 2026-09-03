@@ -1,3 +1,12 @@
+---
+name: integration-plan
+description: "The 8-phase Vitis integration plan — EXECUTED as of 2026-09-02, so it is now a SPEC (design decisions, conformance audits, config formats), not a to-do list"
+metadata:
+  node_type: memory
+  type: reference
+  modified: 2026-09-03T00:00:00.000Z
+---
+
 > **STATUS 2026-09-02 — THIS PLAN IS EXECUTED. It is now a SPEC, not a to-do list.**
 > Both architectures run bit-exact on the physical U280; the sparsity ladder and runtime
 > reconfiguration pass on hardware; throughput AND power are measured for all five
@@ -20,7 +29,7 @@
 **Status at the time of writing (2026-07-29).** Both architectures are RTL-complete,
 verified bit-exact against the Python golden model (behavioural *and* post-implementation
 functional simulation), and implemented out-of-context on `xcu280-fsvh2892-2L-e`. The
-module-level comparison numbers are collected in `Utilization.xlsx`.
+module-level comparison numbers are collected in `results/Utilization.xlsx`.
 
 **What is missing** is everything between the AXI4-Stream boundary and the board: the
 HBM/DDR read-write engine, kernel packaging, host software, and the measurement

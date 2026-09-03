@@ -1,0 +1,16 @@
+site_type,SLR0,SLR1,SLR2,SLR0_pct,SLR1_pct,SLR2_pct,holds
+CLB,19261,20726,8372,35.05,38.38,15.5,
+CLB LUTs,69453,113940,35362,15.8,26.38,8.19,
+LUT as Logic,53540,104211,32322,12.18,24.12,7.48,
+LUT as Memory,15913,9729,3040,7.75,4.92,1.54,
+CLB Registers,133849,133678,60953,15.22,15.47,7.05,
+CARRY8,1311,3357,313,2.39,6.22,0.58,
+F7 Muxes,3143,8843,1054,1.43,4.09,0.49,8192 of SLR1's are the sparse gather muxes
+F8 Muxes,16,141,47,0.01,0.13,0.04,
+Block RAM Tile,276,154.5,94,41.07,22.99,13.99,SLR0 highest (41%) = mover FIFOs + HBM interconnect
+URAM,0,0,0,0.0,0.0,0.0,
+DSPs,0,512,4,0.0,16.67,0.13,"ALL 512 in SLR1 = the entire GEMV engine, one die"
+GTs,16,0,0,,,,SLR0 only = PCIe transceivers
+SLL SLR1<->SLR0,,6853,,,,,the 17 AXIS kernel-to-kernel streams
+SLL SLR2<->SLR1,,3993,,,,,"platform, not ours"
+SLL total,,10846,,,,,
