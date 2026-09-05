@@ -42,6 +42,7 @@ vs 31.8 W) -- it just spends far less time drawing it.
 Run:  python make_energy_csv.py
 """
 
+import argparse
 import csv
 import io
 import os
@@ -55,9 +56,32 @@ def _data(name):
     return p if os.path.exists(p) else os.path.join(HERE, name)
 
 
-SHAPES = "GEMV_shapes_300MHz.csv"
-POWER = "power_results_0903.csv"
-OUT = os.path.join(DATA, "GEMV_Energy_300MHz.csv")
+# Per clock: (shape sweep, [power files, in priority order]).
+#
+#   300 keeps power_results_0903.csv -- a COMPLETE six-configuration set measured
+#   in ONE session, which is exactly what an energy comparison wants. Do not
+#   switch it to power_results.csv (2026-08-31): that file has no MIXED row, and
+#   swapping the source would move every 300 MHz energy value by ~1.6% and
+#   silently invalidate the energy charts already built from this file.
+#
+#   325 needs TWO files because MIXED was measured separately and later:
+#   power_results_325.csv (2026-09-02) covers dense + the four sparsities;
+#   power_mixed_both.csv (2026-09-05) supplies MIXED. Later files are listed
+#   FIRST so their rows win -- power_mixed_both.csv also carries a 300 MHz MIXED
+#   row, which is a useful cross-check against the 0903 one (236.8 vs 242.4
+#   nJ/row, 2.3% apart across sessions) but is not what the 300 set is built on.
+#
+#   ⚠️ power_mixed_325.csv is deliberately NOT used. It is a valid earlier
+#   soak of the same configuration, but it was taken while the card was still
+#   warm from a five-hour build: idle 30.88 W against 30.26 W once settled,
+#   which inflated its energy by 3.9% at identical throughput (158.311 vs
+#   158.930 Mrow/s, 0.39% apart). Kept as evidence that energy measurements
+#   need a settled card and throughput measurements do not.
+CLOCKS = {
+    300: ("GEMV_shapes_300MHz.csv", ["power_results_0903.csv"]),
+    325: ("GEMV_shapes_325MHz.csv", ["power_mixed_both.csv",
+                                     "power_results_325.csv"]),
+}
 
 # shape-sweep label -> power-soak label
 MAP = {"dense": "dense", "2:4": "sparse 2:4", "2:8": "sparse 2:8",
@@ -66,9 +90,24 @@ ORDER = ["dense", "2:4", "2:8", "2:16", "2:32", "MIXED"]
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--clock", type=int, default=300, choices=sorted(CLOCKS))
+    a = ap.parse_args()
+    SHAPES, POWERS = CLOCKS[a.clock]
+    OUT = os.path.join(DATA, "GEMV_Energy_%dMHz.csv" % a.clock)
+
     pw = {}
-    for r in csv.DictReader(io.open(_data(POWER), newline="", encoding="utf-8")):
-        pw[r["label"]] = (float(r["board_load_w"]), float(r["board_idle_w"]))
+    # later-listed files must NOT overwrite earlier ones: first file wins, so
+    # the freshest measurement of a configuration is the one used.
+    for pf in POWERS:
+        for r in csv.DictReader(io.open(_data(pf), newline="", encoding="utf-8")):
+            if abs(float(r["clock_mhz"]) - a.clock) > 0.5:
+                continue          # power_mixed_both.csv holds BOTH clocks
+            pw.setdefault(r["label"], (float(r["board_load_w"]),
+                                       float(r["board_idle_w"])))
+    missing = [MAP[c] for c in ORDER if MAP[c] not in pw]
+    if missing:
+        raise SystemExit("no %d MHz power row for: %s" % (a.clock, ", ".join(missing)))
 
     shp = {}
     for r in csv.DictReader(io.open(_data(SHAPES), newline="", encoding="utf-8")):

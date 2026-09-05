@@ -169,6 +169,120 @@ def block(ws, r, spec, S, D):
     return r
 
 
+
+SYS_SPARSE = os.path.join("sparse_reports_300slr", "impl_1_kernel_util_routed.rpt")
+SYS_DENSE = os.path.join("dense_reports_300", "impl_1_kernel_util_routed.rpt")
+
+
+def parse_kernel_util(path):
+    """report_accelerator_utilization output -> {name: [LUT, LUTAsMem, REG, BRAM, URAM, DSP]}.
+
+    This is a DIFFERENT report from the OOC utilization one: it is produced by the
+    Vitis link and breaks the routed device down per compute unit, so it includes
+    the 17 (sparse) / 14 (dense) HLS data movers and the platform shell.
+    """
+    p = os.path.join(HERE, path)
+    if not os.path.exists(p):
+        return None
+    out = {}
+    for line in io.open(p, encoding="utf-8", errors="replace"):
+        m = re.match(r"\|\s*(\S[^|]*?)\s*\|(.+)\|\s*$", line)
+        if not m or m.group(1).strip() == "Name":
+            continue
+        vals = re.findall(r"(\d+)\s*\[", m.group(2))
+        if len(vals) >= 6:
+            out[m.group(1).strip()] = [int(v) for v in vals[:6]]
+    return out or None
+
+
+def system_sheet(wb, S, D):
+    """Second sheet: what the WHOLE accelerator costs, movers and shell included."""
+    ws = wb.create_sheet("System")
+    ws["A1"] = "System-level area - the whole accelerator on the device"
+    ws["A1"].font = TITLE
+    r = 2
+    r = para(ws, r,
+             "POST-ROUTE, IN-SYSTEM, from the Vitis link's report_accelerator_utilization. "
+             "Unlike the Area sheet, this INCLUDES the HLS data movers (17 CUs sparse, 14 "
+             "dense) and the platform shell. Both builds are 300 MHz: sparse with the SLR "
+             "floorplan, dense without -- which is what each design was actually measured "
+             "on. Never mix these numbers with the OOC ones on the Area sheet.", height=44)
+
+    r += 1
+    ws.cell(row=r, column=1, value="1. WHERE THE LOGIC IS").font = SEC
+    r += 1
+    r = header(ws, r, ["Component", "Sparse LUT", "Dense LUT", "Sparse cost",
+                       "vs dense", "What it is"], [22, 12, 12, 13, 11, 62])
+    ENG_S, ENG_D = "krnl_gemv_sparse", "krnl_gemv_dense"
+    spec = [
+        ("engine (gemv CU)", S.get(ENG_S), D.get(ENG_D),
+         "the compute engine as placed IN SYSTEM"),
+        ("movers: mm2s", S.get("krnl_mm2s"), D.get("krnl_mm2s"),
+         "13 read movers vs 10 -- the 3 extra carry the sparsity INDICES"),
+        ("movers: s2mm", S.get("krnl_s2mm"), D.get("krnl_s2mm"),
+         "4 write movers in both -- the output path is unchanged by sparsity"),
+        ("ALL user logic", S.get("Used Resources"), D.get("Used Resources"),
+         "everything inside the dynamic region"),
+        ("platform (shell)", S.get("Platform"), D.get("Platform"),
+         "not ours -- grows only because more HBM channels are wired up"),
+    ]
+    for lab, a, b, note in spec:
+        if not a or not b:
+            continue
+        d = a[0] - b[0]
+        put(ws, r, 1, lab, font=BOLD)
+        put(ws, r, 2, a[0], "#,##0")
+        put(ws, r, 3, b[0], "#,##0")
+        put(ws, r, 4, d, "+#,##0;-#,##0;0", fill=(HI if d > 0 else OK))
+        put(ws, r, 5, d / float(b[0]), "+0.0%;-0.0%", fill=(HI if d > 0 else OK))
+        put(ws, r, 6, note)
+        r += 1
+
+    r += 1
+    mv_s = S["krnl_mm2s"][0] + S["krnl_s2mm"][0]
+    mv_d = D["krnl_mm2s"][0] + D["krnl_s2mm"][0]
+    r = para(ws, r,
+             "THE MOVERS ARE NOT A ROUNDING ERROR. Sparse: %s LUTs of engine plus %s of "
+             "movers = %s of user logic, so the data movers are %.0f%% of the accelerator "
+             "(dense: %.0f%%). An area claim that quotes only the engine understates the "
+             "real cost by about a third. Both numbers belong in the thesis, labelled."
+             % ("{:,}".format(S[ENG_S][0]), "{:,}".format(mv_s),
+                "{:,}".format(S["Used Resources"][0]),
+                100.0 * mv_s / S["Used Resources"][0],
+                100.0 * mv_d / D["Used Resources"][0]), height=44)
+    r = para(ws, r,
+             "THE ENGINE DELTA AGREES WITH THE OOC MEASUREMENT: +41.0%% in system against "
+             "+41.1%% out-of-context. Two independent implementations -- different tool "
+             "context, different constraint, different clock target -- landing within 0.1 "
+             "point. That is the area result cross-validated, and it is worth saying.",
+             height=30)
+    r = para(ws, r,
+             "The absolute engine figure does move: %s LUTs in system against 62,417 OOC, "
+             "+6.0%%, because the engine is re-optimised in context with the platform. So "
+             "the two sheets are not interchangeable even though their DELTAS agree."
+             % "{:,}".format(S[ENG_S][0]), height=30)
+
+    r += 1
+    ws.cell(row=r, column=1, value="2. FULL RESOURCE PICTURE").font = SEC
+    r += 1
+    r = header(ws, r, ["Component", "LUT", "LUTAsMem", "REG", "BRAM", "DSP"],
+               [22, 13, 13, 13, 11, 11])
+    for tag, src, eng in (("SPARSE", S, ENG_S), ("DENSE", D, ENG_D)):
+        put(ws, r, 1, tag, font=BOLD, fill=SEC_FILL)
+        for c in range(2, 7):
+            put(ws, r, c, "", fill=SEC_FILL)
+        r += 1
+        for k in (eng, "krnl_mm2s", "krnl_s2mm", "Used Resources", "Platform"):
+            if k not in src:
+                continue
+            v = src[k]
+            put(ws, r, 1, k)
+            for i, col in enumerate((0, 1, 2, 3, 5), start=2):
+                put(ws, r, i, v[col], "#,##0")
+            r += 1
+    return r
+
+
 def main():
     S, ms = parse(SPARSE)
     D, md = parse(DENSE)
@@ -254,6 +368,13 @@ def main():
              "the sentence for the slide. Effective GFLOPS are the mean-of-3 hardware "
              "measurements at 300 MHz; MIXED is one matrix carrying all four sparsities.",
              height=30)
+
+    SS = parse_kernel_util(SYS_SPARSE)
+    DD = parse_kernel_util(SYS_DENSE)
+    if SS and DD:
+        system_sheet(wb, SS, DD)
+    else:
+        print("NOTE: kernel utilization reports not found -- System sheet skipped")
 
     wb.save(OUT)
     print("wrote", OUT)

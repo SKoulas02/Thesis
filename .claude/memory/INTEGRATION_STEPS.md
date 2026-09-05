@@ -1784,7 +1784,13 @@ will fix this block.
 
 ### S31b [C+S] — hardware profiling monitors *(optional, only if time allows)*
 
-**Deferred by decision 2026-08-24.** Recorded so it is not re-derived.
+**Deferred by decision 2026-08-24. RE-RAISED by the professor 2026-09-03 and DEFERRED AGAIN
+— the reasoning below is unchanged and is the answer to give.** `Vitis/profile.cfg` is
+written and ready if the decision is reversed; the cost is 3–5 h and a build that will very
+likely not close 300 MHz. Note also that the professor's underlying question — *latency from
+first HBM read to last HBM write* — **is already answered without profiling**: the OpenCL
+kernel event span runs from `ap_start` to `ap_done`, so H2D, D2H and setup are already
+outside it. That is the number reported in µs throughout.
 
 `--package` options are Versal/embedded SD-card packaging -- irrelevant here. The real
 controls are `--profile` at link and `xrt.ini` at run time.
@@ -1820,10 +1826,101 @@ captured".
 **Do this only after** the big-stimulus + differential timing work. Monitors cannot fix a
 measurement that is 99% launch overhead -- they would just measure the wrong thing precisely.
 
-### S32 [C] — results table
+### S32 [C] — results table — ✅ **DONE 2026-09-03**
 
 One row per configuration: throughput (rows/s), cycles/lap, bytes moved, achieved GB/s and
 % of peak, LUT/FF/DSP/BRAM, achieved clock + WNS, power, and the correctness verdict.
+
+**Delivered as `results/GEMV_avg3_results.csv` (12 rows x 34 cols)** — dense + four sparsities
++ MIXED, at 300 and 325 MHz, all under the single `run_avg3` estimator. Full detail in the
+memory file `gemv-avg3-shapes-energy.md`; the numbers that go in the thesis:
+
+| | speed-up @300 | % of theory | GFLOPS eff @325 | energy vs dense | DSP occupancy |
+|---|---|---|---|---|---|
+| dense | 1.00x | — | 75.30 | 1.00x | 0.959–0.967 |
+| 2:4 | **1.979x** | 99.0 | 146.97 | 1.77x | 0.965–0.970 |
+| 2:8 | **3.947x** | 98.7 | 293.44 | 3.51x | 0.956–0.960 |
+| 2:16 | **7.833x** | 97.9 | 585.07 | 7.03x | 0.957 |
+| 2:32 | **15.481x** | 96.8 | **1143.51** | **13.99x** | 0.945–0.955 |
+| MIXED | 4.162x | (theory 4.267) | 310.43 | 3.80x | 0.969–0.970 |
+
+⚠️ **PASS CRITERION FOR ANY FUTURE ROW ADDED TO THIS TABLE: it must share the estimator.**
+`sweep_fit`, `power_soak` and `run_avg3` differ 5–6% for identical hardware. A row measured
+another way does not belong in this table, however correct it is on its own.
+
+### S32b [C] — matrix-shape sweep — ✅ **DONE 2026-09-03**
+
+`Vitis/run_shapes.py` → `results/GEMV_shapes_300MHz.csv` (72 rows). 11 shapes G1–G11 x 6
+configurations, **batched** (per-matrix latency = (measured − overhead) / R).
+
+- GEOMEAN speed-ups **2.0000 / 3.9623 / 7.9318 / 15.8113** = 98.8–99.99% of theory.
+- **Aspect ratio is irrelevant**: within each iso-work group (G4/G5, G6/G7/G8, G9/G10/G11)
+  latencies agree to **0.32–0.82%**. Only M×N matters.
+- **Pass criterion, met:** the mixed matrix must cost the mean of its four quarters. Predicted
+  6716.5 µs of compute, implied 6716.5 µs — **additive to 0.66%**, and within 3% across all
+  11 shapes. The prediction was registered before the measurement.
+
+⚠️ **`data_source` must stay the LAST column.** Finished charts address this sheet by absolute
+reference; inserting a column silently re-points every series with no error shown.
+
+### S32c [C] — energy — ✅ **DONE 2026-09-03**
+
+`make_energy_csv.py` joins the shape latencies with the 60 s soaks →
+`results/GEMV_Energy_300MHz.csv` (66 rows). W × µs = µJ directly.
+
+**Static is 84–86% of board energy in every configuration**, unmoved by shape or sparsity. The
+device leaks more than the accelerator burns, so **the only way to save energy is to finish
+sooner** — sparse draws MORE power (35.9 W vs 31.8 W) and still wins 13.99x at 2:32 purely on
+time. Chart the **per-element** columns; absolute energy spans 864x across these shapes.
+
+### S32d [C] — in-system utilization WITH the movers — ✅ **ALREADY EXISTED**
+
+`sparse_reports_300slr/impl_1_kernel_util_routed.rpt` and
+`dense_reports_300/impl_1_kernel_util_routed.rpt` are `report_accelerator_utilization` output
+from the original links and break the routed device down **per compute unit** — all 17 sparse
+CUs (`mm2s_a0/a1`, `mm2s_i0/i1/i2`, `mm2s_w0–w7`, `s2mm_c0–c3`) and 14 dense, plus the shell.
+Parsed into the **System** sheet of `results/GEMV_Area_Comparison.xlsx`.
+
+| Component | Sparse LUT | Dense LUT | Sparse cost |
+|---|---|---|---|
+| engine | 66,167 | 46,926 | **+41.0%** |
+| `krnl_mm2s` | 20,690 | 15,365 | +34.7% |
+| `krnl_s2mm` | 8,139 | 8,135 | +0.05% |
+| ALL user logic | 94,996 | 70,426 | +34.9% |
+| platform | 123,821 | 118,929 | +4.1% |
+
+**+41.0% in system vs +41.1% OOC cross-validates the area result.** The movers are **30% of
+the sparse accelerator** (33% dense) — quoting the engine alone understates the cost by a
+third. `s2mm` identical to 4 LUTs shows the output path is untouched by sparsity.
+
+⚠️ **A `--save-temps` rebuild adds NOTHING here.** Its only product is the routed `.dcp`.
+
+### S34 [S] — the device floorplan picture — ⏳ **THE LAST OUTSTANDING ARTEFACT**
+
+Vitis deletes the routed checkpoint by default, which is why no device view has ever been
+possible: every existing build kept per-IP checkpoints only, never the placed-and-routed
+system. `Vitis/build_floorplan.sh` (untracked) relinks both designs with `--save-temps`.
+
+Preflight passed 2026-09-04: 172 GB on `/`, 109 GB on `/home`, `v++` present, both `.xo`
+present. **Not yet confirmed launched.**
+
+```
+tmux new -s floorplan
+bash ~/build_floorplan.sh 2>&1 | tee ~/floorplan_build.log
+```
+
+It builds **both** designs, one after the other — 3–5 h each. It copies the ~1 GB `.dcp` out
+and deletes the 30–50 GB `_x` tree **before** starting the second, because two do not fit;
+`MIN_GB=60` refuses to start a link without the headroom rather than filling a shared machine.
+
+**It reproduces the builds that were MEASURED, and the asymmetry is deliberate:** sparse @300
+**with** `slr_floorplan.cfg`, dense @300 **without**. Dense closes 300 MHz with its engine in
+SLR0 beside the movers; sparse could not and needed its own die. **The two pictures showing
+different placements is itself the result.** Expect: all 512 sparse DSPs in SLR1, movers and
+HBM interconnect in SLR0, and 6,853 SLLs crossing SLR1↔SLR0 for the 17 AXIS streams
+(`results/GEMV_Floorplan_SLR.csv`).
+
+Then: `open_checkpoint ~/floorplan_dcp/sparse_routed.dcp`, **Window → Device**.
 
 ### S33 [C] — the write-up
 

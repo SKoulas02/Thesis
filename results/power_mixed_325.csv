@@ -1,0 +1,2 @@
+label,clock_mhz,V,soak_s,iterations,Mrow_s_sustained,board_load_w,board_idle_w,board_delta_w,vccint_load_w,vccint_idle_w,vccint_delta_w,vccint_load_a,board_load_min,board_load_max,board_load_sd,board_delta_se,vccint_delta_se,n_load,n_idle,energy_per_row_nJ,energy_per_MAC_pJ,GMAC_per_W,energy_per_row_nJ_vccint,sample_errors
+sparse MIXED,325.0,1024,60.0,9059,158.311,36.967,30.885,6.082,8.355,7.561,0.794,9.826,31.029,37.831,1.119,0.174,0.018,54,21,233.511,228.0381,4.3852,52.778,0
