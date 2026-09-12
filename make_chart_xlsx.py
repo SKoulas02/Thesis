@@ -91,6 +91,18 @@ SOURCES = [
     ("GEMV_Master_Results.csv", "Master"),
     ("mixed_sparsity_300MHz.csv", "Mixed sparsity"),
     ("GEMV_Floorplan_SLR.csv", "Floorplan SLR"),
+    # the CORES x BLOCKS = 64 study. Seven partitionings of the SAME 64 blocks,
+    # externally identical (17 PCs, 128 MACs/cycle, 512 DSPs), so throughput is
+    # invariant BY CONSTRUCTION and only area and Fmax can differ. Sorted by
+    # cores ascending, which is the x-axis for every chart off this sheet.
+    ("GEMV_Diagonal_CxB64.csv", "Diagonal CxB64"),
+    # the FAMILY study: six block-count families T in {16,32,48,64,96,128}, each
+    # at CORES in {4,8,16}. Bare engine, 1.5 ns constraint -- NOT comparable
+    # with the Diagonal sheet above, which used 2.222 ns and the AXIS wrapper.
+    # T=64 appears in both on purpose; keep the two studies separate.
+    ("GEMV_Family_AllPoints.csv", "Family AllPoints"),
+    # best point per family = the DSP vs HBM-channel scaling series.
+    ("GEMV_Family_Scaling.csv", "Family Scaling"),
 ]
 
 # Columns that hold labels even when they look numeric, so they are never

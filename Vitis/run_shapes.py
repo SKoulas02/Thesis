@@ -71,6 +71,26 @@ SHAPES = [
     ("G11", 2048, 8192),
 ]
 
+# OPT-IN shapes. NOT part of the default sweep -- reachable only via --only.
+#
+# H1 exists for ONE purpose: a same-board comparison against Serpens (Song,
+# Chi, Guo, Cong, DAC'22) at EQUAL NON-ZERO COUNT. Their hollywood row (their
+# Table 3: 1.07M vertices, 113M edges) is measured at 6.20 ms on Serpens-A16
+# (their Table 4). At 2:32 this engine's non-zero count is
+#     M x N / 16 = 220,672 x 8,192 / 16 = 112,984,064
+# which matches 113M to within 0.014%. M divides by 64 (3,448 laps) and also by
+# 256, so --sparsity mix stays legal on it.
+#
+# RUN IT AT --sparsity 11 ONLY. At any other sparsity the freeze changes, the
+# non-zero count changes with it, and the equal-NNZ match is gone.
+#
+# It is deliberately kept OUT of SHAPES: GEMV_Charts_Final.xlsx addresses the
+# merged shapes sheet by absolute cell reference and geomeans over exactly 11
+# shapes, so a 12th default row would silently move every chart series.
+EXTRA_SHAPES = [
+    ("H1", 220672, 8192),
+]
+
 FREEZE = {"00": 8, "01": 4, "10": 2, "11": 1}          # 32/M for 2:M
 LABEL = {"00": "2:4", "01": "2:8", "10": "2:16", "11": "2:32", "mix": "MIXED"}
 DENSE_FREEZE = 16                                       # dense: 512 beats/lap at nwin=32
@@ -141,6 +161,10 @@ def main():
     ap.add_argument("--target-beats", type=int, default=2097152,
                     help="batch each shape up to at least this many weight beats "
                          "so the launch overhead is a small, subtractable fraction")
+    ap.add_argument("--only", default=None,
+                    help="comma-separated shape names to run INSTEAD of the "
+                         "full 11-shape sweep, e.g. --only H1. Names may come "
+                         "from the default sweep or from EXTRA_SHAPES.")
     ap.add_argument("--csv", required=True)
     a = ap.parse_args()
     require_xrt()
@@ -162,9 +186,23 @@ def main():
         if not os.path.exists(p):
             raise SystemExit("no such {}: {}".format(what, p))
 
+    # ---- select shapes -----------------------------------------------------
+    # Default behaviour is unchanged: the same 11 shapes in the same order.
+    catalogue = SHAPES + EXTRA_SHAPES
+    if a.only:
+        want = [s.strip() for s in a.only.split(",") if s.strip()]
+        by_name = dict((n, (n, M, N)) for n, M, N in catalogue)
+        unknown = [w for w in want if w not in by_name]
+        if unknown:
+            raise SystemExit("unknown shape(s): {} -- known: {}".format(
+                ", ".join(unknown), ", ".join(n for n, _, _ in catalogue)))
+        selected = [by_name[w] for w in want]
+    else:
+        selected = SHAPES
+
     # ---- plan every shape before touching the card -------------------------
     plan = []
-    for name, M, N in SHAPES:
+    for name, M, N in selected:
         if M % 64:
             raise SystemExit("{}: M={} is not a multiple of 64".format(name, M))
         if N % 32:

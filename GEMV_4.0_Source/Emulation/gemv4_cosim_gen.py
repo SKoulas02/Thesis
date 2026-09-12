@@ -62,9 +62,38 @@ SEED       = 20250701
 VALUE_LO   = 1           # exact-in-bf16 integer range for weights & activations
 VALUE_HI   = 7           #   products <= 49, small sums -> exact in bf16 (no rounding)
 
-CORES      = 8
-BLOCKS     = 8
+CORES      = 8           # --cores  ) defaults are the 8x8 reference config; the
+BLOCKS     = 8           # --blocks ) family study overrides both on the command line
 WIN_ELEMS  = 32          # activation elements per window (512b / 16)
+
+
+def _ceildiv(a, b):
+    return -(-a // b)
+
+
+def derived(cores, blocks):
+    """Every bus width as a function of CORES x BLOCKS.
+
+    THE 8x8 NUMBERS USED TO BE LITERALS HERE -- 8*i+b, 16*i+2*b, 80*i+10*b,
+    <<640, and the 0512X/0192X format widths. Every one of them is a different
+    spelling of "8 blocks per core", and at 4x4 they produced an IndexError on
+    the first and silent corruption on the rest. Derived now:
+
+        T        = cores x blocks          C Blocks in total
+        W_PER_C  = 2 x blocks              weights per core (2 per block)
+        IBITS_C  = 10 x blocks             index bits per core (2 x 5-bit)
+        IND_BITS = 10 x T                  where the sparsity code sits
+        W_PCS    = ceil(T x 32 / 256)      weight PCs -> weight bus width
+        IND_PCS  = ceil((10T + 2) / 256)   +2 because the code rides ABOVE the
+                                           index bits, not inside them
+    """
+    T = cores * blocks
+    w_pcs = _ceildiv(T * 32, 256)
+    ind_bits = 10 * T
+    ind_pcs = _ceildiv(ind_bits + 2, 256)
+    return dict(T=T, W_PER_C=2 * blocks, IBITS_C=10 * blocks,
+                IND_BITS=ind_bits, W_PCS=w_pcs, IND_PCS=ind_pcs,
+                W_HEX=w_pcs * 64, I_HEX=ind_pcs * 64, A_HEX=128)
 
 WFILE = HERE / "weights.hex"
 IFILE = HERE / "indices.hex"
@@ -127,7 +156,14 @@ def main() -> None:
     ap.add_argument("--seed",  type=int, default=SEED)
     ap.add_argument("--value-lo", type=int, default=VALUE_LO)
     ap.add_argument("--value-hi", type=int, default=VALUE_HI)
+    ap.add_argument("--cores",  type=int, default=CORES)
+    ap.add_argument("--blocks", type=int, default=BLOCKS)
     a = ap.parse_args()
+
+    # Shape, and every bus width that follows from it. Local names so the body
+    # below reads the same as it always did.
+    CORES_N, BLOCKS_N = a.cores, a.blocks
+    D = derived(CORES_N, BLOCKS_N)
 
     # per-lap sparsity list (one code per lap)
     if a.sparsities:
@@ -158,17 +194,17 @@ def main() -> None:
     # weights & indices per beat, per (core, block): (w0,w1) tensors + (i0,i1) 0..31
     w_val = [[[ (f_to_bf16(rng.randint(a.value_lo, a.value_hi)),
                  f_to_bf16(rng.randint(a.value_lo, a.value_hi)))
-               for _ in range(BLOCKS)] for _ in range(CORES)] for _ in range(NBEATS)]
+               for _ in range(BLOCKS_N)] for _ in range(CORES_N)] for _ in range(NBEATS)]
     idx   = [[[ (rng.randint(0, WIN_ELEMS-1), rng.randint(0, WIN_ELEMS-1))
-               for _ in range(BLOCKS)] for _ in range(CORES)] for _ in range(NBEATS)]
+               for _ in range(BLOCKS_N)] for _ in range(CORES_N)] for _ in range(NBEATS)]
 
     # ---- golden: per-lap accumulate (exact internal), bf16-trunc at flush --
     golden = []                              # nlaps * 64 rows, in emit order
     for L in range(nlaps):
         lap_beats = [b for b in range(NBEATS) if beat_meta[b][0] == L]
-        lap_out = [0] * (CORES * BLOCKS)
-        for i in range(CORES):
-            for b in range(BLOCKS):
+        lap_out = [0] * D["T"]
+        for i in range(CORES_N):
+            for b in range(BLOCKS_N):
                 acc = 0.0
                 for gbeat in lap_beats:
                     win = beat_meta[gbeat][2]
@@ -178,7 +214,7 @@ def main() -> None:
                     p1 = bf16_rne(w1 * act_val[win][i1])
                     add = bf16_rne(p0 + p1)
                     acc += float(add)
-                lap_out[8 * i + b] = double_to_bf16_trunc_raw(acc)
+                lap_out[BLOCKS_N * i + b] = double_to_bf16_trunc_raw(acc)
         golden.extend(lap_out)
 
     # ---- pack + write bus beats -------------------------------------------
@@ -186,38 +222,41 @@ def main() -> None:
         for beat in range(NBEATS):
             wbus = 0
             ibus = 0
-            for i in range(CORES):
-                for b in range(BLOCKS):
+            for i in range(CORES_N):
+                for b in range(BLOCKS_N):
                     w0, w1 = w_val[beat][i][b]
-                    e0 = 16 * i + 2 * b
+                    e0 = D["W_PER_C"] * i + 2 * b
                     wbus |= bf16_raw(w0) << (16 * e0)
                     wbus |= bf16_raw(w1) << (16 * e0 + 16)
                     i0, i1 = idx[beat][i][b]
-                    base = 80 * i + 10 * b
+                    base = D["IBITS_C"] * i + 10 * b
                     ibus |= (i0 & 0x1F) << base
                     ibus |= (i1 & 0x1F) << (base + 5)
             sp_int = int(beat_meta[beat][1], 2)      # THIS beat's sparsity (its lap's)
-            ibus |= (sp_int & 0x3) << 640            # Sparsity at [641:640]
-            wf.write(f"{wbus:0512X}\n")              # 2048 bits
-            jf.write(f"{ibus:0192X}\n")              #  768 bits
+            ibus |= (sp_int & 0x3) << D["IND_BITS"]   # code rides ABOVE the index bits
+            wf.write("{:0{}X}\n".format(wbus, D["W_HEX"]))   # W_PCS x 256 bits
+            jf.write("{:0{}X}\n".format(ibus, D["I_HEX"]))   # IND_PCS x 256 bits
 
     with AFILE.open("w") as af:
         for w in range(a.nwin):
             abus = 0
             for k in range(WIN_ELEMS):
                 abus |= act_raw[w][k] << (16 * k)
-            af.write(f"{abus:0128X}\n")              # 512 bits
+            af.write("{:0{}X}\n".format(abus, D["A_HEX"]))   # A_PCS x 256 = 512, always
 
     with GFILE.open("w") as gf:
         for raw in golden:
             gf.write(f"{raw:04X}\n")                 # one bf16 per line
 
     laps_desc = ", ".join(f"L{L}:{s}(2:{SP_MAP[s]})" for L, s in enumerate(lap_sp))
+    print(f"shape={CORES_N}x{BLOCKS_N} = {D['T']} blocks   "
+          f"W_PCS={D['W_PCS']}  IND_PCS={D['IND_PCS']}  IND_BITS={D['IND_BITS']}")
     print(f"NWIN={a.nwin}  laps=[{laps_desc}]  total beats={NBEATS}")
-    print(f"  weights.hex    : {NBEATS} beats x 2048b -> {WFILE.name}")
-    print(f"  indices.hex    : {NBEATS} beats x  768b -> {IFILE.name}  (per-lap Sparsity in [641:640])")
+    print(f"  weights.hex    : {NBEATS} beats x {D['W_PCS']*256}b -> {WFILE.name}")
+    print(f"  indices.hex    : {NBEATS} beats x {D['IND_PCS']*256:4}b -> {IFILE.name}"
+          f"  (per-lap Sparsity in [{D['IND_BITS']+1}:{D['IND_BITS']}])")
     print(f"  activations.hex: {a.nwin} windows x 512b  -> {AFILE.name}")
-    print(f"  golden.txt     : {len(golden)} rows ({nlaps} lap(s) x 64) -> {GFILE.name}")
+    print(f"  golden.txt     : {len(golden)} rows ({nlaps} lap(s) x {D['T']}) -> {GFILE.name}")
 
 
 if __name__ == "__main__":
