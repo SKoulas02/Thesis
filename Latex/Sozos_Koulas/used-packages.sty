@@ -1,0 +1,124 @@
+\def\linkToHome{packages/}
+\RequirePackage{alphabeta}
+\RequirePackage[greek,english]{babel}
+
+\RequirePackage[
+ margin=3cm, 
+ bmargin=2cm, 
+]{geometry}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{afterpage}
+\RequirePackage{datetime}
+\RequirePackage[LGR,T1]{fontenc}
+\RequirePackage{amsmath} % Equations
+\RequirePackage{amssymb} % Equations
+\RequirePackage{amsthm}
+\RequirePackage{upquote} % Upright quotes for verbatim code
+% \RequirePackage{pgfmath}
+\RequirePackage{standalone}
+\RequirePackage{float}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{subcaption}
+\RequirePackage{mathtools}
+\RequirePackage{csquotes}
+\RequirePackage{pdfpages}
+\RequirePackage{booktabs}
+\RequirePackage{optidef}
+\RequirePackage{mwe}
+\RequirePackage[justification=centering]{caption}
+\RequirePackage{fancyhdr}
+\RequirePackage{bbm}
+\RequirePackage{dsfont}
+% \RequirePackage{histinit}
+\RequirePackage[]{parskip}
+% \RequirePackage{bookmark}
+
+\RequirePackage{multirow}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\RequirePackage{xcolor}
+
+\RequirePackage{minitoc}
+
+\def\colouredtextcolor{}
+
+\newcommand\InitialCharacter{}
+\usepackage{lettrine}
+\renewcommand\InitialCharacter[1]{%
+    \lettrine[lines=2]%
+    {\color{black}\scalebox{1.3}%
+    {#1}}{}%
+}
+% \RequirePackage[hyphens]{url}
+
+% \Urlmuskip=0mu plus 1mu\relax
+% \def\UrlBreaks{\do\/\do-}
+% \RequirePackage{breakurl}
+\RequirePackage[pdfencoding=unicode]{hyperref}
+% \PassOptionsToPackage{hyphens}{url}
+% \RequirePackage[pdfencoding=unicode]{hyperref}
+\hypersetup{
+   colorlinks,
+   citecolor = black,
+   filecolor = black,
+   linkcolor = black,
+   urlcolor = black
+}
+
+\RequirePackage{bookmark}
+
+% ======================================================
+\RequirePackage[linesnumbered,ruled,vlined,]{algorithm2e}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+% ======================================================
+
+\numberwithin{equation}{section}
+
+
+% ======================================================
+% 
+%	CUSTOM STYLES
+%
+% ======================================================
+\RequirePackage{\linkToHome environments}
+% \RequirePackage{\linkToHome commands}
+\RequirePackage{\linkToHome math-commands}
+
+
+
+\addto\captionsenglish{% Replace "english" with the language you use
+	\renewcommand{\contentsname}{Contents}%
+	\renewcommand{\figurename}{Figure}
+	\renewcommand{\tablename}{Table}
+	\renewcommand{\listfigurename}{Figure List}%
+	\renewcommand{\listtablename}{Table List}
+	\renewcommand{\appendixname}{Appendix}
+	\renewcommand{\refname}{Bibliography}%
+	\renewcommand{\mtctitle}{mm}
+}
+
+
+\counterwithin{figure}{section}
+\makeatletter
+\renewcommand{\@chapapp}{Chapter}
+\renewcommand{\footrulewidth}{0.4pt}
+\setlength{\footskip}{70pt}
+\setlength{\headsep}{30pt}
+\makeatother
+
+
+
+
+
+
+
+
+
+
+
+
+
+

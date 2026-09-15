@@ -9,6 +9,18 @@ metadata:
 
 # Integration — Step-by-Step Execution Guide
 
+> **⚠️ STATUS BANNER (added 2026-09-14). This file was last updated on 2026-09-05 and is no
+> longer the live position. The short memories are current:**
+> - Scope "8 cores, fixed" below is **SUPERSEDED**. The professor requested the cores/blocks
+>   study, and both the diagonal (OOC) and the six-family bitstream campaign (built + measured)
+>   are done: [[gemv-scope-dense-vs-sparse-8-cores]], [[gemv-cores-blocks-diagonal]],
+>   [[gemv-family-bitstream-campaign]].
+> - S28 (§7.2 HBM vs DDR) has a result: **sparse does not fit on DDR**, dense closes 250/225
+>   ([[gemv-hbm-vs-ddr]]). S29 (§7.3) was never started.
+> - S34 (floorplan pictures) was **DONE 2026-09-05** ([[gemv-integration-status]]).
+> - `dsp_occupancy` values quoted here are biased low by the old overhead table
+>   ([[gemv-avg3-shapes-energy]]).
+
 Companion to [INTEGRATION_PLAN.md](INTEGRATION_PLAN.md). The plan says *what* and *why*;
 this says *what to run next*, in order, with a pass criterion for every step.
 
@@ -40,7 +52,7 @@ Always pass the **absolute `.xpfm`** to `v++ --platform`. The path above is v++-
 
 ---
 
-## Scope — 8 cores, fixed
+## Scope — 8 cores, fixed  [SUPERSEDED — see the banner at the top]
 
 **The thesis question is dense vs sparse. 8 cores is the fixed reference configuration used
 to answer it, not a variable** (user, 2026-08-18). The core-count sweep may be attempted
@@ -1741,6 +1753,10 @@ data and they carry no signal.
 
 ### S28 — §7.2 HBM vs DDR
 
+> **RESULT (2026-09-05 → 07), see [[gemv-hbm-vs-ddr]]:** the expectation below ("DDR
+> dramatically slower") was never measured. Sparse did not even BUILD on DDR: five attempts
+> failed on the shell's fixed-clock DDR interconnect. Dense closed 250/225.
+
 `connectivity.cfg` only. Map several bundles onto `DDR[0]` (option (a) — no engine change)
 and let Vitis insert the interconnect. GEMV is memory-bound at ~0.38 MAC/byte with no weight
 reuse, so expect DDR to be dramatically slower. **That is the result**, and it is what
@@ -1752,7 +1768,7 @@ justifies the platform choice.
 movers, plus the `stream_connect` FIFO depth. Cheapest first: the HLS pragmas need no RTL
 change at all.
 
-### ~~S30 — §7.4 core count~~ — **out of scope**
+### ~~S30 — §7.4 core count~~ — **out of scope** [REVERSED: done as the diagonal + family campaign, see the banner. The family campaign also showed 4x32 = 16 weight + 6 index + 2 act + 8 out = all 32 HBM PCs, which built, closed 250 MHz and measured cleanly]
 
 8 cores is the fixed reference configuration (see Scope). Recorded for completeness: 16-core
 sparse would need **all 32 HBM PCs** and would sit exactly on the 32-interface-per-kernel
@@ -1895,7 +1911,7 @@ third. `s2mm` identical to 4 LUTs shows the output path is untouched by sparsity
 
 ⚠️ **A `--save-temps` rebuild adds NOTHING here.** Its only product is the routed `.dcp`.
 
-### S34 [S] — the device floorplan picture — ⏳ **THE LAST OUTSTANDING ARTEFACT**
+### S34 [S] — the device floorplan picture — ✅ **DONE 2026-09-05** (was "THE LAST OUTSTANDING ARTEFACT"; see [[gemv-integration-status]])
 
 Vitis deletes the routed checkpoint by default, which is why no device view has ever been
 possible: every existing build kept per-IP checkpoints only, never the placed-and-routed

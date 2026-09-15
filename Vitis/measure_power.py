@@ -109,7 +109,46 @@ def main():
     ap.add_argument("--bdf", default="0000:af:00.1")
     ap.add_argument("--V", type=int, default=1024, help="vector length, for MAC accounting")
     ap.add_argument("--csv", default="power_results.csv")
+    ap.add_argument("--gen-args", default=None,
+                    help="REGENERATE the stimulus before soaking, with these "
+                         "gen_timing_stimulus.py arguments, e.g. "
+                         "'--cores 4 --blocks 4 --sparsity 00 --nwin 32 --nlaps 8192'. "
+                         "Without it the soak runs on whatever is in bin/ -- which is "
+                         "how two soaks once measured the wrong matrix at 8x low.")
+    ap.add_argument("--expect-rows", type=int, default=None,
+                    help="abort unless the host reports exactly this many rows for "
+                         "the stimulus -- catches a stale bin/ or a wrong host build")
+    ap.add_argument("--expect-beats", type=int, default=None,
+                    help="abort unless the host reports exactly this many weight beats. "
+                         "Rows alone cannot tell every plan apart: MIXED (16,384 laps) "
+                         "and 2:8 (16,384 laps) have identical row counts, and only the "
+                         "beat count (1,966,080 vs 2,097,152) separates them")
     a = ap.parse_args()
+
+    # ---- the stimulus: regenerate, or say loudly that we did not ----------------
+    # bin/ is SHARED MUTABLE STATE: run_shapes.py leaves its last shape there, and a
+    # different family configuration leaves a different PC layout. A power soak that
+    # trusts it measures whatever ran last.
+    if a.gen_args:
+        gen = os.path.join(os.path.abspath(os.path.expanduser(a.emu)),
+                           "gen_timing_stimulus.py")
+        gcmd = [sys.executable, gen] + a.gen_args.split()
+        gp = subprocess.Popen(gcmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                              universal_newlines=True)
+        gout, _ = gp.communicate()
+        if gp.returncode != 0:
+            sys.stderr.write(gout)
+            raise SystemExit("stimulus generation failed")
+        print("")
+        print("stimulus regenerated: {}".format(a.gen_args))
+        for line in gout.splitlines():
+            if any(k in line for k in ("shape", "sparsity", "n_weight_beats", "laps ",
+                                       "TOTAL", "MIXED")):
+                print("  " + line.strip())
+    else:
+        print("")
+        print("WARNING: no --gen-args -- soaking on whatever stimulus is already in bin/.")
+        print("         If anything else ran since it was generated, this measures THAT.")
 
     print("")
     print("power measurement: {}".format(a.label))
@@ -144,6 +183,23 @@ def main():
         sampler.stop()
         sys.stderr.write(out)
         raise SystemExit("host failed (code {})".format(p.returncode))
+
+    if a.expect_rows is not None:
+        hr = re.search(r"(\d+)\s+output beats\s*=\s*(\d+)\s+rows", out)
+        if not hr or int(hr.group(2)) != a.expect_rows:
+            sampler.stop()
+            sys.stderr.write(out)
+            raise SystemExit("host reports {} rows, expected {} -- stale stimulus or a "
+                             "host built for a different shape. Nothing recorded."
+                             .format(hr.group(2) if hr else "no", a.expect_rows))
+    if a.expect_beats is not None:
+        hb = re.search(r"stimulus:\s*(\d+)\s+weight beats", out)
+        if not hb or int(hb.group(1)) != a.expect_beats:
+            sampler.stop()
+            sys.stderr.write(out)
+            raise SystemExit("host reports {} weight beats, expected {} -- the stimulus in "
+                             "bin/ is not the one this soak was meant to measure. Nothing "
+                             "recorded.".format(hb.group(1) if hb else "no", a.expect_beats))
 
     m0, m1 = RE_START.search(out), RE_END.search(out)
     if not (m0 and m1):

@@ -52,13 +52,34 @@ BIN = HERE / "bin"
 
 PC_BITS = 256
 PC_BYTES = PC_BITS // 8            # 32 -- one 256-bit pseudo-channel beat
-W_PCS, IND_PCS, A_PCS = 8, 3, 2
-CORES, BLOCKS = 8, 8
-W_PER_CORE = 16                    # 2 weights x 8 blocks
-IND_PER_CORE_BITS = 80             # 16 indices x 5 bits
+A_PCS = 2                          # the 32-element window is 512 bits at every shape
 IND_BITS = 5
-SPARSITY_BIT = 640
 HBM_PC_BYTES = 256 * 1024 * 1024   # one U280 pseudo-channel
+
+
+def ceildiv(a, b):
+    return -(-a // b)
+
+
+def shape(cores, blocks):
+    """Every width that depends on the engine's CORES x BLOCKS.
+
+    These used to be module constants fixed at 8x8 -- W_PCS=8, IND_PCS=3,
+    SPARSITY_BIT=640, and a self-check reading index PC2 byte 16. For any other
+    configuration that planted the sparsity code where the engine does not look,
+    so the host read a different mode off correct hardware. Derived now, with the
+    8x8 defaults reproducing the old images byte for byte.
+    """
+    lanes = cores * blocks
+    ind_bits = 10 * lanes
+    return dict(cores=cores, blocks=blocks, lanes=lanes,
+                w_pcs=ceildiv(lanes * 32, PC_BITS),
+                ind_pcs=ceildiv(ind_bits + 2, PC_BITS),   # +2: the code rides ABOVE
+                w_per_core=2 * blocks,
+                ind_per_core_bits=10 * blocks,
+                sparsity_bit=ind_bits,
+                sp_pc=ind_bits // PC_BITS,
+                sp_byte=(ind_bits % PC_BITS) // 8)
 
 SP_MAP = {"00": 4, "01": 8, "10": 16, "11": 32}
 
@@ -67,25 +88,26 @@ SP_MAP = {"00": 4, "01": 8, "10": 16, "11": 32}
 W_PATTERN = bytes([0x40, 0x40, 0x80, 0x40, 0xA0, 0x40, 0x80, 0x3F]) * 4   # 32 bytes
 
 
-def build_index_pcs(sp_code):
-    """One index beat -> three 32-byte PC chunks, with the sparsity code in PC2.
+def build_index_pcs(sp_code, S):
+    """One index beat -> IND_PCS 32-byte PC chunks, with the sparsity code at
+    joined bit IND_BITS (= index PC S['sp_pc'], byte S['sp_byte']).
 
     Indices cycle 0..31 so the gather actually reaches every activation element.
     Timing does not depend on that, but a degenerate all-zero index field would
     make any accidental correctness check pass for the wrong reason.
     """
     ibus = 0
-    for core in range(CORES):
-        for blk in range(BLOCKS):
+    for core in range(S["cores"]):
+        for blk in range(S["blocks"]):
             for slot in range(2):
-                flat = W_PER_CORE * core + 2 * blk + slot     # 0..127
+                flat = S["w_per_core"] * core + 2 * blk + slot
                 idx = flat % 32
-                bit = (IND_PER_CORE_BITS * core) + (2 * IND_BITS * blk) + (IND_BITS * slot)
+                bit = (S["ind_per_core_bits"] * core) + (2 * IND_BITS * blk) + (IND_BITS * slot)
                 ibus |= (idx & 0x1F) << bit
-    ibus |= (int(sp_code, 2) & 0x3) << SPARSITY_BIT
+    ibus |= (int(sp_code, 2) & 0x3) << S["sparsity_bit"]
     mask = (1 << PC_BITS) - 1
     return [((ibus >> (PC_BITS * i)) & mask).to_bytes(PC_BYTES, "little")
-            for i in range(IND_PCS)]
+            for i in range(S["ind_pcs"])]
 
 
 def write_stream(prefix, index, chunk, nbeats):
@@ -133,12 +155,18 @@ def main():
                          "because a lap is one row's complete dot product -- the host "
                          "rejects a mid-lap change. Mutually exclusive with "
                          "--sparsity/--nlaps.")
+    ap.add_argument("--cores", type=int, default=8,
+                    help="engine CORES_NUM -- must match the xclbin AND the host build")
+    ap.add_argument("--blocks", type=int, default=8,
+                    help="engine BLOCKS_NUM -- one lap = cores x blocks output rows")
     ap.add_argument("--freq-mhz", type=float, default=300.0,
                     help="COSMETIC ONLY -- scales the 'ideal kernel' line printed below. It "
                          "does NOT affect the generated images in any way; they are "
                          "byte-identical whatever you pass. Default 300 because both the "
                          "floorplanned sparse build and dense close at 300 MHz.")
     a = ap.parse_args()
+    S = shape(a.cores, a.blocks)
+    LANES = S["lanes"]
 
     # ---- resolve the schedule: one segment, or several -----------------
     if a.mix:
@@ -172,7 +200,7 @@ def main():
         freeze_s = 32 // SP_MAP[code]
         bpl = a.nwin * freeze_s
         seg.append(dict(code=code, laps=laps, freeze=freeze_s, bpl=bpl,
-                        beats=laps * bpl, rows=laps * 64))
+                        beats=laps * bpl, rows=laps * LANES))
 
     n_weight_beats = sum(x["beats"] for x in seg)
     total_laps = sum(x["laps"] for x in seg)
@@ -185,16 +213,16 @@ def main():
     BIN.mkdir(exist_ok=True)
 
     wbytes = 0
-    for i in range(W_PCS):
+    for i in range(S["w_pcs"]):
         wbytes += write_stream("weights_pc", i, W_PATTERN, n_weight_beats)
 
     # the index images carry the schedule
     chunks_by_code = {}
     for x in seg:
         if x["code"] not in chunks_by_code:
-            chunks_by_code[x["code"]] = build_index_pcs(x["code"])
+            chunks_by_code[x["code"]] = build_index_pcs(x["code"], S)
     ibytes = 0
-    for i in range(IND_PCS):
+    for i in range(S["ind_pcs"]):
         ibytes += write_segments("ind_pc", i,
                                  [(chunks_by_code[x["code"]][i], x["beats"]) for x in seg])
     ind_chunks = chunks_by_code[seg[0]["code"]]
@@ -203,19 +231,36 @@ def main():
     for i in range(A_PCS):
         abytes += write_stream("act_pc", i, W_PATTERN, n_act_beats)
 
+    # Remove per-PC images a LARGER configuration left behind. bin/ is shared by
+    # every configuration; after an 8x8 run it holds weights_pc0..7, and a 4x4 run
+    # that rewrites only pc0..1 would leave pc2..7 from a different run -- different
+    # beat counts, silently -- for the next host that happens to read them.
+    stale = []
+    for prefix, keep in (("weights_pc", S["w_pcs"]), ("ind_pc", S["ind_pcs"])):
+        for p in BIN.glob(prefix + "*.bin"):
+            tail = p.stem[len(prefix):]
+            if tail.isdigit() and int(tail) >= keep:
+                p.unlink()
+                stale.append(p.name)
+
     # Cheap self-check: the code must be readable back exactly where the host
     # will look for it. Costs nothing and catches a packing regression here
     # rather than as a wrong answer on the card.
+    sp_pc, sp_byte = S["sp_pc"], S["sp_byte"]
     for x in seg:
-        got_x = (chunks_by_code[x["code"]][2][16] & 0x3)
+        got_x = (chunks_by_code[x["code"]][sp_pc][sp_byte] & 0x3)
         if got_x != int(x["code"], 2):
-            raise SystemExit("sparsity code landed wrong: PC2 byte 16 = {:02b}, expected {}"
-                             .format(got_x, x["code"]))
-    got = (ind_chunks[2][16] & 0x3)
+            raise SystemExit("sparsity code landed wrong: PC{} byte {} = {:02b}, expected {}"
+                             .format(sp_pc, sp_byte, got_x, x["code"]))
+    got = (ind_chunks[sp_pc][sp_byte] & 0x3)
 
     ideal_us = n_weight_beats * (1000.0 / a.freq_mhz) / 1000.0
 
     print("SPARSE TIMING stimulus (no golden -- correctness is NOT checkable on this data)")
+    print("  shape          = {}x{} ({} rows/lap)  W_PCS={} IND_PCS={}  code at PC{} byte {}"
+          .format(S["cores"], S["blocks"], LANES, S["w_pcs"], S["ind_pcs"], sp_pc, sp_byte))
+    if stale:
+        print("  removed stale  = {}".format(" ".join(sorted(stale))))
     if len(seg) > 1:
         print("  ** MIXED-SPARSITY MATRIX -- {} segments **".format(len(seg)))
         print("  V              = {} elements ({} windows)".format(a.nwin * 32, a.nwin))
@@ -230,7 +275,7 @@ def main():
         print("    {:>4}  {:<6} {:>8} {:>10} {:>12} {:>10}".format(
             "", "TOTAL", "", "", "{} ({})".format(total_laps, total_rows), n_weight_beats))
         print("")
-        uni = [(c, total_rows // 64 * (a.nwin * (32 // SP_MAP[c]))) for c in ("00", "11")]
+        uni = [(c, total_rows // LANES * (a.nwin * (32 // SP_MAP[c]))) for c in ("00", "11")]
         print("  for reference, the SAME {} rows uniformly:".format(total_rows))
         for c, b in uni:
             print("    all 2:{:<3} = {:>10} beats".format(SP_MAP[c], b))
@@ -248,12 +293,12 @@ def main():
     print("  images         = {:.1f} MB weights + {:.1f} MB indices + {:.3f} MB activations".format(
         wbytes / 1e6, ibytes / 1e6, abytes / 1e6))
     if len(seg) > 1:
-        print("  sparsity codes = all {} verified at ind_pc2 byte 16 of their segments"
-              .format(len(seg)))
+        print("  sparsity codes = all {} verified at ind_pc{} byte {} of their segments"
+              .format(len(seg), sp_pc, sp_byte))
         print("                   the host will re-read them per lap and print its own")
         print("                   schedule -- that printout is the proof the card saw them")
     else:
-        print("  sparsity code  = verified at ind_pc2 byte 16 = {:02b}".format(got))
+        print("  sparsity code  = verified at ind_pc{} byte {} = {:02b}".format(sp_pc, sp_byte, got))
     print("  ideal kernel   = {:.3f} us at {:.0f} MHz (1 weight beat/clock)".format(
         ideal_us, a.freq_mhz))
     print("                   ^ informational only -- --freq-mhz does not change the data")

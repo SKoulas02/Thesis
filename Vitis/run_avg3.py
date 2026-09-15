@@ -59,29 +59,39 @@ import sys
 
 V_ELEMS = 1024                     # matrix columns; --nwin 32 -> V = 1024
 TARGET_BEATS = 2097152             # same weight-beat count in every UNIFORM config
-MACS_PER_BEAT = 128                # 8 cores x 8 blocks x 2 multipliers
 
-# label -> (extra generator args, weight beats, output rows)
+# label -> (extra generator args, weight beats, LAPS)
 #
 # The four uniform sparsities each move an identical 2,097,152 weight beats, so
 # launch overhead is amortised the same way in all of them. Their ROW counts
 # differ by 16x -- that is the result, not a confound.
+#
+# LAPS, NOT ROWS, ARE FIXED HERE. A lap is nwin x freeze weight beats whatever the
+# engine shape, so the SAME lap counts give the SAME weight beats on every family
+# configuration -- and rows = laps x (cores x blocks). These used to be written as
+# row counts (laps x 64), which silently overstated every 4x4 row count, Mrow/s and
+# GFLOPS figure by 4x. At the 8x8 default the numbers are exactly the old ones.
 PLAN_SPARSE = [
-    ("2:4",  ["--sparsity", "00", "--nlaps", "8192"],  2097152,  524288),
-    ("2:8",  ["--sparsity", "01", "--nlaps", "16384"], 2097152, 1048576),
-    ("2:16", ["--sparsity", "10", "--nlaps", "32768"], 2097152, 2097152),
-    ("2:32", ["--sparsity", "11", "--nlaps", "65536"], 2097152, 4194304),
+    ("2:4",  ["--sparsity", "00", "--nlaps", "8192"],  2097152,  8192),
+    ("2:8",  ["--sparsity", "01", "--nlaps", "16384"], 2097152, 16384),
+    ("2:16", ["--sparsity", "10", "--nlaps", "32768"], 2097152, 32768),
+    ("2:32", ["--sparsity", "11", "--nlaps", "65536"], 2097152, 65536),
     # ---- and once with ALL FOUR in a single matrix -----------------------
-    # Four EQUAL-ROW quarters, 4096 laps (262,144 rows) each. Equal rows is what
-    # "split the matrix in 4 parts" means, and it cannot also come to exactly
-    # 2,097,152 beats -- that would need 4369.07 laps per segment. So this one
-    # config moves 1,966,080 beats, 6.3% fewer. Reported explicitly rather than
-    # hidden; every rate below is per-beat or per-row, so nothing is distorted.
-    ("MIXED", ["--mix", "00:4096,01:4096,10:4096,11:4096"], 1966080, 1048576),
+    # Four EQUAL-ROW quarters, 4096 laps each. Equal rows is what "split the
+    # matrix in 4 parts" means, and it cannot also come to exactly 2,097,152
+    # beats -- that would need 4369.07 laps per segment. So this one config moves
+    # 1,966,080 beats, 6.3% fewer. Reported explicitly rather than hidden; every
+    # rate below is per-beat or per-row, so nothing is distorted.
+    ("MIXED", ["--mix", "00:4096,01:4096,10:4096,11:4096"], 1966080, 16384),
 ]
-PLAN_DENSE = [("dense", ["--nlaps", "4096"], 2097152, 262144)]
+PLAN_DENSE = [("dense", ["--nlaps", "4096"], 2097152, 4096)]
 
 RE_SPAN = re.compile(r"kernel span\s*:\s*([0-9.]+)\s*us")
+# "1 lap(s) -> 1 output beats = 48 rows" -- the HOST's own row count, from its own
+# LANES constant. Compared against ours before any number is kept: a host built
+# for a different shape than --cores/--blocks describes is caught here.
+RE_HOST_ROWS = re.compile(r"(\d+)\s+output beats\s*=\s*(\d+)\s+rows")
+RE_HOST_BEATS = re.compile(r"stimulus:\s*(\d+)\s+weight beats")
 RE_BW = re.compile(r"HBM bandwidth\s*:\s*([0-9.]+)\s*GB/s")
 RE_BPC = re.compile(r"beats/cycle\s*:\s*([0-9.]+)")
 
@@ -122,21 +132,36 @@ def main():
                     help="the clock the xclbin was LINKED at -- passed to the host")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--nwin", type=int, default=32)
+    ap.add_argument("--cores", type=int, default=8,
+                    help="engine CORES_NUM of this xclbin (sparse only)")
+    ap.add_argument("--blocks", type=int, default=8,
+                    help="engine BLOCKS_NUM of this xclbin (sparse only)")
     ap.add_argument("--csv", required=True)
+    ap.add_argument("--dry-run", action="store_true",
+                    help="print the plan and exit -- no card, no XRT needed")
     a = ap.parse_args()
-    require_xrt()
+    if a.design == "dense" and (a.cores, a.blocks) != (8, 8):
+        raise SystemExit("--cores/--blocks apply to the sparse engine only")
+    lanes = a.cores * a.blocks
+    macs_per_beat = 2 * lanes          # cores x blocks x 2 multipliers, per weight beat
+    config = "{}x{}".format(a.cores, a.blocks)
+    if not a.dry_run:
+        require_xrt()
 
     host = os.path.abspath(os.path.expanduser(a.host))
     xclbin = os.path.abspath(os.path.expanduser(a.xclbin))
     emu = os.path.abspath(os.path.expanduser(a.emu))
     gen = os.path.join(emu, "gen_timing_stimulus.py")
-    for p, what in ((host, "host"), (xclbin, "xclbin"), (gen, "generator")):
-        if not os.path.exists(p):
-            raise SystemExit("no such {}: {}".format(what, p))
+    if not a.dry_run:
+        for p, what in ((host, "host"), (xclbin, "xclbin"), (gen, "generator")):
+            if not os.path.exists(p):
+                raise SystemExit("no such {}: {}".format(what, p))
 
-    plan = PLAN_SPARSE if a.design == "sparse" else PLAN_DENSE
-    print("{} @ {:.0f} MHz -- {} configuration(s), {} runs each, averaged"
-          .format(a.design, a.clock, len(plan), a.reps))
+    base = PLAN_SPARSE if a.design == "sparse" else PLAN_DENSE
+    plan = [(label, ga, beats, laps * lanes) for label, ga, beats, laps in base]
+    print("{} {} @ {:.0f} MHz -- {} configuration(s), {} runs each, averaged"
+          .format(a.design, config, a.clock, len(plan), a.reps))
+    print("   {} rows per lap, {} MACs per weight beat".format(lanes, macs_per_beat))
     for label, _ga, beats, rows_out in plan:
         flag = ""
         if label == "MIXED":
@@ -146,15 +171,34 @@ def main():
         print("   {:<6} {:>10,} beats  {:>10,} rows{}".format(
             label, beats, rows_out, flag))
     print("")
+    if a.dry_run:
+        print("dry run -- nothing generated, nothing run")
+        return
 
     out_rows = []
     for label, genargs, beats, rows_out in plan:
         cmd = [sys.executable, gen, "--nwin", str(a.nwin)] + genargs
+        if a.design == "sparse":
+            cmd += ["--cores", str(a.cores), "--blocks", str(a.blocks)]
         run(cmd, "stimulus generation for " + label)
 
         spans, bws, bpcs = [], [], []
         for i in range(a.reps):
             txt = run([host, xclbin, emu, str(a.clock)], "host run for " + label)
+            hr = RE_HOST_ROWS.search(txt)
+            if hr and int(hr.group(2)) != rows_out:
+                sys.stderr.write(txt)
+                raise SystemExit(
+                    "{}: the host reports {} rows but {} x {} laps predicts {}. The "
+                    "host binary was built for a different shape than --cores {} "
+                    "--blocks {} -- wrong host for this xclbin, or wrong flags."
+                    .format(label, hr.group(2), lanes, rows_out // lanes, rows_out,
+                            a.cores, a.blocks))
+            hb = RE_HOST_BEATS.search(txt)
+            if hb and int(hb.group(1)) != beats:
+                sys.stderr.write(txt)
+                raise SystemExit("{}: the host reports {} weight beats, the plan says {}"
+                                 .format(label, hb.group(1), beats))
             m = RE_SPAN.search(txt)
             if not m:
                 sys.stderr.write(txt)
@@ -173,12 +217,14 @@ def main():
         # EFFECTIVE: the M x N GEMV the user received, zeros included -- they
         # never had to be computed but the workload still delivered them.
         gf_eff = 2.0 * rows_out * V_ELEMS / (mean * 1000.0)
-        # ACTUAL: the multiplies the silicon really performed. beats x 128 holds
-        # for every configuration including MIXED, because the engine issues 128
-        # MACs per weight beat whatever the sparsity.
-        gf_act = 2.0 * beats * MACS_PER_BEAT / (mean * 1000.0)
+        # ACTUAL: the multiplies the silicon really performed. beats x (2 x cores x
+        # blocks) holds for every sparsity including MIXED, because the engine
+        # issues that many MACs per weight beat whatever the sparsity. (128 at 8x8.)
+        gf_act = 2.0 * beats * macs_per_beat / (mean * 1000.0)
         out_rows.append(dict(
-            design=a.design, clock_mhz=a.clock, sparsity=label,
+            design=a.design, config=config, cores=a.cores, blocks=a.blocks,
+            lanes=lanes, macs_per_beat=macs_per_beat,
+            clock_mhz=a.clock, sparsity=label,
             estimator="run_avg{}".format(a.reps),
             M_rows=rows_out, N_cols=V_ELEMS, weight_beats=beats,
             beats_per_row=round(beats / float(rows_out), 4),
@@ -195,7 +241,8 @@ def main():
               "{:8.1f} GFLOPS\n".format(label, mean, best,
                                         100.0 * (worst - best) / best, gf_eff))
 
-    cols = ["design", "clock_mhz", "sparsity", "estimator", "M_rows", "N_cols",
+    cols = ["design", "config", "cores", "blocks", "lanes", "macs_per_beat",
+            "clock_mhz", "sparsity", "estimator", "M_rows", "N_cols",
             "weight_beats", "beats_per_row", "latency_avg_us",
             "latency_best_us", "latency_worst_us", "spread_pct", "Mrow_s",
             "bandwidth_avg_GBs", "beats_per_cycle_raw", "GFLOPS_effective",

@@ -1,0 +1,64 @@
+% =====================================================================
+%  related_work_table_nodeps.tex
+%  Landscape of accelerators for structured sparse GEMV.
+%
+%  ZERO-DEPENDENCY VARIANT of related_work_table.tex.
+%
+%  This version needs NO new packages in the ntua-thesis template:
+%    - \checkmark comes from amssymb, which ntua-thesis.cls loads in
+%      BOTH font branches (cls lines 687 and 692), so it is present
+%      whether you compile with "modern" or "classic".
+%    - \textcolor comes from xcolor, pulled in by the unconditional
+%      \usepackage{tikz} at cls line 1238.
+%    - Rules use plain \hline instead of booktabs.
+%    - The 3-line header is built by hand instead of with multirow.
+%
+%  Use related_work_table.tex instead if you install pifont, booktabs
+%  and multirow -- it looks better (proper booktabs rule weights).
+%
+%  USAGE
+%    \input{tables/related_work_table_nodeps}
+% =====================================================================
+
+\providecommand{\cmark}{\textcolor{green!60!black}{$\checkmark$}}
+\providecommand{\xmark}{\textcolor{red}{$\times$}}
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccccc}
+\hline
+             & Struct. & Runtime        & Group        & HBM     & No      & Real Si.\ + & Iso-Platform \\
+             & $N{:}M$ & Ratio          & $M\!\ge\!32$ & Multi-  & Reduct. & Meas.       & Dense        \\
+Architecture & Weights & Switch         & (93.75\%)    & Channel & Tree    & Power       & Baseline     \\
+\hline
+Mishra~\cite{mishra2021}        & \cmark & \xmark          & \xmark & \xmark & \cmark & \xmark & \cmark \\
+FNM-Trans~\cite{fnmtrans2024}   & \cmark & \cmark\,(lim.)  & \xmark & \xmark & \xmark & \xmark & \xmark \\
+Serpens~\cite{serpens2022}      & \xmark & \xmark          & \xmark & \cmark & \xmark & \cmark & \xmark \\
+SST~\cite{sst2025}              & \cmark & \cmark          & \xmark & \xmark & \xmark & \xmark & \xmark \\
+Transitive Array~\cite{ta2025}  & \xmark & \xmark          & \xmark & \xmark & \xmark & \xmark & \xmark \\
+DFX~\cite{dfx2022}              & \xmark & \xmark          & \xmark & \cmark & \xmark & \cmark & \xmark \\
+DynaX~\cite{dynax2025}          & \cmark & \cmark\,(lim.)  & \cmark & \xmark & \xmark & \xmark & \xmark \\
+FlightVGM~\cite{flightvgm2025}  & \xmark & \cmark          & \xmark & \cmark & \xmark & \cmark & \xmark \\
+\hline
+\textbf{This work}              & \cmark & \cmark          & \cmark & \cmark & \cmark & \cmark & \cmark \\
+\hline
+\end{tabular}
+\caption{Landscape of accelerators for structured sparse GEMV.
+\emph{Struct.\ $N{:}M$ Weights}: a fixed, hardware-friendly sparsity
+pattern imposed on the weight tensor.
+\emph{Runtime Ratio Switch}: the sparsity ratio changes without
+re-synthesis.
+\emph{Group $M\!\ge\!32$}: the group size reaches 32, i.e.\ a 93.75\%
+sparsity ceiling rather than the 75\% of $M\!=\!4$ designs.
+\emph{HBM Multi-Channel}: operands streamed over HBM pseudo-channels.
+\emph{No Reduction Tree}: load balance by construction, with no
+arbiters, schedulers, crossbars or adder trees.
+\emph{Real Si.\ + Meas.\ Power}: deployed on silicon with power
+measured in-system rather than modelled or read from a synthesis
+report.
+\emph{Iso-Platform Dense Baseline}: sparse compared against a dense
+counterpart on the same board, flow and clock.}
+\label{tab:related-work}
+\end{table}

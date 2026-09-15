@@ -1,0 +1,39 @@
+\preto{\section}{\setcounter{equation}{0}}
+
+% ====================
+% GENERAL
+% ====================
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\qeda}{\tag*{$\blacksquare$}}
+\newcommand{\undertext}[2]{\textcolor{blue}{\underbrace{\textcolor{black}{#1}}_{\equdesc{#2}}}}
+\newcommand{\mathcomment}[1]{&&\textcolor{blue}{\triangleright \text{{\small #1}}}}
+\newcommand{\tagg}[1]{\tag*{\textcolor{blue}{\( \triangleright \) {\small #1} }}}
+
+% ====================
+% MATH OPERATORS
+% ====================
+\DeclareMathOperator{\dom}{\textbf{dom}}
+\DeclareMathOperator{\id}{\textbf{id}}
+\DeclareMathOperator{\argmin}{\textbf{argmin}}
+\DeclareMathOperator{\argmax}{\textbf{argmax}}
+
+% ====================
+% NUMBER TYPES
+% ====================
+\def\r{\mathbb{R}}
+\def\rn{\mathbb{R}^{n}}
+\def\rnn{\mathbb{R}^{n\times n}}
+\def\rmin{\mathbb{R}_\text{min}}
+\def\rmax{\mathbb{R}_\text{max}}
+
+
+% ====================
+% TROPICAL ALGEBRA 
+% ====================
+\newcommand{\maxmatrmult}{\ensuremath{\boxplus}} % max-plus matrix multiplication 
+\newcommand{\minmatrmult}{\ensuremath{\boxplus'}} % min-plus matrix multiplication
+\newcommand{\conjtranmtr}[1]{\ensuremath{\mathbf{{#1}}^\ast}} % adjoint (=conjugate transpose) 
+
+
+\newcommand{\erosion}{\varepsilon}
+\newcommand{\dilation}{\delta}

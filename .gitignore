@@ -30,11 +30,26 @@ __pycache__/
 *.gen/
 work/
 
-# Claude AI
+# Claude Code
 
 CLAUDE.md
 .claude/
-Latex/
+
+#Latex
+Latex/Template/
+Latex/**/*.aux
+Latex/**/*.log
+Latex/**/*.out
+Latex/**/*.toc
+Latex/**/*.lof
+Latex/**/*.bbl
+Latex/**/*.bcf
+Latex/**/*.blg
+Latex/**/*.run.xml
+Latex/**/*.synctex.gz
+Latex/**/*.mtc*
+Latex/**/*.maf
+Latex/**/_minted*
 
 # IP Generated Files
 *.vho
