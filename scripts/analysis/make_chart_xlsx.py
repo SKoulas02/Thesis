@@ -32,7 +32,7 @@ What matters for charting, and what this script guarantees:
     runs. They differ by 5-6% for IDENTICAL hardware. Charting one against
     another invents a slowdown that does not exist. Filter first.
 
-Run:  python make_chart_xlsx.py
+Run:  python scripts/analysis/make_chart_xlsx.py
 """
 
 import csv
@@ -44,14 +44,15 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 
 def _data(name):
     # results/ first, then the repo root -- so a CSV freshly copied down from
     # the server is still found before it has been filed away.
     p = os.path.join(DATA, name)
-    return p if os.path.exists(p) else os.path.join(HERE, name)
+    return p if os.path.exists(p) else os.path.join(ROOT, name)
 
 
 def _out(name):
@@ -122,6 +123,13 @@ SOURCES = [
     # (the area chart), G:H = DSP % and HBM-channel % (32 on the card). Built by
     # make_family_util_csv.py. Appended LAST so no existing sheet changes position.
     ("GEMV_Family_Utilization.csv", "Family Utilization"),
+    # the eleven MIXED matrices on all six families, each family at its own closed clock.
+    # Latency is WIDE (A = shape, B:G = one column per family) for a grouped log chart;
+    # energy is LONG, 66 rows, A:B = two-level category (shape label on the FIRST row of
+    # each group only -- a centred label shifts every Excel group), C:D = static/dynamic uJ,
+    # E:F = static/dynamic pJ per element. Built by make_family_mixed_csv.py.
+    ("GEMV_Family_Mixed_Latency.csv", "Family Mixed Latency"),
+    ("GEMV_Family_Mixed_Energy.csv", "Family Mixed Energy"),
 ]
 
 # Columns that hold labels even when they look numeric, so they are never
@@ -133,6 +141,8 @@ TEXT_COLS = {
     # Family Hardware labels
     "config", "family", "role", "floorplan", "timing_source", "closed",
     "fmax_kind", "engine_die", "report_dir", "note",
+    # Family Mixed labels ("512x512", "4x4") -- never numbers
+    "dimensions", "shape", "shape_group", "data_source",
 }
 
 H_FILL = PatternFill("solid", fgColor="1F3864")

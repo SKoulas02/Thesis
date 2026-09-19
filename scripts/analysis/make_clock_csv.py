@@ -44,7 +44,7 @@ against a 2026-09-02 325 MHz one for no reason.
 The 300 MHz file carries TWO `sparse 2:4` rows -- replicate soaks. They are
 AVERAGED, which is where the 35.44 W in the existing tables comes from.
 
-Run:  python make_clock_csv.py
+Run:  python scripts/analysis/make_clock_csv.py
 """
 
 import csv
@@ -52,14 +52,15 @@ import io
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 IDEAL = 325.0 / 300.0          # 1.08333 -- the scaling a clock-limited design must show
 
 
 def _data(name):
     p = os.path.join(DATA, name)
-    return p if os.path.exists(p) else os.path.join(HERE, name)
+    return p if os.path.exists(p) else os.path.join(ROOT, name)
 
 
 AVG3 = "GEMV_avg3_results.csv"

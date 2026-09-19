@@ -1,6 +1,6 @@
 """Merge the six family configurations' card measurements into chart-ready CSVs.
 
-    python make_family_measured_csv.py
+    python scripts/analysis/make_family_measured_csv.py
 
 Inputs : results/family_measurements/<tag>/  (run_family_measure.py output, copied down)
          results/GEMV_Family_Hardware.csv     (build data: closed clock, OOC Fmax, area)
@@ -41,7 +41,8 @@ import statistics
 import check_family_measure as cfm
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RES = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+RES = os.path.join(ROOT, "results")
 OUT_WIDE = os.path.join(RES, "GEMV_Family_Measured.csv")
 OUT_LONG = os.path.join(RES, "GEMV_Family_Measured_long.csv")
 

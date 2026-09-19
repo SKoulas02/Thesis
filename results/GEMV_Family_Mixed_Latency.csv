@@ -1,0 +1,12 @@
+dimensions,latency_us_4x4,latency_us_8x4,latency_us_16x3,latency_us_8x8,latency_us_4x24,latency_us_4x32,padding_rows_4x4,padding_rows_8x4,padding_rows_16x3,padding_rows_8x8,padding_rows_4x24,padding_rows_4x32,shape,shape_order,M_rows,N_cols,matrix_elements,data_source
+512x512,4.9106,2.6391,2.105,1.5054,1.6302,0.9699,0,0,64,0,256,0,G1,1,512,512,262144,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+768x768,11.0585,5.8828,4.1964,3.3788,2.4612,2.8801,0,0,0,0,0,256,G2,2,768,768,589824,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+1024x1024,19.4883,10.4333,8.3294,5.972,4.8741,3.8021,0,0,128,0,128,0,G3,3,1024,1024,1048576,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+3072x768,44.1648,23.4419,16.5832,13.5523,9.8202,8.8222,0,0,0,0,0,0,G4,4,3072,768,2359296,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+768x3072,43.5779,23.3579,16.564,13.3446,9.7149,11.4574,0,0,0,0,0,256,G5,5,768,3072,2359296,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+4096x1024,78.1175,42.0355,30.3086,24.0229,17.8304,15.4469,0,0,128,0,128,0,G6,6,4096,1024,4194304,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+1024x4096,77.3105,41.3539,33.2667,23.8428,19.1567,15.3556,0,0,128,0,128,0,G7,7,1024,4096,4194304,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+2048x2048,77.7627,41.6508,30.5019,23.694,19.4485,15.3422,0,0,64,0,256,0,G8,8,2048,2048,4194304,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+4096x4096,310.609,167.6192,120.8005,94.8771,71.2833,61.6223,0,0,128,0,128,0,G9,9,4096,4096,16777216,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+8192x2048,309.0082,166.7927,117.0011,94.5814,71.7843,61.404,0,0,64,0,256,0,G10,10,8192,2048,16777216,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"
+2048x8192,309.4496,165.6937,121.2366,95.1581,76.4822,61.6403,0,0,64,0,256,0,G11,11,2048,8192,16777216,"shapes_<tag>_<MHz>_MIXED.csv latency_per_matrix_us, per-sweep overhead fit, each family at its own clock"

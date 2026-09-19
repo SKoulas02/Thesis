@@ -1,8 +1,8 @@
 """Build results/GEMV_Family_Utilization.csv -- how much of the U280 each family build uses.
 
-    python make_family_util_csv.py [family_hw_reports]
+    python scripts/analysis/make_family_util_csv.py [reports/family_hw_reports]
 
-Inputs : family_hw_reports/<report_dir>/   snapshotted in-system reports, headline builds only
+Inputs : reports/family_hw_reports/<report_dir>/   snapshotted in-system reports, headline builds only
          results/GEMV_Family_Hardware.csv   hbm_pcs per family (cross-checked, not trusted)
 Output : results/GEMV_Family_Utilization.csv   WIDE, 6 rows (one per family, size order)
 
@@ -36,7 +36,8 @@ import sys
 import make_family_hw_csv as hw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RES = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+RES = os.path.join(ROOT, "results")
 OUT = os.path.join(RES, "GEMV_Family_Utilization.csv")
 HW_CSV = os.path.join(RES, "GEMV_Family_Hardware.csv")
 
@@ -94,7 +95,7 @@ def parse_system_rows(path):
 
 
 def main():
-    base = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "family_hw_reports")
+    base = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "reports", "family_hw_reports")
     with io.open(HW_CSV, newline="", encoding="utf-8") as fh:
         hwrows = {r["config"]: r for r in csv.DictReader(fh) if r["role"] == "headline"}
 

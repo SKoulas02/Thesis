@@ -1,7 +1,7 @@
 """Generate the per-configuration build artefacts for the six family winners.
 
-    python make_family_build.py            # all six
-    python make_family_build.py 4x4        # just one
+    python family_builds/make_family_build.py            # all six
+    python family_builds/make_family_build.py 4x4        # just one
 
 Writes family_builds/<tag>/ containing everything that DIFFERS between one
 family's bitstream build and another's:
@@ -48,7 +48,8 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUTROOT = os.path.join(HERE, "family_builds")
+ROOT = os.path.dirname(HERE)  # repository root; this file is in family_builds/
+OUTROOT = HERE
 
 EL_SIZE, A_IDX, IND_NUM, PC_WIDTH = 16, 32, 10, 256
 
@@ -459,7 +460,7 @@ def gen_verilog(c):
 # gen_xo_<tag>.tcl -- only the wizard block differs from gen_xo_sparse.tcl
 # ===========================================================================
 def gen_xo_tcl(c):
-    src_tpl = os.path.join(HERE, "gen_xo_sparse.tcl")
+    src_tpl = os.path.join(ROOT, "Vitis", "gen_xo_sparse.tcl")
     base = io.open(src_tpl, encoding="utf-8").read()
 
     rows, i = [], 0
@@ -923,7 +924,7 @@ scp -r family_builds/{tag} skoulas@coroni:/home/skoulas/GEMV_Sparse/family_build
 scp family_builds/{tag}/gen_xo_{tag}.tcl skoulas@coroni:/home/skoulas/
 scp family_builds/{tag}/sparse_hbm_{tag}.cfg \\
     family_builds/{tag}/slr_floorplan_{tag}.cfg \\
-    impl_family.cfg skoulas@coroni:/home/skoulas/GEMV_Sparse/Vitis_{tag}/
+    Vitis/impl_family.cfg skoulas@coroni:/home/skoulas/GEMV_Sparse/Vitis_{tag}/
 ```
 
 Environment, needed in EVERY fresh shell -- nothing below works without it:
@@ -1230,8 +1231,8 @@ def main():
             print("no such config; known:", ", ".join(t for t, _, _, _, _ in CONFIGS))
             return
 
-    emit(os.path.join(HERE, "impl_family.cfg"), IMPL_FAMILY)
-    print("wrote impl_family.cfg   (shared by all six -- one strategy, one variable)\n")
+    emit(os.path.join(ROOT, "Vitis", "impl_family.cfg"), IMPL_FAMILY)
+    print("wrote Vitis/impl_family.cfg   (shared by all six -- one strategy, one variable)\n")
 
     for c in cfgs:
         d = os.path.join(OUTROOT, c.tag)

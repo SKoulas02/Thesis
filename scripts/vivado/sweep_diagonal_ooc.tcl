@@ -57,8 +57,8 @@
 # GUI-SAFE: no `exit`, no `create_project -force`. Run it from the Vivado Tcl
 # Console with the GEMV_4.0 project open:
 #
-#     cd <repo root>
-#     source sweep_diagonal_ooc.tcl
+#     cd <repo root>/reports          ;# reports land in reports/diagonal_sweep/
+#     source ../scripts/vivado/sweep_diagonal_ooc.tcl
 #
 # Each point is a full synth+impl of the project, so expect 30-60 min per point
 # and ~6 hours for all seven. The GUI blocks on wait_on_run; that is expected.

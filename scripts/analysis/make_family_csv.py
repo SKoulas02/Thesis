@@ -41,7 +41,7 @@ TWO HARD BOUNDS, BOTH FOUND BY FAILED SYNTHESIS RATHER THAN BY ANALYSIS:
   So the architecture's usable range on this device is 16 <= T <= 128, bounded
   below by channel granularity and above by channel count.
 
-Run:  python make_family_csv.py
+Run:  python scripts/analysis/make_family_csv.py
 """
 
 import csv
@@ -49,7 +49,8 @@ import io
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 SRC = os.path.join(DATA, "family_summary_all18.csv")
 OUT_ALL = os.path.join(DATA, "GEMV_Family_AllPoints.csv")

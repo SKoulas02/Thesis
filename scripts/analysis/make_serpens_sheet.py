@@ -35,8 +35,8 @@ COLUMN ORDER IS APPEND-ONLY. Once a chart points at this sheet, inserting a
 column silently re-points every series -- Excel stores absolute references.
 `data_source` stays LAST.
 
-Run:  python make_serpens_sheet.py
-      python make_serpens_sheet.py --dry-run     # print, write nothing
+Run:  python scripts/analysis/make_serpens_sheet.py
+      python scripts/analysis/make_serpens_sheet.py --dry-run     # print, write nothing
 """
 
 import argparse
@@ -79,7 +79,7 @@ def read_rows(name):
     if not os.path.exists(p):
         raise SystemExit(
             "missing {}\nGenerate it first:\n"
-            "    python make_serpens_csv.py --headline H1 "
+            "    python scripts/analysis/make_serpens_csv.py --headline H1 "
             "--shapes-csv results/shapes_H1_300MHz.csv".format(p))
     with io.open(p, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))

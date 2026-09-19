@@ -13,13 +13,13 @@
 # those .xci files, and the sparse script uses the identical block, so both
 # designs provably get the same IP and the area comparison stays honest.
 #
-# LAYOUT EXPECTED -- put this script next to the source trees:
-#   <root>/create_dense_2021.tcl
+# LAYOUT EXPECTED -- this script lives two levels below the repository root:
+#   <root>/scripts/vivado/create_dense_2021.tcl
 #   <root>/GEMV_Dense_Source/{Design,Simulation,Emulation}, timing.xdc
 #
-# USAGE
-#   vivado -mode batch -source create_dense_2021.tcl -nojournal -nolog
-#   vivado -mode batch -source create_dense_2021.tcl -tclargs impl   ;# + synth/impl
+# USAGE (from the repository root)
+#   vivado -mode batch -source scripts/vivado/create_dense_2021.tcl -nojournal -nolog
+#   vivado -mode batch -source scripts/vivado/create_dense_2021.tcl -tclargs impl   ;# + synth/impl
 #
 # Add "impl" to also run OOC synthesis + implementation and write reports.
 # Note: synthesis MUST be out-of-context -- the top has 3628 ports, far beyond
@@ -27,7 +27,7 @@
 # ----------------------------------------------------------------------------
 
 # ---- configuration ---------------------------------------------------------
-set root      [file normalize [file dirname [info script]]]
+set root      [file normalize [file join [file dirname [info script]] .. ..]]
 set src       "$root/GEMV_Dense_Source"
 set proj_name "GEMV_Dense"
 set proj_dir  "$root/$proj_name"
@@ -35,7 +35,7 @@ set part      "xcu280-fsvh2892-2L-e"
 set jobs      8
 
 # Run synthesis + implementation as well?
-#   batch : vivado -mode batch -source create_dense_2021.tcl -tclargs impl
+#   batch : vivado -mode batch -source scripts/vivado/create_dense_2021.tcl -tclargs impl
 #   GUI   : set RUN_IMPL 1     <- in the Tcl Console, BEFORE sourcing this file
 # ($argv only exists in batch mode, hence the info-exists guard.)
 if {![info exists RUN_IMPL]} { set RUN_IMPL 0 }
@@ -43,7 +43,7 @@ if {[info exists argv] && [lsearch -exact $argv "impl"] >= 0} { set RUN_IMPL 1 }
 set do_impl $RUN_IMPL
 
 if {![file isdirectory $src]} {
-    error "ERROR: source tree not found at $src\n       Put this script beside GEMV_Dense_Source/."
+    error "ERROR: source tree not found at $src\n       Keep this script in scripts/vivado/ under the repository root."
 }
 if {[file exists $proj_dir]} {
     error "ERROR: $proj_dir already exists. Delete it or change \$proj_dir."

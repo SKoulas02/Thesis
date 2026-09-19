@@ -91,7 +91,7 @@ for f in "$TOPV" "$AXISV"; do
     if [ ! -f "$f" ]; then echo "FATAL: missing source: $f"; exit 1; fi
 done
 
-# gen_xo_sparse.tcl lives at the REPO ROOT in the git tree, but the server
+# gen_xo_sparse.tcl lives in Vitis/ in the git tree, but the server
 # layout is not necessarily the same -- so search the likely places and fail
 # HERE rather than three minutes into phase 1. Override with GENXO=/path/... .
 GENXO=${GENXO:-}

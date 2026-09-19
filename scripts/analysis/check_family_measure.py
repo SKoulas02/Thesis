@@ -1,7 +1,7 @@
 """Check one family configuration's card measurements, and compare it with every
 configuration already measured.
 
-    python check_family_measure.py 8x4          # results/family_measurements/8x4/
+    python scripts/analysis/check_family_measure.py 8x4          # results/family_measurements/8x4/
 
 Reads what run_family_measure.py produced (copied into results/family_measurements/<tag>/)
 and runs the same checks on every configuration, so a problem in config five is caught the
@@ -31,8 +31,9 @@ import statistics
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BASE = os.path.join(HERE, "results", "family_measurements")
-REF = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+BASE = os.path.join(ROOT, "results", "family_measurements")
+REF = os.path.join(ROOT, "results")
 
 CONFIGS = {"4x4": (4, 4, 400), "8x4": (8, 4, 375), "16x3": (16, 3, 350),
            "8x8": (8, 8, 325), "4x24": (4, 24, 300), "4x32": (4, 32, 250)}
@@ -124,7 +125,7 @@ def load(tag):
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in CONFIGS:
-        raise SystemExit("usage: python check_family_measure.py <%s>" % "|".join(ORDER))
+        raise SystemExit("usage: python scripts/analysis/check_family_measure.py <%s>" % "|".join(ORDER))
     tag = sys.argv[1]
     X = load(tag)
     if X is None:

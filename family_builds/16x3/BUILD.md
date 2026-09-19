@@ -73,7 +73,7 @@ scp -r family_builds/16x3 skoulas@coroni:/home/skoulas/GEMV_Sparse/family_builds
 scp family_builds/16x3/gen_xo_16x3.tcl skoulas@coroni:/home/skoulas/
 scp family_builds/16x3/sparse_hbm_16x3.cfg \
     family_builds/16x3/slr_floorplan_16x3.cfg \
-    impl_family.cfg skoulas@coroni:/home/skoulas/GEMV_Sparse/Vitis_16x3/
+    Vitis/impl_family.cfg skoulas@coroni:/home/skoulas/GEMV_Sparse/Vitis_16x3/
 ```
 
 Environment, needed in EVERY fresh shell -- nothing below works without it:

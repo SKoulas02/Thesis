@@ -30,7 +30,7 @@ PHYSICALLY IMPOSSIBLE -- 1.004 beats/cycle, faster than the clock itself. See
 the '325 MHz' sheet, section 5. NEVER compare a 325 soak number against a 300
 fit number: different estimators, ~6% apart, and the difference is not physical.
 
-Run:  python make_comparison_xlsx.py
+Run:  python scripts/analysis/make_comparison_xlsx.py
 """
 
 import csv
@@ -42,14 +42,15 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 
 def _data(name):
     # results/ first, then the repo root -- so a CSV freshly copied down from
     # the server is still found before it has been filed away.
     p = os.path.join(DATA, name)
-    return p if os.path.exists(p) else os.path.join(HERE, name)
+    return p if os.path.exists(p) else os.path.join(ROOT, name)
 
 
 def _out(name):

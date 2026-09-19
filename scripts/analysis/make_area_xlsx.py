@@ -21,7 +21,7 @@ Sparse is 41.1% LARGER in LUTs. An earlier note recorded this as "-29%", which
 is the same fact with sparse as the denominator and reads, wrongly, as though
 sparsity saved area. State it as a cost.
 
-Run:  python make_area_xlsx.py
+Run:  python scripts/analysis/make_area_xlsx.py
 """
 
 import io
@@ -33,14 +33,15 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 
 def _data(name):
     # results/ first, then the repo root -- so a CSV freshly copied down from
     # the server is still found before it has been filed away.
     p = os.path.join(DATA, name)
-    return p if os.path.exists(p) else os.path.join(HERE, name)
+    return p if os.path.exists(p) else os.path.join(ROOT, name)
 
 
 def _out(name):
@@ -50,8 +51,8 @@ def _out(name):
 
 
 OUT = _out("GEMV_Area_Comparison.xlsx")
-SPARSE = "two2N_axis_utilization_placed.rpt"
-DENSE = "dense_gemv_axis_utilization_placed.rpt"
+SPARSE = os.path.join("reports", "ooc", "two2N_axis_utilization_placed.rpt")
+DENSE = os.path.join("reports", "ooc", "dense_gemv_axis_utilization_placed.rpt")
 
 H_FILL = PatternFill("solid", fgColor="1F3864")
 H_FONT = Font(color="FFFFFF", bold=True, size=11)
@@ -170,8 +171,8 @@ def block(ws, r, spec, S, D):
 
 
 
-SYS_SPARSE = os.path.join("sparse_reports_300slr", "impl_1_kernel_util_routed.rpt")
-SYS_DENSE = os.path.join("dense_reports_300", "impl_1_kernel_util_routed.rpt")
+SYS_SPARSE = os.path.join("reports", "sparse_reports_300slr", "impl_1_kernel_util_routed.rpt")
+SYS_DENSE = os.path.join("reports", "dense_reports_300", "impl_1_kernel_util_routed.rpt")
 
 
 def parse_kernel_util(path):
@@ -181,7 +182,7 @@ def parse_kernel_util(path):
     Vitis link and breaks the routed device down per compute unit, so it includes
     the 17 (sparse) / 14 (dense) HLS data movers and the platform shell.
     """
-    p = os.path.join(HERE, path)
+    p = os.path.join(ROOT, path)
     if not os.path.exists(p):
         return None
     out = {}

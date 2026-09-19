@@ -39,7 +39,7 @@ size running one accelerator, leakage dominates, so the only way to save energy
 is to FINISH SOONER. Sparse does not draw less power -- it draws more (35.9 W
 vs 31.8 W) -- it just spends far less time drawing it.
 
-Run:  python make_energy_csv.py
+Run:  python scripts/analysis/make_energy_csv.py
 """
 
 import argparse
@@ -48,12 +48,13 @@ import io
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 
 def _data(name):
     p = os.path.join(DATA, name)
-    return p if os.path.exists(p) else os.path.join(HERE, name)
+    return p if os.path.exists(p) else os.path.join(ROOT, name)
 
 
 # Per clock: (shape sweep, [power files, in priority order]).

@@ -55,8 +55,8 @@
 # achieved period. Fmax = 1000 / (2.222 - WNS).
 #
 # GUI-SAFE: no `exit`. Run from the Vivado Tcl Console with GEMV_4.0 open:
-#     cd /home/skoulas/GEMV_Sparse
-#     source sweep_families_ooc.tcl
+#     cd <repo root>/reports          ;# reports land in reports/family_sweep/
+#     source ../scripts/vivado/sweep_families_ooc.tcl
 # ----------------------------------------------------------------------------
 
 # {CORES BLOCKS} -- grouped by family, ordered small to large so the cheap

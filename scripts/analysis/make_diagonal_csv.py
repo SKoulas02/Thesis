@@ -26,7 +26,7 @@ authority for every timing number in this project anyway.
   bad luck. Getting error bars would need a different seed or directive per
   point, not a repeat.
 
-Run:  python make_diagonal_csv.py
+Run:  python scripts/analysis/make_diagonal_csv.py
 """
 
 import csv
@@ -35,8 +35,9 @@ import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
-SWEEP = os.path.join(HERE, "diagonal_sweep")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
+SWEEP = os.path.join(ROOT, "reports", "diagonal_sweep")
 
 SRC = os.path.join(DATA, "diagonal_summary_run1.csv")
 OUT = os.path.join(DATA, "GEMV_Diagonal_CxB64.csv")

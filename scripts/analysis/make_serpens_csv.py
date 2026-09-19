@@ -72,9 +72,9 @@ launch per run and reads 5-6% slower on identical hardware -- do not feed its
 CSV to this script.
 
 Run:
-    python make_serpens_csv.py                       # geomean of the 2:32 sweep
-    python make_serpens_csv.py --headline H1         # the equal-NNZ run alone
-    python make_serpens_csv.py --shapes-csv results/shapes_2to32_325MHz.csv
+    python scripts/analysis/make_serpens_csv.py                       # geomean of the 2:32 sweep
+    python scripts/analysis/make_serpens_csv.py --headline H1         # the equal-NNZ run alone
+    python scripts/analysis/make_serpens_csv.py --shapes-csv results/shapes_2to32_325MHz.csv
 """
 
 import argparse
@@ -83,7 +83,8 @@ import math
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "results")
+ROOT = os.path.dirname(os.path.dirname(HERE))  # repository root; this file is in scripts/analysis/
+DATA = os.path.join(ROOT, "results")
 
 # ---------------------------------------------------------------------------
 # Serpens-A16, as published. Do not "improve" these numbers.

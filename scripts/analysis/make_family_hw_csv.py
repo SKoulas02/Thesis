@@ -5,12 +5,15 @@ RUN LOCALLY, against reports copied down from the server:
     # server
     cd ~/GEMV_Sparse && tar czf family_hw_reports.tar.gz reports_*
     # local, from the repo root
-    scp <server>:/home/skoulas/GEMV_Sparse/family_hw_reports.tar.gz .
-    mkdir family_hw_reports ; tar xzf family_hw_reports.tar.gz -C family_hw_reports
-    python make_family_hw_csv.py family_hw_reports     # -> results/GEMV_Family_Hardware.csv
+    scp <server>:/home/skoulas/GEMV_Sparse/family_hw_reports.tar.gz reports/
+    mkdir reports/family_hw_reports
+    tar xzf reports/family_hw_reports.tar.gz -C reports/family_hw_reports
+    python scripts/analysis/make_family_hw_csv.py reports/family_hw_reports
+                                         # -> results/GEMV_Family_Hardware.csv
 
 Also runs unchanged on the server (Python 3.6 compatible -- coroni has 3.6.9); with no
-results/ beside it, the CSV lands in the reports base instead.
+results/ at the repository root (two levels above this script), the CSV lands in the
+reports base instead.
 
 WHY A PARSER AND NOT NUMBERS TYPED FROM THE CHAT. Two reasons, the second one found
 while writing this:
@@ -218,10 +221,10 @@ def parse_slr_util(path):
 def main():
     base = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
     # In the repo, the CSV belongs in results/ with every other measurement CSV, not
-    # inside the reports archive. On the server (no results/ beside the script) it falls
-    # back to the reports base.
-    here = os.path.dirname(os.path.abspath(__file__))
-    out_dir = os.path.join(here, "results")
+    # inside the reports archive. On the server (no results/ at the repository root, two
+    # levels above this script) it falls back to the reports base.
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    out_dir = os.path.join(root, "results")
     if not os.path.isdir(out_dir):
         out_dir = base
     out_path = os.path.join(out_dir, "GEMV_Family_Hardware.csv")

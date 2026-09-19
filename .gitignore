@@ -1,3 +1,82 @@
+# ============================================================================
+# Kept out of the public repository
+# ============================================================================
+
+# Claude Code -- assistant instructions, settings, skills and memory
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
+
+# Thesis text -- LaTeX sources, figures and the compiled PDF
+Latex/
+
+# Thesis presentation
+docs/
+
+# ============================================================================
+# Xilinx Vivado
+# ============================================================================
+
+# Temporary files
+*.log
+*.jou
+*.str
+*.os
+*.pb
+.Xil/
+
+# Project output folders -- regenerated from the .xpr and the .xci files
+*.cache/
+*.gen/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+work/
+
+# Output of scripts/vivado/s7_wizard_probe.tcl
+s7_out/
+
+# IP generated files
+*.vho
+*.veo
+*_stub.v
+*_stub.vhdl
+*_sim_netlist.v
+*_sim_netlist.vhdl
+
+# ============================================================================
+# Xilinx Vitis / Vitis HLS / XRT -- outputs of the build flow in README.md
+# ============================================================================
+_x/
+.ipcache/
+*.xo
+*.xclbin
+*.xclbin.info
+*.ltx
+*.link_summary
+*.compile_summary
+*.run_summary
+emconfig.json
+hls_mm2s/
+hls_s2mm/
+xo_build*/
+
+# ============================================================================
+# OS / editor / Office
+# ============================================================================
+*.code-workspace
+*~
+~$*
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ============================================================================
+# Python (standard GitHub template)
+# ============================================================================
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -5,59 +84,6 @@ __pycache__/
 
 # C extensions
 *.so
-
-# Vivado Temporary Files
-*.log
-*.jou
-*.str
-*.os
-.Xil/
-*.pb
-*.jou
-
-# Vivado Project Folders
-
-*.cache/
-*.hw/
-*.ip_user_files/
-*.runs/
-*.sim/
-
-# Backup files
-*~
-
-# Additional Vivado junk
-*.gen/
-work/
-
-# Claude Code
-
-CLAUDE.md
-.claude/
-
-#Latex
-Latex/Template/
-Latex/**/*.aux
-Latex/**/*.log
-Latex/**/*.out
-Latex/**/*.toc
-Latex/**/*.lof
-Latex/**/*.bbl
-Latex/**/*.bcf
-Latex/**/*.blg
-Latex/**/*.run.xml
-Latex/**/*.synctex.gz
-Latex/**/*.mtc*
-Latex/**/*.maf
-Latex/**/_minted*
-
-# IP Generated Files
-*.vho
-*.veo
-*_stub.v
-*_stub.vhdl
-*_sim_netlist.v
-*_sim_netlist.vhdl
 
 # Distribution / packaging
 .Python
