@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"import torch; print\\('torch', torch.__version__\\)\")",
-      "Bash(py -c \"import torch; print\\('torch', torch.__version__\\)\")"
-    ]
-  }
-}
