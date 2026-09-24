@@ -130,6 +130,23 @@ SOURCES = [
     # E:F = static/dynamic pJ per element. Built by make_family_mixed_csv.py.
     ("GEMV_Family_Mixed_Latency.csv", "Family Mixed Latency"),
     ("GEMV_Family_Mixed_Energy.csv", "Family Mixed Energy"),
+    # MULTI-TENANCY: N independent 4x4 engines on one card. The tenants-running series all
+    # comes from ONE bitstream (the largest measured with --soak-each, x4 at 374 MHz today),
+    # so only the number of running tenants changes along the x-axis. A:B of Interference
+    # and Energy are a two-level category (workload label on the FIRST row of each group
+    # only). Throughput and energy are power-soak figures; interference is the active-span
+    # ratio. Scale-out vs Scale-up is steady state on both sides at 24 channels. Idle vs
+    # Channels covers every family and multi-tenant build. make_multi_tenant_csv.py.
+    ("GEMV_MultiTenant_Interference.csv", "MT Interference"),
+    ("GEMV_MultiTenant_Throughput.csv", "MT Throughput"),
+    ("GEMV_MultiTenant_Energy.csv", "MT Energy"),
+    ("GEMV_ScaleOut_vs_ScaleUp.csv", "Scale-out vs Scale-up"),
+    ("GEMV_Idle_vs_Channels.csv", "Idle vs Channels"),
+    # EVERY BUILD SIDE BY SIDE: the six single engines and every multi-tenant build, sorted
+    # by HBM channels, steady state on both sides. Each chart metric has a _single and a
+    # _multi column with one blank per row, so two series at 100% overlap colour each bar
+    # by its kind. A build not measured yet keeps a blank "pending" row (its chart slot).
+    ("GEMV_Configurations.csv", "Configurations"),
 ]
 
 # Columns that hold labels even when they look numeric, so they are never
@@ -143,6 +160,12 @@ TEXT_COLS = {
     "fmax_kind", "engine_die", "report_dir", "note",
     # Family Mixed labels ("512x512", "4x4") -- never numbers
     "dimensions", "shape", "shape_group", "data_source",
+    # multi-tenant labels ("2 tenants", "All 2:32", "4x4 (6 ch)")
+    "workload", "workload_name", "tenants_running", "bitstream", "metric", "unit",
+    "scaleout", "scaleup", "basis", "build_label", "build", "kind", "uses_channel_16_up",
+    "source",
+    # Configurations labels ("3 x 8x4 (30 ch)", "split", "pending: not measured yet")
+    "config_label", "configuration", "engine_shape", "floorplan", "status",
 }
 
 H_FILL = PatternFill("solid", fgColor="1F3864")

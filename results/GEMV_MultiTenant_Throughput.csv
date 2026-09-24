@@ -1,0 +1,6 @@
+tenants_running,gmac_s_mixed,gmac_s_all2to32,gmac_s_linear_scaling,gmac_s_peak,scaling_x_mixed,scaling_x_all2to32,pct_of_peak_mixed,pct_of_peak_all2to32,tenants_n,bitstream,clock_mhz,estimator
+1 tenant,9.881,9.729,9.881,10.528,1.0,1.0,93.85,92.41,1,sparse_4x4_x5_375_split.xclbin,329.0,"60 s power soak, host calculation counts x MACs per calculation"
+2 tenants,19.743,19.13,19.762,21.056,1.998,1.966,93.76,90.85,2,sparse_4x4_x5_375_split.xclbin,329.0,"60 s power soak, host calculation counts x MACs per calculation"
+3 tenants,29.351,28.938,29.643,31.584,2.97,2.974,92.93,91.62,3,sparse_4x4_x5_375_split.xclbin,329.0,"60 s power soak, host calculation counts x MACs per calculation"
+4 tenants,39.196,37.706,39.524,42.112,3.967,3.876,93.08,89.54,4,sparse_4x4_x5_375_split.xclbin,329.0,"60 s power soak, host calculation counts x MACs per calculation"
+5 tenants,48.543,47.209,49.405,52.64,4.913,4.852,92.22,89.68,5,sparse_4x4_x5_375_split.xclbin,329.0,"60 s power soak, host calculation counts x MACs per calculation"

@@ -1,0 +1,7 @@
+metric,ratio_scaleout_over_scaleup,scaleout_value,scaleup_value,unit,scaleout,scaleup,basis
+HBM channels,1.0,24,24,channels,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build",the controlled variable: the same channel budget
+Kernel clock,1.2467,374.0,300.0,MHz,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build",runtime clock of each bitstream
+MACs per cycle,0.6667,128,192,MACs/cycle,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build",4 x 32 vs 96 blocks x 2 (DSPs 512 vs 768)
+Throughput,0.8307,47.37,57.025,GMAC/s,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build","steady state: x4 = MACs / (active span - 189 us fixed cost), all four tenants running; 4x24 = ss_gflops_act_MIXED / 2"
+Board power,0.9979,40.345,40.43,W,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build","60 s MIXED soak, board load"
+Energy per MAC,1.2013,0.8517,0.709,nJ/MAC,"4 x 4x4 tenants, sparse_4x4_x4_375.xclbin","one 4x24 engine, family build",soak board power / steady-state GMAC/s (the family's per-W method)

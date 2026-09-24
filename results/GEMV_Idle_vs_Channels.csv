@@ -1,0 +1,14 @@
+build_label,idle_vccint_W,idle_rest_W,idle_board_W,hbm_channels,build,kind,clock_mhz,uses_channel_16_up,n_soaks,source
+4x4 (6 ch),6.048,19.395,25.443,6,4x4,single engine,400.0,no,5,results/family_measurements/4x4/power_4x4_400MHz.csv
+8x4 (10 ch),6.56,20.091,26.651,10,8x4,single engine,375.0,no,5,results/family_measurements/8x4/power_8x4_375MHz.csv
+2 x 4x4 (12 ch),6.655,20.108,26.764,12,4x4_x2,multi-tenant,394.0,no,2,"multi_x2_394MHz.csv, multi_x2_394MHz_all2to32.csv"
+16x3 (13 ch),7.139,20.448,27.587,13,16x3,single engine,350.0,no,5,results/family_measurements/16x3/power_16x3_350MHz.csv
+8x8 (17 ch),7.528,23.309,30.837,17,8x8,single engine,325.0,yes,5,results/family_measurements/8x8/power_8x8_325MHz.csv
+3 x 4x4 (18 ch),7.514,23.353,30.867,18,4x4_x3,multi-tenant,399.0,yes,3,"multi_x3_399MHz.csv, multi_x3_399MHz_all2to32.csv"
+2 x 8x4 (20 ch),7.716,23.669,31.386,20,8x4_x2,multi-tenant,361.0,yes,2,"multi_8x4_x2_361MHz.csv, multi_8x4_x2_361MHz_all2to32.csv"
+4x24 (24 ch),8.287,24.259,32.546,24,4x24,single engine,300.0,yes,5,results/family_measurements/4x24/power_4x24_300MHz.csv
+4 x 4x4 (24 ch),8.365,24.416,32.782,24,4x4_x4,multi-tenant,374.0,yes,8,"multi_x4_374MHz.csv, multi_x4_374MHz_all2to32.csv"
+2 x 16x3 (26 ch),9.048,25.084,34.132,26,16x3_x2,multi-tenant,341.0,yes,4,"multi_16x3_x2_341MHz.csv, multi_16x3_x2_341MHz_all2to32.csv"
+5 x 4x4 (30 ch),8.64,25.025,33.665,30,4x4_x5,multi-tenant,329.0,yes,10,"multi_x5_329MHz.csv, multi_x5_329MHz_all2to32.csv"
+3 x 8x4 (30 ch),8.877,25.183,34.061,30,8x4_x3,multi-tenant,354.0,yes,6,"multi_8x4_x3_354MHz.csv, multi_8x4_x3_354MHz_all2to32.csv"
+4x32 (32 ch),8.612,25.039,33.651,32,4x32,single engine,250.0,yes,5,results/family_measurements/4x32/power_4x32_250MHz.csv

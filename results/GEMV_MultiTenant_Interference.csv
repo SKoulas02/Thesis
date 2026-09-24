@@ -1,0 +1,9 @@
+workload,tenants_running,slowdown_pct_t0,slowdown_pct_t1,slowdown_pct_t2,slowdown_pct_t3,slowdown_pct_t4,interference_t0,interference_t1,interference_t2,interference_t3,interference_t4,active_overlap_pct,alone_spread_pct_max,workload_name,tenants_n,bitstream,clock_mhz,estimator
+Mixed,2 tenants,0.89,-1.07,,,,1.0089,0.9893,,,,97.37,0.994,Mixed,2,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,3 tenants,0.97,-0.66,-0.37,,,1.0097,0.9934,0.9963,,,94.27,0.994,Mixed,3,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,4 tenants,1.18,-0.14,0.05,-0.3,,1.0118,0.9986,1.0005,0.997,,91.5,0.994,Mixed,4,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,5 tenants,1.45,0.04,0.46,-0.38,-0.28,1.0145,1.0004,1.0046,0.9962,0.9972,88.27,0.994,Mixed,5,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+All 2:32,2 tenants,0.43,-0.8,,,,1.0043,0.992,,,,95.57,0.441,All 2:32,2,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,3 tenants,0.39,-0.8,-0.08,,,1.0039,0.992,0.9992,,,92.07,0.441,All 2:32,3,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,4 tenants,0.41,-0.64,0.13,-0.41,,1.0041,0.9936,1.0013,0.9959,,85.03,0.441,All 2:32,4,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
+,5 tenants,0.92,-0.06,0.46,-0.62,-0.01,1.0092,0.9994,1.0046,0.9938,0.9999,83.9,0.441,All 2:32,5,sparse_4x4_x5_375_split.xclbin,329.0,"active-span ratio vs the same tenant alone, mean of 3 reps"
