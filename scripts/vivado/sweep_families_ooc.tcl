@@ -10,7 +10,7 @@
 #                                               block, 2 DSPs each)
 #
 #   W_IDX    = 2 x BLOCKS            IND_BITS = 10 x T
-#   W_PCS    = ceil(T / 8)           IND_PCS  = ceil(IND_BITS / 256)
+#   W_PCS    = ceil(T / 8)           IND_PCS  = ceil((IND_BITS + 2) / 256)
 #   C_PCS    = ceil(T / 16)          A_PCS    = 2  (the 32-element activation
 #   HBM PCs  = W + IND + A + C             window is 512b whatever T is)
 #
@@ -43,16 +43,18 @@
 #  SWAP IT BACK AFTERWARDS -- the .xo packaging and every Vitis link use the
 #  wrapper and need ap_clk.
 #
-#  ⚠️ T=64 IS DELIBERATELY ABSENT -- already measured, on the WRAPPER. That
-#  leaves a small methodology seam between the two studies. It is defensible:
-#  the wrapper was measured transparent at 8x8 (18 LUTs and 40 FFs SMALLER than
-#  the bare engine, F7/DSP/BRAM exactly equal). Say so in the write-up rather
-#  than presenting the two sets as one homogeneous sweep.
+#  T=64 IS INCLUDED, although the C x B = 64 diagonal already measured those
+#  shapes on the WRAPPER at 2.222 ns: re-running them here puts every point of
+#  this study on one method (see the note above `set FAM`). The wrapper was
+#  measured transparent at 8x8 (18 LUTs and 40 FFs SMALLER than the bare engine,
+#  F7/DSP/BRAM exactly equal). Keep the two studies' CSVs separate.
 #
-# CONSTRAIN TIGHT ON PURPOSE: 2.222 ns (450 MHz), the same constraint as every
-# other OOC number in this project. A design that MEETS its constraint reports a
-# LOWER BOUND because the tool stops optimising; one that misses reports its true
-# achieved period. Fmax = 1000 / (2.222 - WNS).
+# CONSTRAIN TIGHT ON PURPOSE: 1.5 ns ($PERIOD, 667 MHz). That is tighter than the
+# 2.222 ns (450 MHz) of the diagonal and of every earlier OOC number, because the
+# small families MET 2.222 ns and so reported only lower bounds (see "the
+# constraint" below). A design that MEETS its constraint reports a LOWER BOUND
+# because the tool stops optimising; one that misses reports its true achieved
+# period. Fmax = 1000 / (PERIOD - WNS).
 #
 # GUI-SAFE: no `exit`. Run from the Vivado Tcl Console with GEMV_4.0 open:
 #     cd <repo root>/reports          ;# reports land in reports/family_sweep/

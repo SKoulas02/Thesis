@@ -1,0 +1,40 @@
+window 20261002_1611 on coroni, user skoulas
+1-minute load at the start: 2.04; busy processes: none
+card 0000:af:00.1; XRT_INI_PATH=/home/skoulas/GEMV_Sparse/xrt_ert_off.ini:
+[Runtime]
+ert=false
+xbutil --version:
+Version              : 2.13.0
+Branch               : 2022.1
+Hash                 : ca4bdf101cd1d698377f5a7113d8583f709c2143
+Hash Date            : 2024-07-29 15:52:51
+XOCL                 : 2.13.466, f5505e402c2ca1ffe45eb6d3a9399b23a0dc8776
+XCLMGMT              : 2.13.466, f5505e402c2ca1ffe45eb6d3a9399b23a0dc8776
+shapes: 11 MIXED shapes (Vitis/run_shapes.py's G1..G11), each ONE matrix split over the engines (lockstep), batch sizes R and 4R, 10 timed passes per host call (run_shapes_xrt default), gen_timing_stimulus data; soak 60 s at V=1024 MIXED, idle 20 s; host timeout 300 s per call
+tool md5s:
+  6f99102479c1acda9508ceba99edfdc6  run_window_shapes.py
+  c16f1a35071902070351f7c67941d1f6  run_window_shapes.sh
+  54ded75d062d025607f324d75dff4825  run_shapes_xrt.py
+  0a0da07fce38d37d6378d0f15f3989aa  plan_shapes.py
+  57ba0df77432c501fc1f283887b23a13  plan_qwen.py
+  b0671345f66b80fd4281911492f8e2aa  run_workload_xrt.py
+  47df853ebd3741571292a1e10e61b85b  plan_workload.py
+  7f4c869b8fb68eed8f2ad26f21407a45  plan_workload_bcast.py
+  1c6a7a63db92e2da75afb5547401e187  host_workload_xrt.cpp
+builds (part arch shape engines MHz folder xclbin):
+  shapes 2x4x4 4x4 2 394 Vitis_multi_x2 sparse_4x4_x2_400.xclbin
+  shapes 3x4x4 4x4 3 399 Vitis_multi_x3 sparse_4x4_x3_400.xclbin
+  shapes 4x4x4 4x4 4 374 Vitis_multi_x4 sparse_4x4_x4_375.xclbin
+  shapes 5x4x4 4x4 5 329 Vitis_multi_x5_split sparse_4x4_x5_375_split.xclbin
+  shapes 2x8x4 8x4 2 361 Vitis_multi_8x4_x2 sparse_8x4_x2_375.xclbin
+  shapes 3x8x4 8x4 3 354 Vitis_multi_8x4_x3 sparse_8x4_x3_375.xclbin
+  shapes 2x16x3 16x3 2 341 Vitis_multi_16x3_x2 sparse_16x3_x2_375.xclbin
+  shapes 3x4x4_shared 4x4 3 392 Vitis_multi_x3_shared sparse_4x4_x3_shared_400.xclbin
+  shapes 3x8x4_shared 8x4 3 321 Vitis_multi_8x4_x3_shared sparse_8x4_x3_shared_375.xclbin
+  shapes 2x16x3_shared 16x3 2 332 Vitis_multi_16x3_x2_shared sparse_16x3_x2_shared_375.xclbin
+  shapes 3x4x4_bcast 4x4 3 393 Vitis_multi_x3_bcast sparse_4x4_x3_bcast_400.xclbin
+  shapes 6x4x4_bcast 4x4 6 343 Vitis_multi_x6_bcast sparse_4x4_x6_bcast_375.xclbin
+  shapes 7x4x4_bcast 4x4 7 311 Vitis_multi_x7_bcast sparse_4x4_x7_bcast_375.xclbin
+  shapes 2x8x8_bcast 8x8 2 305 Vitis_multi_8x8_x2_bcast_wl sparse_8x8_x2_bcast_wl_325.xclbin
+  shapes 3x8x4_bcast 8x4 3 337 Vitis_multi_8x4_x3_bcast sparse_8x4_x3_bcast_375.xclbin
+  shapes 2x16x3_bcast 16x3 2 339 Vitis_multi_16x3_x2_bcast sparse_16x3_x2_bcast_375.xclbin

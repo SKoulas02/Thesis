@@ -1,0 +1,2 @@
+arch,kind,clock_mhz,layer_width,weight_scale_log2,rows,rms_exact,mean_offset,mean_offset_rel_rms,mean_abs_offset,median_abs_offset_rel_rms,p95_abs_offset_rel_rms,max_abs_offset_rel_rms,match_float_out_trunc,match_fix7_floor_out_trunc,match_fix7_toward_0_out_trunc,match_fix7_nearest-even_out_trunc,match_fix7_floor_out_RNE,match_fix7_toward_0_out_RNE,match_fix7_nearest-even_out_RNE
+3x4x4_bcast,broadcast,393,2048,8,256,255.71003438,-0.03524967,-0.00013785,0.73535103,0.00229185,0.00736631,0.01694501,98.83,95.7,100.0,97.66,55.86,57.42,56.25

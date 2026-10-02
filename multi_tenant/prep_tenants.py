@@ -92,6 +92,9 @@ PLAN = [
     ("11", 2, 8, 333),      # 2:32, V=64,  128 rows
     ("01", 6, 3, 444),      # 2:8,  V=192,  48 rows
     ("10", 3, 6, 555),      # 2:16, V=96,   96 rows
+    # tenants 6 and 7 (added 2026-09-28 for the 6 and 7 x 4x4 shared-vector builds)
+    ("01", 5, 4, 666),      # 2:8,  V=160,  64 rows
+    ("11", 7, 3, 777),      # 2:32, V=224,  48 rows
 ]
 
 # measure mode: tenant -> (sparsity code, nwin). nlaps is DERIVED so that every
@@ -102,6 +105,8 @@ MEASURE_PLAN = [
     ("11", 64),     # 2:32, V=2048
     ("01", 32),     # 2:8,  V=1024
     ("10", 16),     # 2:16, V=512
+    ("01", 16),     # 2:8,  V=512   (tenants 6 and 7, added 2026-09-28)
+    ("11", 32),     # 2:32, V=1024
 ]
 
 # --all-sparsity CODE: every tenant runs the SAME mode. 11 (2:32) gives the most output
@@ -110,7 +115,7 @@ MEASURE_PLAN = [
 # 2:32, plus the one-cycle lap bubble), so V=256 is one beat per 9 cycles. The INPUT side
 # (3 channels per tenant, one beat per cycle) is the same in every mode and dominates the
 # HBM traffic. Vector lengths stay distinct so the tenants are still different jobs.
-ALL_SAME_NWIN = [32, 16, 64, 8, 128]      # V = 1024, 512, 2048, 256, 4096
+ALL_SAME_NWIN = [32, 16, 64, 8, 128, 96, 24]  # V = 1024, 512, 2048, 256, 4096, 3072, 768
 
 def check_packer(emu):
     """hex_to_bin.py's constants must match THIS shape, or the images are wrong."""

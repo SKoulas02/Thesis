@@ -1,0 +1,20 @@
+config_label,kind,engine_shape,engines,lanes_total,weights_ch,indices_ch,activation_ch,output_ch,total_ch,unused_ch,movers,hbm_ports_free,uses_second_stack,saved_by_sharing,shared_twin_of,engine_dsp,build_dsp,dsp_pct,dsp_source,clock_mhz,status
+4x4 (6 ch),single engine,4x4,1,16,2,1,2,1,6,26,6,26,no,0,,128,132,1.46,measured (routed utilization report),400,built and measured
+8x4 (10 ch),single engine,8x4,1,32,4,2,2,2,10,22,10,22,no,0,,256,260,2.88,measured (routed utilization report),375,built and measured
+16x3 (13 ch),single engine,16x3,1,48,6,2,2,3,13,19,13,19,no,0,,384,388,4.3,measured (routed utilization report),350,built and measured
+8x8 (17 ch),single engine,8x8,1,64,8,3,2,4,17,15,17,15,yes,0,,512,516,5.72,measured (routed utilization report),325,built and measured
+4x24 (24 ch),single engine,4x24,1,96,12,4,2,6,24,8,24,8,yes,0,,768,772,8.55,measured (routed utilization report),300,built and measured
+4x32 (32 ch),single engine,4x32,1,128,16,6,2,8,32,0,32,0,yes,0,,1024,1028,11.39,measured (routed utilization report),250,built and measured
+2 x 4x4 (12 ch),"multi-tenant, own vector channels",4x4,2,32,4,2,4,2,12,20,12,20,no,0,,256,260,2.88,measured (routed utilization report),394,built and measured
+3 x 4x4 (18 ch),"multi-tenant, own vector channels",4x4,3,48,6,3,6,3,18,14,18,14,yes,0,,384,388,4.3,measured (routed utilization report),399,built and measured
+3 x 4x4 shared (14 ch),"multi-tenant, shared vector channels",4x4,3,48,6,3,2,3,14,18,18,14,no,4,3 x 4x4 (18 ch),384,388,4.3,formula: 8 per lane x lanes + 4 platform (not built yet),,to build
+4 x 4x4 (24 ch),"multi-tenant, own vector channels",4x4,4,64,8,4,8,4,24,8,24,8,yes,0,,512,516,5.72,measured (routed utilization report),374,built and measured
+5 x 4x4 (30 ch),"multi-tenant, own vector channels",4x4,5,80,10,5,10,5,30,2,30,2,yes,0,,640,644,7.14,measured (routed utilization report),329,built and measured
+6 x 4x4 shared (26 ch),"multi-tenant, shared vector channels",4x4,6,96,12,6,2,6,26,6,36,-4,yes,10,,768,772,8.55,formula: 8 per lane x lanes + 4 platform (not built yet),,cannot link: 36 movers > 32 HBM kernel ports
+7 x 4x4 shared (30 ch),"multi-tenant, shared vector channels",4x4,7,112,14,7,2,7,30,2,42,-10,yes,12,,896,900,9.97,formula: 8 per lane x lanes + 4 platform (not built yet),,cannot link: 42 movers > 32 HBM kernel ports
+2 x 8x4 (20 ch),"multi-tenant, own vector channels",8x4,2,64,8,4,4,4,20,12,20,12,yes,0,,512,516,5.72,measured (routed utilization report),361,built and measured
+3 x 8x4 (30 ch),"multi-tenant, own vector channels",8x4,3,96,12,6,6,6,30,2,30,2,yes,0,,768,772,8.55,measured (routed utilization report),354,built and measured
+3 x 8x4 shared (26 ch),"multi-tenant, shared vector channels",8x4,3,96,12,6,2,6,26,6,30,2,yes,4,3 x 8x4 (30 ch),768,772,8.55,formula: 8 per lane x lanes + 4 platform (not built yet),,to build
+2 x 16x3 (26 ch),"multi-tenant, own vector channels",16x3,2,96,12,4,4,6,26,6,26,6,yes,0,,768,772,8.55,measured (routed utilization report),341,built and measured
+2 x 16x3 shared (24 ch),"multi-tenant, shared vector channels",16x3,2,96,12,4,2,6,24,8,26,6,yes,2,2 x 16x3 (26 ch),768,772,8.55,formula: 8 per lane x lanes + 4 platform (not built yet),,to build
+2 x 8x8 shared (32 ch),"multi-tenant, shared vector channels",8x8,2,128,16,6,2,8,32,0,34,-2,yes,2,,1024,1028,11.39,formula: 8 per lane x lanes + 4 platform (not built yet),,cannot link: 34 movers > 32 HBM kernel ports

@@ -1,0 +1,2 @@
+label,clock_mhz,V,engines,soak_s,iterations,Mrow_s_sustained,board_load_w,board_idle_w,board_delta_w,vccint_load_w,vccint_idle_w,n_load,n_idle,beats_per_engine_per_pass,host_load_1min
+6x4x4_bcast MIXED,343,1024,6,60.0,9921,260.069,44.399,33.669,10.73,10.47,8.651,54,21,1966080,2.73

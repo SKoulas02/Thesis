@@ -1,0 +1,5 @@
+sparsity,terms_per_row,rows,data_sets,builds,median_pct,p95_pct,max_pct,mean_abs_pct,mean_offset_pct,model_match_pct,basis
+2:4,1024,1200,16,22,0.289,1.022,2.572,0.384,-0.0368,100.0,"|card - exact| / rms(exact) of each build's realistic layer (weights N(0,1) magnitude-pruned, vector N(0,1)); every distinct data set pooled once (twins share theirs)"
+2:8,512,1856,16,22,0.254,0.908,2.22,0.341,0.015,100.0,"|card - exact| / rms(exact) of each build's realistic layer (weights N(0,1) magnitude-pruned, vector N(0,1)); every distinct data set pooled once (twins share theirs)"
+2:16,256,1200,16,22,0.237,0.733,1.454,0.285,-0.01,100.0,"|card - exact| / rms(exact) of each build's realistic layer (weights N(0,1) magnitude-pruned, vector N(0,1)); every distinct data set pooled once (twins share theirs)"
+2:32,128,2400,16,22,0.199,0.719,1.872,0.267,0.0258,100.0,"|card - exact| / rms(exact) of each build's realistic layer (weights N(0,1) magnitude-pruned, vector N(0,1)); every distinct data set pooled once (twins share theirs)"

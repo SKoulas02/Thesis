@@ -1,0 +1,2 @@
+part,arch,shape,engines,clock_mhz,folder,status,minutes,note
+qwen,2x8x8_bcast,8x8,2,305,Vitis_multi_8x8_x2_bcast_wl,OK,1.66,

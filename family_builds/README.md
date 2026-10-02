@@ -14,12 +14,46 @@ cores.
 | 4x24 | 4x24 | 96 | 768 | **24** | 8 | 407.3 | **300** | 57.60 |
 | 4x32 | 4x32 | 128 | 1024 | **32** | 0 | 355.4 | **250** | 64.00 |
 
+## Outcome -- the campaign is complete
+
+All six configurations closed their targets on the final (post-route phys-opt)
+timing report and ran bit-exact on the U280. The rest of this file is the plan
+as written before the builds; where it differs from what happened, this section
+is the record.
+
+| tag | HBM channels | floorplan used | target (MHz) | kernel WNS (ns) | achieved (MHz) |
+|---|---|---|---|---|---|
+| 4x4 | 6 | single die (SLR0) | 400 | +0.022 | 403.6 |
+| 8x4 | 10 | single die (SLR0) | 375 | +0.061 | 383.8 |
+| 16x3 | 13 | single die (SLR0) | 350 | +0.008 | 351.0 |
+| 8x8 | 17 | split (engine in SLR1) | 325 | +0.001 | 325.1 |
+| 4x24 | 24 | split (engine in SLR1) | 300 | +0.002 | 300.2 |
+| 4x32 | 32 | split (engine in SLR1) | 250 | +0.001 | 250.1 |
+
+- **Floorplans.** `slr_floorplan_<tag>.cfg` keeps every compute unit in SLR0;
+  `slr_floorplan_<tag>_split.cfg` moves the engine to SLR1. The rule was one
+  die until a build missed: single die up to 16x3, split from 8x8 up (8x8 on
+  one die missed 325 MHz by 0.311 ns).
+- **8x8** is the build made before the campaign, reused as planned.
+- **"Achieved"** is 1000 / (period - WNS), a lower bound for a build that
+  closed. Each bitstream runs at its target.
+- **The movers were never rebuilt:** every target closed with the 300 MHz
+  movers. The mover ceiling appeared later, in the multi-tenant study
+  (`multi_tenant/`), where two 4x4 engines at 400 MHz failed on mover paths
+  only.
+- **SLR0 has 672 block-RAM tiles** (measured), not the 720 assumed below. The
+  4x32 split build used 495.5 of them (73.7%).
+- Measurements: `results/family_measurements/`. Reports:
+  `reports/family_hw_reports/`.
+
 ## The one strategy
 
 All six use `impl_family.cfg` **unchanged** -- `Flow_AlternateRoutability`
 synthesis on `my_rm_synth_1`, `Performance_ExplorePostRoutePhysOpt`
 implementation, `AggressiveExplore` routing -- plus each config's own
-`slr_floorplan_<tag>.cfg` (gemv to SLR1, movers to SLR0).
+floorplan: `slr_floorplan_<tag>.cfg` (every compute unit in SLR0) or
+`slr_floorplan_<tag>_split.cfg` (gemv in SLR1, movers in SLR0). See the
+outcome above for which one each build used.
 
 That is the best strategy this project has measured, and the attribution is
 clean: dense went from +0.013 ns at 325 MHz to **+0.025 ns at 350 MHz** -- more
@@ -39,7 +73,8 @@ two reasons worth knowing before you spend six hours:
    code in an otherwise-empty pseudo-channel. There is no spare channel to
    trade if the link needs one.
 2. **32 movers land in SLR0.** At roughly 13.5 BRAM each that is ~432 BRAM on
-   top of the platform's 204, against SLR0's 720 -- about 88%. If
+   top of the platform's 204, against SLR0's 720 -- about 88% (a planning
+   estimate; in the event the 4x32 split build used 73.7% of SLR0's 672 tiles). If
    `place_design` fails with an over-utilisation error naming SLR0, delete the
    `slr=mm2s*` / `slr=s2mm*` lines from `slr_floorplan_4x32.cfg` and keep only
    `slr=gemv:SLR1`. The movers follow their HBM ports to SLR0 anyway; they just

@@ -147,6 +147,41 @@ SOURCES = [
     # _multi column with one blank per row, so two series at 100% overlap colour each bar
     # by its kind. A build not measured yet keeps a blank "pending" row (its chart slot).
     ("GEMV_Configurations.csv", "Configurations"),
+    # THE WORKLOAD STUDY: the same 132 matrices on all 13 builds, same rows and order as
+    # Configurations. Wall time and energy per pass are measured; engine time is derived from
+    # each build's measured efficiency; overhead = wall - engine. make_workload_csv.py.
+    ("GEMV_Workload.csv", "Workload"),
+    # The same table for the multi-user inference run: every matrix its own calculation and
+    # input vector (skipped until results/workload_per_matrix/ exists).
+    ("GEMV_Workload_PerMatrix.csv", "Workload per matrix"),
+    # MoE: one token through 11 layers, one expert per engine, on the 13 builds and the
+    # shared-vector builds; chart columns in _single/_multi/_shared triples. Then each
+    # shared-vector build beside its own-vector twin (the energy of the freed channels).
+    # Both skipped until results/workload_moe/ exists.
+    ("GEMV_Workload_MoE.csv", "Workload MoE"),
+    ("GEMV_Shared_Twins.csv", "Shared vs own vector"),
+    # HBM channels (weights / indices / vector / outputs) and DSPs of every configuration:
+    # single engines, multi-tenant with own vector channels, and the shared-vector builds.
+    # make_hbm_channels_csv.py.
+    ("GEMV_HBM_Channels.csv", "HBM Channels"),
+    # THE MEASUREMENT WINDOW (2026-10-01, quiet server, native XRT host, ert=false):
+    # make_window_csv.py. UC1 keeps the "Workload per matrix" (OpenCL) sheet's columns and
+    # rows in the same order, the window's own columns appended -- its charts copy over.
+    ("GEMV_UC1_XRT.csv", "UC1 XRT"),
+    # UC2, Qwen3.5-35B-A3B step 1, one row per build sorted by HBM channels (2x8x8_bcast a
+    # pending row until measured): chart columns in _single/_multi/_shared/_bcast quads,
+    # the realistic layer's accuracy appended; then that accuracy by sparsity.
+    ("GEMV_Qwen_XRT.csv", "Qwen XRT"),
+    ("GEMV_Qwen_Accuracy.csv", "Qwen Accuracy"),
+    # The 8x8 shape study for all six single-engine family builds: 11 shapes x 5 modes, latency
+    # (pooled overhead), silicon / delivered GFLOPS, energy static + dynamic. LONG, 330 rows.
+    # make_shapes_singles.py (the chart-ready blocks are in GEMV_Charts_Shapes_Singles.xlsx).
+    ("GEMV_Shapes_Singles.csv", "Shapes Singles"),
+    # The shape study's 11 MIXED matrices on all 22 configurations (6 singles + the 16
+    # multi-engine builds' 2026-10-02 shape sweep): one row per build (chart columns in kind
+    # quads), then the long record. make_shapes_builds.py.
+    ("GEMV_Shapes_Builds_Summary.csv", "Shapes Builds"),
+    ("GEMV_Shapes_Builds.csv", "Shapes Builds Long"),
 ]
 
 # Columns that hold labels even when they look numeric, so they are never
@@ -166,6 +201,16 @@ TEXT_COLS = {
     "source",
     # Configurations labels ("3 x 8x4 (30 ch)", "split", "pending: not measured yet")
     "config_label", "configuration", "engine_shape", "floorplan", "status",
+    # Workload labels ("7/7/7")
+    "calcs_per_tenant",
+    # HBM Channels labels
+    "uses_second_stack", "shared_twin_of", "dsp_source", "status",
+    # MoE / twin labels
+    "efficiency_from", "pair",
+    # window labels ("9216" on one engine, "3072/3072/3072" on three; "3x4x4")
+    "layer_rows_per_engine", "acc_same_data_as", "host", "window",
+    # shape-study provenance
+    "latency_source", "power_source", "fixed_cost_source",
 }
 
 H_FILL = PatternFill("solid", fgColor="1F3864")

@@ -1,0 +1,2 @@
+arch,shape,tenants,lanes,clock_mhz,xclbin,matrices,useful_macs,padded_macs,padding_pct,calcs_per_tenant,predicted_us,active_sum_us,makespan_us,host_wall_us,finish_balance,balance_planned,host_load_1min,soak_passes,soak_s,wall_pass_us,wall_gmac_s,board_load_W,board_idle_W,vccint_load_W,vccint_idle_W,energy_wall_uJ,energy_wall_static_uJ,energy_dynamic_uJ,nj_per_mac_wall
+2x16x3,16x3,2,48,341,sparse_16x3_x2_375.xclbin,132,195563520,197061120,0.76,7/7,3020.2,4766.7,7401.3,7908.9,0.9971,0.9999,3.13,8864,60.01,6769.7,28.888,38.457,33.887,9.611,8.844,260343.3,229404.1,30939.3,1.3312
